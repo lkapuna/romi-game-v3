@@ -367,7 +367,7 @@ function renderLobby(room){
   if(amHost){
     btn.style.display="block";
     btn.disabled=!allReady;
-    btn.textContent=allReady?"&#127912; כולם מוכנים — התחל!":"&#127912; התחל משחק!";
+    btn.textContent=allReady?"🎨 כולם מוכנים — התחל!":"🎨 התחל משחק!";
     btn.style.background=allReady?"linear-gradient(135deg,#6bcb77,#2ea04b)":"";
     msg.textContent=allReady?"":"ממתין ל-"+(max-cur)+" שחקנים נוספים...";
   }else{
@@ -429,7 +429,7 @@ function renderResults(room){
       +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
     document.getElementById("verdictWrap").style.display="block";
     var nb=document.getElementById("nextBtn");
-    if(amHost){nb.style.display="block";nb.textContent=room.round>=5?"&#127882; סיים משחק!":"&#10145; לסיבוב הבא";}
+    if(amHost){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
     else{nb.style.display="none";}
   }
 }
@@ -438,8 +438,8 @@ function renderFinal(room){
   var sorted=room.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
   var top=sorted[0];
   var tied=sorted.filter(function(p){return(p.score||0)===(top.score||0);});
-  document.getElementById("finalMsg").textContent=tied.length>1?"&#129309; תיקו!":"מזל טוב "+top.name+"! &#127881;";
-  var medals=["&#129351;","&#129352;","&#129353;","4"];
+  document.getElementById("finalMsg").textContent=tied.length>1?"🤝 תיקו!":"מזל טוב "+top.name+"! 🎉";
+  var medals=["🥇","🥈","🥉","4️⃣"];
   document.getElementById("finalList").innerHTML=sorted.map(function(p,i){
     return'<div class="frow">'
       +'<span class="f" style="font-size:1.25rem;width:30px;text-align:center">'+medals[i]+'</span>'
