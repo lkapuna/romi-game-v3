@@ -185,12 +185,20 @@ io.on("connection", function(socket) {
   socket.emit("lobby_list", getLobbyList());
 
   socket.on("create", function(data) {
+    // Clean up any existing room this socket was hosting
+    Object.keys(rooms).forEach(function(rid) {
+      if (rooms[rid].hostId === socket.id) {
+        clearInterval(rooms[rid].timer);
+        delete rooms[rid];
+      }
+    });
+
     var id = Math.random().toString(36).slice(2,8).toUpperCase();
     var max = Math.min(Math.max(+(data.maxPlayers)||2, 2), 3);
     rooms[id] = {
       id:id, hostId:socket.id, maxPlayers:max,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
-      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null
+      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now()
     };
     socket.join(id);
     socket.data.roomId = id;
@@ -250,6 +258,19 @@ io.on("connection", function(socket) {
     pushLobby();
   });
 });
+
+// Clean up stale rooms every 5 minutes
+setInterval(function() {
+  var now = Date.now();
+  Object.keys(rooms).forEach(function(rid) {
+    var r = rooms[rid];
+    if (r.phase === "lobby" && now - r.createdAt > 10 * 60 * 1000) {
+      clearInterval(r.timer);
+      delete rooms[rid];
+      pushLobby();
+    }
+  });
+}, 5 * 60 * 1000);
 
 var PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, function() { console.log("Server on port " + PORT); });
