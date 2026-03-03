@@ -257,7 +257,7 @@ socket.on("state", room => {
   curRoom = room;
   amHost = (myId === room.hostId);
   if (room.phase === "lobby")   { go("sLobby");  renderLobby(room); }
-  if (room.phase === "drawing") { go("sDraw");   renderDraw(room); }
+  if (room.phase === "drawing") { goSafe("sDraw");   renderDraw(room); }
   if (room.phase === "judging") { go("sJudge");  renderJudging(room); }
   if (room.phase === "results") { go("sJudge");  renderResults(room); }
   if (room.phase === "done")    { go("sFinal");  renderFinal(room); confetti(); }
@@ -496,6 +496,13 @@ function go(id) {
     document.getElementById("submitBtn").disabled=false;
     initCanvas();
   }
+}
+
+// goSafe — switches to screen but does NOT reinit canvas if already there
+function goSafe(id) {
+  const already = document.getElementById(id).classList.contains("active");
+  if (already) return; // already on this screen — don't touch canvas
+  go(id);
 }
 
 function tab(t) {
