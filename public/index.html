@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0918"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ציורים של רומי"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
 <title>תחרות הציורים של רומי</title>
 <script src="/socket.io/socket.io.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Heebo:wght@400;700&display=swap" rel="stylesheet"/>
@@ -149,7 +155,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div id="swatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       </div>
       <div style="position:relative">
-        <canvas id="cv" width="1000" height="800"></canvas>
+        <canvas id="cv" width="1000" height="560"></canvas>
         <div class="sub-over" id="subOver">
           <span>&#9989;</span><span>הציור נשלח!</span>
           <span style="color:var(--mu);font-family:'Heebo',sans-serif;font-size:.85rem">ממתין לשאר...</span>
@@ -492,6 +498,17 @@ function confetti(){
     c.appendChild(p);
   }
   setTimeout(function(){c.innerHTML="";},4500);
+}
+</script>
+<script>
+if("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/sw.js").then(function(reg) {
+      console.log("SW registered");
+    }).catch(function(err) {
+      console.log("SW error:", err);
+    });
+  });
 }
 </script>
 </body>
