@@ -242,6 +242,24 @@ io.on("connection", function(socket) {
     if (allDone) { clearInterval(r.timer); r.timer = null; judge(r.id); }
   });
 
+  socket.on("leave_room", function() {
+    var r = rooms[socket.data.roomId];
+    if (!r) return;
+    // if host leaves lobby, delete the room
+    if (r.hostId === socket.id && r.phase === "lobby") {
+      clearInterval(r.timer);
+      delete rooms[r.id];
+      pushLobby();
+    } else {
+      r.players = r.players.filter(function(p){ return p.id !== socket.id; });
+      if (r.players.length === 0) { clearInterval(r.timer); delete rooms[r.id]; }
+      else broadcast(r);
+      pushLobby();
+    }
+    socket.leave(socket.data.roomId);
+    socket.data.roomId = null;
+  });
+
   socket.on("next", function() {
     var r = rooms[socket.data.roomId];
     if (!r || r.hostId !== socket.id) return;
