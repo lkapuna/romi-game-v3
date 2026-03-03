@@ -142,7 +142,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div class="tab" id="t2" onclick="switchTab('join')">הצטרף לחדר</div>
       </div>
       <div id="pCreate">
-        <div id="cNameWrap"><label class="lbl">השם שלך</label><input class="inp" id="cName" placeholder="הכנס שם..."/></div>
+        <div id="cNameWrap">
+          <label class="lbl">השם שלך במשחק</label>
+          <input class="inp" id="cName" placeholder="הכנס שם..."/>
+          <div id="cNameHint" style="color:var(--mu);font-size:.78rem;margin-top:-8px;margin-bottom:10px">משתמש בשם המשתמש שלך — אפשר לשנות</div>
+        </div>
         <label class="lbl">כמה שחקנים?</label>
         <div class="mpgrid">
           <div class="mpbtn on" id="mp2" onclick="setMax(2)">2 שחקנים</div>
@@ -151,8 +155,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn btn-blue" onclick="doCreate()">&#10024; פתח חדר</button>
       </div>
       <div id="pJoin" style="display:none">
-        <label class="lbl">השם שלך</label>
+        <label class="lbl">השם שלך במשחק</label>
         <input class="inp" id="jName" placeholder="הכנס שם..."/>
+        <div style="color:var(--mu);font-size:.78rem;margin-top:-8px;margin-bottom:10px">משתמש בשם המשתמש שלך — אפשר לשנות</div>
         <label class="lbl" style="margin-bottom:8px">בחר חדר לפי שם המארח:</label>
         <div class="room-list" id="roomList"><div class="no-rooms">אין חדרים פתוחים כרגע...</div></div>
         <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled>&#128682; הצטרף</button>
@@ -163,7 +168,10 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- LOBBY -->
   <div id="sLobby" class="screen fu">
     <div class="card">
-      <h2 class="f" style="color:var(--y);margin-bottom:14px;font-size:1.2rem">&#127918; ממתינים לשחקנים...</h2>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="leaveRoom()" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">&#8594; חזרה</button>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem">&#127918; ממתינים לשחקנים...</h2>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="color:var(--mu);font-size:.82rem">שחקנים שהצטרפו</span>
         <span class="f" style="color:var(--y)" id="progTxt">0/0</span>
@@ -247,6 +255,7 @@ var currentUser = null;
       currentUser = JSON.parse(saved);
       showUserBar();
       go("sHome");
+      setTimeout(prefillNames, 100);
     } catch(e) { localStorage.removeItem("romi_user"); }
   }
 })();
@@ -272,6 +281,7 @@ async function doLogin() {
     localStorage.setItem("romi_user", JSON.stringify(currentUser));
     showUserBar();
     go("sHome");
+    prefillNames();
   } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
 }
 
@@ -290,6 +300,7 @@ async function doRegister() {
     localStorage.setItem("romi_user", JSON.stringify(currentUser));
     showUserBar();
     go("sHome");
+    prefillNames();
   } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
 }
 
@@ -298,6 +309,24 @@ function doLogout() {
   localStorage.removeItem("romi_user");
   document.getElementById("userBar").style.display = "none";
   go("sAuth");
+}
+
+function leaveRoom() {
+  // tell server to remove this socket from room
+  if (socket && myRoomId) {
+    socket.emit("leave_room");
+    myRoomId = null;
+  }
+  go("sHome");
+}
+
+function prefillNames() {
+  if (currentUser) {
+    var cn = document.getElementById("cName");
+    var jn = document.getElementById("jName");
+    if (cn && !cn.value) cn.value = currentUser.username;
+    if (jn && !jn.value) jn.value = currentUser.username;
+  }
 }
 
 function showUserBar() {
