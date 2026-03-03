@@ -67,19 +67,36 @@ async function judge(roomId) {
   }
 
   try {
-    const parts = drawers.map(function(p) {
-      return { inlineData: { mimeType:"image/png", data:r.drawings[p.id].split(",")[1] } };
-    });
     const names = drawers.map(function(p,i) { return "ציור "+(i+1)+": "+p.name; }).join("\n");
-    parts.push({ text:"שופט תחרות ציורים. נושא: \""+r.topic+"\".\n"+names+"\nבחר מנצח לפי קרבה לנושא ויצירתיות.\nענה JSON בלבד: {\"winner\":\"שם\",\"reason\":\"סיבה בעברית\"}" });
+
+    const imageMessages = drawers.map(function(p) {
+      return {
+        type: "image_url",
+        image_url: { url: r.drawings[p.id] }
+      };
+    });
 
     const res = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+process.env.GEMINI_API_KEY,
-      { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ contents:[{ parts:parts }] }) }
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
+        body:JSON.stringify({
+          model: "meta-llama/llama-4-scout-17b-16e-instruct",
+          max_tokens: 300,
+          messages: [{
+            role: "user",
+            content: [
+              ...imageMessages,
+              { type:"text", text:"שופט תחרות ציורים. נושא: \""+r.topic+"\".\n"+names+"\nבחר מנצח לפי קרבה לנושא ויצירתיות.\nענה JSON בלבד: {\"winner\":\"שם\",\"reason\":\"סיבה בעברית\"}" }
+            ]
+          }]
+        })
+      }
     );
     const data = await res.json();
-    console.log("Gemini:", JSON.stringify(data).slice(0,300));
-    const text = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || "";
+    console.log("Groq:", JSON.stringify(data).slice(0,300));
+    const text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
     const m = text.match(/\{[\s\S]*\}/);
     if (!m) throw new Error("no JSON: "+text.slice(0,80));
     const parsed = JSON.parse(m[0]);
