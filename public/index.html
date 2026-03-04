@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a0918"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="הציורים של רומי"/>
+<meta name="apple-mobile-web-app-title" content="ציורים של רומי"/>
 <link rel="manifest" href="/manifest.json"/>
 <link rel="apple-touch-icon" href="/icon-192.png"/>
 <title>תחרות הציורים של רומי</title>
@@ -91,7 +91,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 <body>
 <div id="conf"></div>
 <div class="wrap">
-  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;display:none;align-items:center;gap:10px;border:1px solid var(--brd)"><span style="font-size:1.1rem">&#128100;</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px;border:1px solid var(--brd)">יציאה</button></div><h1 class="f title fu">&#127912; תחרות הציורים של רומי</h1>
+  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><h1 class="f title fu">&#127912; תחרות הציורים של רומי</h1>
   <p class="sub">צייר, התחרה, נצח!</p>
   <div style="background:var(--card);border-radius:14px;padding:14px 18px;margin-bottom:20px;border:1px solid var(--brd);color:var(--mu);font-size:.9rem;line-height:1.7;text-align:center">
     פתחו חדר ועדכנו את חבריכם להצטרף אליכם. כולם מציירים את אותו הנושא בו זמנית.<br/>
@@ -106,53 +106,42 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div class="tabs">
         <div class="tab on" id="ta1" onclick="authTab('login')">כניסה</div>
         <div class="tab" id="ta2" onclick="authTab('register')">הרשמה</div>
-        <div class="tab" id="ta3" onclick="authTab('reset')" style="display:none"></div>
       </div>
-
-      <!-- LOGIN -->
       <div id="pLogin">
         <label class="lbl">שם משתמש</label>
         <input class="inp" id="lUser" placeholder="הכנס שם משתמש..."/>
         <label class="lbl">קוד סודי (4 ספרות)</label>
-        <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input class="inp" id="lPin" type="password" maxlength="4" inputmode="numeric" placeholder="&#9679;&#9679;&#9679;&#9679;" style="margin-bottom:0;font-size:1.4rem;letter-spacing:6px;text-align:center"/>
-        </div>
-        <button class="btn btn-blue" onclick="doLogin()">&#128274; כנס למשחק</button>
+        <input class="inp" id="lPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+        <button class="btn btn-blue" onclick="doLogin()">🔒 כנס למשחק</button>
         <div style="text-align:center;margin-top:10px">
           <span onclick="authTab('reset')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline">שכחתי את הקוד</span>
         </div>
-        <div id="loginErr" style="color:var(--r);text-align:center;margin-top:10px;font-size:.88rem"></div>
+        <div id="loginErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
-
-      <!-- REGISTER -->
       <div id="pRegister" style="display:none">
         <label class="lbl">בחר שם משתמש</label>
         <input class="inp" id="rUser" placeholder="למשל: רומי123"/>
         <label class="lbl">מספר טלפון</label>
-        <input class="inp" id="rPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX" style="margin-bottom:12px"/>
-        <label class="lbl">בחר קוד סודי (4 ספרות)</label>
-        <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input class="inp" id="rPin" type="password" maxlength="4" inputmode="numeric" placeholder="&#9679;&#9679;&#9679;&#9679;" style="margin-bottom:0;font-size:1.4rem;letter-spacing:6px;text-align:center"/>
-        </div>
-        <button class="btn btn-green" onclick="doRegister()">&#10024; צור חשבון</button>
-        <div id="regErr" style="color:var(--r);text-align:center;margin-top:10px;font-size:.88rem"></div>
+        <input class="inp" id="rPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
+        <label class="lbl">קוד סודי (4 ספרות)</label>
+        <input class="inp" id="rPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+        <button class="btn btn-green" onclick="doRegister()">✨ צור חשבון</button>
+        <div id="regErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
-      <!-- RESET -->
       <div id="pReset" style="display:none">
-        <h3 class="f" style="color:var(--y);margin-bottom:14px;font-size:1.1rem">&#128273; איפוס קוד סודי</h3>
+        <h3 class="f" style="color:var(--y);margin-bottom:12px;font-size:1.05rem">🔑 איפוס קוד סודי</h3>
         <label class="lbl">מספר טלפון שנרשמת איתו</label>
         <input class="inp" id="resetPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
         <div id="resetStep2" style="display:none">
           <label class="lbl">קוד סודי חדש (4 ספרות)</label>
-          <input class="inp" id="resetPin" type="password" maxlength="4" inputmode="numeric" placeholder="&#9679;&#9679;&#9679;&#9679;" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+          <input class="inp" id="resetPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
         </div>
-        <button class="btn btn-yel" onclick="doReset()" id="resetBtn">&#128269; מצא חשבון</button>
-        <div id="resetErr" style="color:var(--r);text-align:center;margin-top:10px;font-size:.88rem"></div>
+        <button class="btn btn-yel" id="resetBtn" onclick="doReset()">🔍 מצא חשבון</button>
+        <div id="resetErr" style="margin-top:8px;text-align:center;font-size:.88rem"></div>
         <div style="text-align:center;margin-top:10px">
           <span onclick="authTab('login')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline">חזרה לכניסה</span>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -160,8 +149,8 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div id="sLeader" class="screen fu">
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">&#8594; חזרה</button>
-        <h2 class="f" style="color:var(--y);font-size:1.2rem">&#127942; טבלת מובילים</h2>
+        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem">🏆 טבלת מובילים</h2>
       </div>
       <div id="leaderList"><div style="text-align:center;padding:20px;color:var(--mu)">טוען...</div></div>
     </div>
@@ -170,18 +159,15 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- HOME -->
   <div id="sHome" class="screen fu">
     <div class="card">
-      <button class="btn" style="background:linear-gradient(135deg,var(--y),#ff8c42);color:#111;font-family:'Fredoka One',cursive;margin-bottom:14px" onclick="openLeaderboard()">&#127942; טבלת מובילים</button>
-      <div id="myBadges" style="display:none;margin-bottom:14px;flex-wrap:wrap;gap:6px"></div>
+      <button class="btn btn-yel" style="margin-bottom:12px" onclick="openLeaderboard()">🏆 טבלת מובילים</button>
+      <div id="myBadges" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
       <div class="tabs">
         <div class="tab on" id="t1" onclick="switchTab('create')">פתח חדר חדש</div>
         <div class="tab" id="t2" onclick="switchTab('join')">הצטרף לחדר</div>
       </div>
       <div id="pCreate">
-        <div id="cNameWrap">
-          <label class="lbl">השם שלך במשחק</label>
-          <input class="inp" id="cName" placeholder="הכנס שם..."/>
-          <div id="cNameHint" style="color:var(--mu);font-size:.78rem;margin-top:-8px;margin-bottom:10px">משתמש בשם המשתמש שלך — אפשר לשנות</div>
-        </div>
+        <label class="lbl">השם שלך</label>
+        <input class="inp" id="cName" placeholder="הכנס שם..."/>
         <label class="lbl">כמה שחקנים?</label>
         <div class="mpgrid">
           <div class="mpbtn on" id="mp2" onclick="setMax(2)">2 שחקנים</div>
@@ -190,9 +176,8 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn btn-blue" onclick="doCreate()">&#10024; פתח חדר</button>
       </div>
       <div id="pJoin" style="display:none">
-        <label class="lbl">השם שלך במשחק</label>
+        <label class="lbl">השם שלך</label>
         <input class="inp" id="jName" placeholder="הכנס שם..."/>
-        <div style="color:var(--mu);font-size:.78rem;margin-top:-8px;margin-bottom:10px">משתמש בשם המשתמש שלך — אפשר לשנות</div>
         <label class="lbl" style="margin-bottom:8px">בחר חדר לפי שם המארח:</label>
         <div class="room-list" id="roomList"><div class="no-rooms">אין חדרים פתוחים כרגע...</div></div>
         <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled>&#128682; הצטרף</button>
@@ -203,10 +188,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- LOBBY -->
   <div id="sLobby" class="screen fu">
     <div class="card">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <button onclick="leaveRoom()" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">&#8594; חזרה</button>
-        <h2 class="f" style="color:var(--y);font-size:1.2rem">&#127918; ממתינים לשחקנים...</h2>
-      </div>
+      <h2 class="f" style="color:var(--y);margin-bottom:14px;font-size:1.2rem">&#127918; ממתינים לשחקנים...</h2>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="color:var(--mu);font-size:.82rem">שחקנים שהצטרפו</span>
         <span class="f" style="color:var(--y)" id="progTxt">0/0</span>
@@ -274,217 +256,16 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">המשחק הסתיים!</h2>
     <p id="finalMsg" style="color:var(--mu);margin-bottom:22px"></p>
     <div class="card" style="text-align:right"><div id="finalList"></div></div>
-    <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()">&#127968; משחק חדש</button>
-    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()">&#128279; שתף תוצאות</button>
-    <div id="newBadgesWrap" style="margin-top:16px;display:none">
-      <div class="f" style="color:var(--y);margin-bottom:8px;font-size:1rem">&#127881; תג חדש!</div>
+    <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()">🏠 משחק חדש</button>
+    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()">📲 שתף תוצאות</button>
+    <div id="newBadgesWrap" style="display:none;margin-top:14px">
+      <div class="f" style="color:var(--y);margin-bottom:8px">🎉 תג חדש!</div>
       <div id="newBadgesList" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
     </div>
   </div>
 </div>
 
 <script>
-
-// ── Auth ─────────────────────────────────────────────────────────────
-var currentUser = null;
-
-(function() {
-  var saved = localStorage.getItem("romi_user");
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      showUserBar();
-      go("sHome");
-      setTimeout(prefillNames, 100);
-    } catch(e) { localStorage.removeItem("romi_user"); }
-  }
-})();
-
-function authTab(t) {
-  document.getElementById("ta1").classList.toggle("on", t==="login");
-  document.getElementById("ta2").classList.toggle("on", t==="register");
-  document.getElementById("pLogin").style.display = t==="login"?"block":"none";
-  document.getElementById("pRegister").style.display = t==="register"?"block":"none";
-  document.getElementById("pReset").style.display = t==="reset"?"block":"none";
-  // reset state
-  if (t==="reset") {
-    document.getElementById("resetStep2").style.display="none";
-    document.getElementById("resetBtn").textContent="&#128269; מצא חשבון";
-    document.getElementById("resetBtn").setAttribute("data-step","find");
-    document.getElementById("resetErr").textContent="";
-  }
-}
-
-async function doLogin() {
-  var username = document.getElementById("lUser").value.trim();
-  var pin = document.getElementById("lPin").value.trim();
-  var errEl = document.getElementById("loginErr");
-  errEl.textContent = "";
-  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
-  try {
-    var res = await fetch("/auth/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username,pin}) });
-    var data = await res.json();
-    if (!data.ok) { errEl.textContent = data.error; return; }
-    currentUser = data.user;
-    localStorage.setItem("romi_user", JSON.stringify(currentUser));
-    showUserBar();
-    go("sHome");
-    prefillNames();
-  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-}
-
-async function doRegister() {
-  var username = document.getElementById("rUser").value.trim();
-  var pin = document.getElementById("rPin").value.trim();
-  var errEl = document.getElementById("regErr");
-  errEl.textContent = "";
-  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
-  if (!/^\d{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות בדיוק 4 ספרות"; return; }
-  try {
-    var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
-  if (!phone || phone.length < 9) { errEl.textContent = "הכנס מספר טלפון תקין"; return; }
-  var res = await fetch("/auth/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username,pin,phone}) });
-    var data = await res.json();
-    if (!data.ok) { errEl.textContent = data.error; return; }
-    currentUser = data.user;
-    localStorage.setItem("romi_user", JSON.stringify(currentUser));
-    showUserBar();
-    go("sHome");
-    prefillNames();
-  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-}
-
-function doLogout() {
-  currentUser = null;
-  localStorage.removeItem("romi_user");
-  document.getElementById("userBar").style.display = "none";
-  go("sAuth");
-}
-
-function leaveRoom() {
-  // tell server to remove this socket from room
-  if (socket && myRoomId) {
-    socket.emit("leave_room");
-    myRoomId = null;
-  }
-  go("sHome");
-}
-
-var resetUserId = null;
-
-async function doReset() {
-  var errEl = document.getElementById("resetErr");
-  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
-  errEl.textContent = "";
-
-  if (step === "find") {
-    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
-    if (!phone || phone.length < 9) { errEl.textContent = "הכנס מספר טלפון תקין"; return; }
-    try {
-      var res = await fetch("/auth/find-by-phone", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({phone}) });
-      var data = await res.json();
-      if (!data.ok) { errEl.textContent = data.error; return; }
-      resetUserId = data.userId;
-      document.getElementById("resetStep2").style.display = "block";
-      document.getElementById("resetBtn").textContent = "&#128273; שמור קוד חדש";
-      document.getElementById("resetBtn").setAttribute("data-step","save");
-      errEl.style.color = "var(--g)";
-      errEl.textContent = "נמצא חשבון: " + data.username;
-    } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-  } else {
-    var pin = document.getElementById("resetPin").value.trim();
-    if (!/^\d{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
-    try {
-      var res = await fetch("/auth/reset-pin", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({userId:resetUserId, pin}) });
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent = data.error; return; }
-      errEl.style.color = "var(--g)";
-      errEl.textContent = "הקוד עודכן! כנס עם הקוד החדש";
-      setTimeout(function(){ authTab("login"); }, 2000);
-    } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-  }
-}
-
-function prefillNames() {
-  showMyBadges();
-  if (currentUser) {
-    var cn = document.getElementById("cName");
-    var jn = document.getElementById("jName");
-    if (cn && !cn.value) cn.value = currentUser.username;
-    if (jn && !jn.value) jn.value = currentUser.username;
-  }
-}
-
-function showUserBar() {
-  var bar = document.getElementById("userBar");
-  bar.style.display = "flex";
-  document.getElementById("userBarName").textContent = "שלום, " + currentUser.username + "!";
-  document.getElementById("userBarStats").textContent = "ניצחונות: " + (currentUser.wins||0) + " | משחקים: " + (currentUser.gamesPlayed||0);
-}
-
-// ── Leaderboard & Badges ─────────────────────────────────────────────
-async function openLeaderboard() {
-  go("sLeader");
-  try {
-    var res = await fetch("/leaderboard");
-    var data = await res.json();
-    var medals = ["&#129351;","&#129352;","&#129353;"];
-    document.getElementById("leaderList").innerHTML = data.length === 0
-      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
-      : data.map(function(u, i) {
-          return "<div class='frow'>"
-            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
-            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
-            +"<span style='color:var(--y);font-size:.85rem'>"+u.wins+" &#9733;</span>"
-            +(u.badges&&u.badges.length?"<span style='font-size:.75rem;margin-right:6px'>"+getBadgeEmojis(u.badges)+"</span>":"")
-            +"</div>";
-        }).join("");
-  } catch(e) {
-    document.getElementById("leaderList").innerHTML = "<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
-  }
-}
-
-function getBadgeEmojis(badges) {
-  var map = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
-  return badges.map(function(b){ return map[b]||""; }).join("");
-}
-
-function showMyBadges() {
-  if (!currentUser || !currentUser.badges || currentUser.badges.length === 0) return;
-  var el = document.getElementById("myBadges");
-  var map = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
-  el.style.display = "flex";
-  el.innerHTML = currentUser.badges.map(function(b){
-    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.8rem'>"+(map[b]||b)+"</span>";
-  }).join("");
-}
-
-function shareResult() {
-  if (!curRoom) return;
-  var sorted = curRoom.players.slice().sort(function(a,b){ return (b.score||0)-(a.score||0); });
-  var winner = sorted[0];
-  var text = "&#127912; שיחקתי תחרות ציורים של רומי!
-"
-    +"&#127942; "+winner.name+" ניצח עם "+winner.score+" נקודות!
-"
-    +"בוא לשחק: "+location.origin;
-  if (navigator.share) {
-    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
-  } else {
-    navigator.clipboard.writeText(text).then(function(){ toast("הטקסט הועתק לשיתוף! &#128203;"); });
-  }
-}
-
-function showNewBadges(badges) {
-  if (!badges || badges.length === 0) return;
-  var wrap = document.getElementById("newBadgesWrap");
-  var list = document.getElementById("newBadgesList");
-  wrap.style.display = "block";
-  list.innerHTML = badges.map(function(b){
-    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
-  }).join("");
-}
-
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
 var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
@@ -729,11 +510,7 @@ function renderResults(room){
 }
 
 function renderFinal(room){
-  // show new badges if any
-  if (currentUser && room.lastWinner && room.lastWinner.id) {
-    var myPlayer = room.players.find(function(p){ return p.userId === currentUser.id; });
-    if (myPlayer && room.lastWinner.newBadges) showNewBadges(room.lastWinner.newBadges);
-  }
+  if(room.lastWinner&&room.lastWinner.newBadges) showNewBadges(room.lastWinner.newBadges);
   var sorted=room.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
   var top=sorted[0];
   var tied=sorted.filter(function(p){return(p.score||0)===(top.score||0);});
@@ -794,6 +571,189 @@ function confetti(){
 }
 </script>
 <script>
+
+// ════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════
+var currentUser = null;
+var resetUserId = null;
+
+// Auto-login from localStorage
+(function() {
+  var saved = localStorage.getItem("romi_user");
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showUserBar();
+      // go to sHome after socket connects
+      setTimeout(function(){ go("sHome"); prefillNames(); }, 100);
+    } catch(e) { localStorage.removeItem("romi_user"); }
+  }
+})();
+
+function authTab(t) {
+  ["login","register","reset"].forEach(function(tab) {
+    var tabEl = document.getElementById("ta"+({login:1,register:2,reset:3}[tab]||1));
+    var panelEl = document.getElementById("p"+tab.charAt(0).toUpperCase()+tab.slice(1));
+    if (tabEl) tabEl.classList.toggle("on", tab===t);
+    if (panelEl) panelEl.style.display = tab===t ? "block" : "none";
+  });
+  if (t==="reset") {
+    document.getElementById("resetStep2").style.display="none";
+    document.getElementById("resetBtn").textContent="🔍 מצא חשבון";
+    document.getElementById("resetBtn").setAttribute("data-step","find");
+    document.getElementById("resetErr").textContent="";
+  }
+}
+
+async function doLogin() {
+  var username = document.getElementById("lUser").value.trim();
+  var pin = document.getElementById("lPin").value.trim();
+  var errEl = document.getElementById("loginErr");
+  errEl.textContent = "";
+  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
+  try {
+    var res = await fetch("/auth/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin})});
+    var data = await res.json();
+    if (!data.ok) { errEl.textContent = data.error; return; }
+    currentUser = data.user;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    showUserBar();
+    go("sHome");
+    prefillNames();
+  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+}
+
+async function doRegister() {
+  var username = document.getElementById("rUser").value.trim();
+  var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
+  var pin = document.getElementById("rPin").value.trim();
+  var errEl = document.getElementById("regErr");
+  errEl.textContent = "";
+  if (!username || !pin || !phone) { errEl.textContent = "מלא את כל השדות"; return; }
+  if (username.length < 2) { errEl.textContent = "שם חייב להיות לפחות 2 תווים"; return; }
+  if (phone.length < 9) { errEl.textContent = "מספר טלפון לא תקין"; return; }
+  if (!/^[0-9]{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
+  try {
+    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone})});
+    var data = await res.json();
+    if (!data.ok) { errEl.textContent = data.error; return; }
+    currentUser = data.user;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    showUserBar();
+    go("sHome");
+    prefillNames();
+  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+}
+
+async function doReset() {
+  var errEl = document.getElementById("resetErr");
+  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
+  errEl.textContent = "";
+  if (step === "find") {
+    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
+    if (phone.length < 9) { errEl.style.color="var(--r)"; errEl.textContent="מספר לא תקין"; return; }
+    try {
+      var res = await fetch("/auth/find-by-phone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
+      resetUserId = data.userId;
+      document.getElementById("resetStep2").style.display="block";
+      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
+      document.getElementById("resetBtn").setAttribute("data-step","save");
+      errEl.style.color="var(--g)"; errEl.textContent="נמצא: "+data.username;
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+  } else {
+    var pin = document.getElementById("resetPin").value.trim();
+    if (!/^[0-9]{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent="4 ספרות בלבד"; return; }
+    try {
+      var res = await fetch("/auth/reset-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,pin})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
+      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש";
+      setTimeout(function(){ authTab("login"); }, 2000);
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem("romi_user");
+  document.getElementById("userBar").style.display="none";
+  go("sAuth");
+}
+
+function showUserBar() {
+  var bar = document.getElementById("userBar");
+  bar.style.display="flex";
+  document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
+  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
+  showMyBadges();
+}
+
+function prefillNames() {
+  if (!currentUser) return;
+  var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
+  var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
+}
+
+// ════════════════════════════════════════════════
+// LEADERBOARD & BADGES
+// ════════════════════════════════════════════════
+var BADGE_MAP = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
+var BADGE_EMOJI = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
+
+async function openLeaderboard() {
+  go("sLeader");
+  try {
+    var res = await fetch("/leaderboard");
+    var data = await res.json();
+    var medals = ["🥇","🥈","🥉"];
+    document.getElementById("leaderList").innerHTML = data.length===0
+      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
+      : data.map(function(u,i){
+          var badgeEmojis = (u.badges||[]).map(function(b){return BADGE_EMOJI[b]||"";}).join("");
+          return "<div class='frow'>"
+            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
+            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
+            +"<span style='color:var(--y);font-size:.85rem;margin-left:6px'>"+u.wins+" ⭐</span>"
+            +(badgeEmojis?"<span style='font-size:.8rem;margin-right:4px'>"+badgeEmojis+"</span>":"")
+            +"</div>";
+        }).join("");
+  } catch(e) {
+    document.getElementById("leaderList").innerHTML="<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
+  }
+}
+
+function showMyBadges() {
+  if (!currentUser||!currentUser.badges||currentUser.badges.length===0) return;
+  var el=document.getElementById("myBadges");
+  el.style.display="flex";
+  el.innerHTML=currentUser.badges.map(function(b){
+    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.78rem'>"+(BADGE_MAP[b]||b)+"</span>";
+  }).join("");
+}
+
+function showNewBadges(badges) {
+  if(!badges||!badges.length) return;
+  var wrap=document.getElementById("newBadgesWrap");
+  var list=document.getElementById("newBadgesList");
+  if(!wrap||!list) return;
+  wrap.style.display="block";
+  list.innerHTML=badges.map(function(b){
+    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
+  }).join("");
+}
+
+function shareResult() {
+  if(!curRoom) return;
+  var sorted=curRoom.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+  var winner=sorted[0];
+  var text="🎨 שיחקתי תחרות הציורים של רומי!\n🏆 "+winner.name+" ניצח עם "+winner.score+" נקודות!\nבוא לשחק: "+location.origin;
+  if(navigator.share){ navigator.share({title:"תחרות הציורים של רומי",text:text,url:location.origin}); }
+  else { navigator.clipboard.writeText(text).then(function(){toast("הועתק לשיתוף! 📋");}); }
+}
+
 if("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker.register("/sw.js").then(function(reg) {
