@@ -170,6 +170,61 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     </div>
   </div>
 
+
+  <!-- SOLO -->
+  <div id="sSolo" class="screen fu">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
+        <h2 class="f" style="color:#a78bfa;font-size:1.2rem">🎨 אימון יחיד</h2>
+      </div>
+      <div id="soloStart">
+        <p style="color:var(--mu);margin-bottom:16px;line-height:1.6">צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!</p>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()">🚀 התחל אתגר!</button>
+      </div>
+      <div id="soloGame" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="f" style="color:#a78bfa" id="soloRoundLbl"></span>
+          <div><span class="tnum f" id="soloTimer" style="font-size:2rem">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+        </div>
+        <div class="topic-box">
+          <span style="color:var(--mu);font-size:.8rem">צייר:</span>
+          <strong id="soloTopic" style="font-size:1.1rem"></strong>
+        </div>
+        <div class="card" style="padding:14px;position:relative">
+          <div class="tools">
+            <button class="tbtn on" id="soloPenBtn" onclick="setSoloTool('pen')">✏️ עט</button>
+            <button class="tbtn" id="soloErBtn" onclick="setSoloTool('eraser')">🧹 מחק</button>
+            <input type="range" id="soloBSize" min="2" max="30" value="6" style="accent-color:#a78bfa;width:72px"/>
+            <div id="soloSwatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+          </div>
+          <canvas id="soloCv" width="1000" height="560"></canvas>
+          <div class="cact" style="margin-top:10px">
+            <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
+            <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
+          </div>
+        </div>
+      </div>
+      <div id="soloFeedback" style="display:none">
+        <div id="soloScoreBox" style="text-align:center;padding:20px 0"></div>
+        <div id="soloFeedbackBox" class="vbox" style="margin-bottom:14px"></div>
+        <div id="soloDrawingBox" style="margin-bottom:14px"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" style="flex:1;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="go('sHome')">🏠 בית</button>
+          <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloNextBtn" onclick="nextSolo()">➡️ נושא הבא</button>
+        </div>
+      </div>
+      <div id="soloResults" style="display:none;text-align:center">
+        <div class="bo" style="font-size:3rem;margin-bottom:10px">🎨</div>
+        <h2 class="f" style="font-size:1.8rem;margin-bottom:6px;color:#a78bfa">סיימת!</h2>
+        <div id="soloFinalScore" style="font-size:1.1rem;color:var(--mu);margin-bottom:20px"></div>
+        <div id="soloFinalList" class="card" style="text-align:right;margin-bottom:14px"></div>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;max-width:240px" onclick="startSolo()">🔄 שחק שוב</button>
+        <button class="btn btn-blue" style="margin-top:8px;max-width:240px" onclick="go('sHome')">🏠 חזור לבית</button>
+      </div>
+    </div>
+  </div>
+
   <!-- HOME -->
   <div id="sHome" class="screen fu">
     <div class="card">
@@ -287,6 +342,182 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 </div>
 
 <script>
+
+// ════════════════════════════════════════════════
+// SOLO MODE
+// ════════════════════════════════════════════════
+var SOLO_TOPICS = ["חתול","בית","עץ","מכונית","שמש","דג","ציפור","פרח","כוכב","רובוט","עוגה","רקטה","בלון","ים","הר","פרפר","ספינה","מטוס","דינוזאור","גשר","כלב","סוס","צב","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה"];
+var soloRound = 0, soloScores = [], soloTool = "pen", soloCol = "#000", soloBsz = 6;
+var soloDrawing = false, soloLx = 0, soloLy = 0, soloSubmitted = false, soloTimer = null;
+var SOLO_ROUNDS = 5;
+
+function startSolo() {
+  soloRound = 0;
+  soloScores = [];
+  document.getElementById("soloStart").style.display = "none";
+  document.getElementById("soloGame").style.display = "block";
+  document.getElementById("soloFeedback").style.display = "none";
+  document.getElementById("soloResults").style.display = "none";
+  nextSolo();
+}
+
+function nextSolo() {
+  if (soloRound >= SOLO_ROUNDS) { showSoloResults(); return; }
+  soloRound++;
+  soloSubmitted = false;
+  document.getElementById("soloGame").style.display = "block";
+  document.getElementById("soloFeedback").style.display = "none";
+  document.getElementById("soloSubmitBtn").disabled = false;
+  document.getElementById("soloRoundLbl").textContent = "סיבוב " + soloRound + " מתוך " + SOLO_ROUNDS;
+
+  // Pick random topic
+  var topic = SOLO_TOPICS[Math.floor(Math.random() * SOLO_TOPICS.length)];
+  document.getElementById("soloTopic").textContent = topic;
+  document.getElementById("soloTopic").setAttribute("data-topic", topic);
+
+  // Init canvas
+  initSoloCanvas();
+
+  // Timer
+  var timeLeft = 60;
+  document.getElementById("soloTimer").textContent = timeLeft;
+  document.getElementById("soloTimer").className = "tnum f";
+  if (soloTimer) clearInterval(soloTimer);
+  soloTimer = setInterval(function() {
+    timeLeft--;
+    var el = document.getElementById("soloTimer");
+    if (el) { el.textContent = timeLeft; el.className = "tnum f" + (timeLeft<=10?" red":""); }
+    if (timeLeft <= 0) { clearInterval(soloTimer); soloTimer = null; submitSolo(); }
+  }, 1000);
+}
+
+function initSoloCanvas() {
+  var cv = document.getElementById("soloCv");
+  var ctx = cv.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0,0,cv.width,cv.height);
+
+  var sw = document.getElementById("soloSwatches");
+  sw.innerHTML = COLS.map(function(c){
+    return '<div class="sw'+(c===soloCol?" on":"")+'" style="background:'+c+'" onclick="setSoloCol(''+c+'')"></div>';
+  }).join("");
+
+  document.getElementById("soloBSize").oninput = function(e){ soloBsz = +e.target.value; };
+
+  function pos(e) {
+    var rect = cv.getBoundingClientRect();
+    var sx = cv.width/rect.width, sy = cv.height/rect.height;
+    var cx = e.touches?e.touches[0].clientX:e.clientX;
+    var cy = e.touches?e.touches[0].clientY:e.clientY;
+    return {x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
+  }
+
+  cv.onmousedown = function(e){ if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
+  cv.onmousemove = function(e){ if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
+  cv.onmouseup = cv.onmouseleave = function(){ soloDrawing=false; };
+  cv.ontouchstart = function(e){ e.preventDefault(); if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
+  cv.ontouchmove = function(e){ e.preventDefault(); if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
+  cv.ontouchend = function(){ soloDrawing=false; };
+}
+
+function paintSolo(ctx, p) {
+  ctx.beginPath(); ctx.moveTo(soloLx,soloLy); ctx.lineTo(p.x,p.y);
+  ctx.strokeStyle = soloTool==="eraser"?"#fff":soloCol;
+  ctx.lineWidth = soloTool==="eraser"?soloBsz*3:soloBsz;
+  ctx.lineCap="round"; ctx.lineJoin="round"; ctx.stroke();
+  soloLx=p.x; soloLy=p.y;
+}
+
+function setSoloTool(t) {
+  soloTool=t;
+  document.getElementById("soloPenBtn").classList.toggle("on",t==="pen");
+  document.getElementById("soloErBtn").classList.toggle("on",t==="eraser");
+}
+
+function setSoloCol(c) {
+  soloCol=c; setSoloTool("pen");
+  document.querySelectorAll("#soloSwatches .sw").forEach(function(s){
+    s.classList.toggle("on", s.style.background===c||s.style.background===hex2rgb(c));
+  });
+}
+
+function clearSoloCv() {
+  if(soloSubmitted)return;
+  var cv=document.getElementById("soloCv"),ctx=cv.getContext("2d");
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,cv.width,cv.height);
+}
+
+async function submitSolo() {
+  if (soloSubmitted) return;
+  soloSubmitted = true;
+  if (soloTimer) { clearInterval(soloTimer); soloTimer = null; }
+  document.getElementById("soloSubmitBtn").disabled = true;
+
+  var topic = document.getElementById("soloTopic").getAttribute("data-topic");
+  var drawing = document.getElementById("soloCv").toDataURL("image/png");
+
+  document.getElementById("soloGame").style.display = "none";
+  document.getElementById("soloFeedback").style.display = "block";
+  document.getElementById("soloScoreBox").innerHTML = '<div class="spinner" style="margin:0 auto"></div><p style="color:var(--mu);margin-top:10px">השופט בוחן...</p>';
+  document.getElementById("soloFeedbackBox").innerHTML = "";
+  document.getElementById("soloDrawingBox").innerHTML = "";
+
+  try {
+    var res = await fetch("/solo/judge", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({topic:topic, drawing:drawing})
+    });
+    var data = await res.json();
+    var score = data.score || 5;
+    soloScores.push({round:soloRound, topic:topic, score:score, feedback:data.feedback, tip:data.tip, drawing:drawing});
+
+    // Score display
+    var stars = "";
+    for(var i=1;i<=10;i++) stars += i<=score ? "⭐" : "☆";
+    var color = score>=8?"var(--g)":score>=5?"var(--y)":"var(--r)";
+    document.getElementById("soloScoreBox").innerHTML =
+      '<div class="f" style="font-size:3rem;color:'+color+'">'+score+'/10</div>'
+      +'<div style="font-size:1.1rem;margin:4px 0">'+stars+'</div>'
+      +(data.badge?'<div style="background:rgba(167,139,250,.15);border:1px solid #a78bfa;border-radius:20px;padding:6px 16px;display:inline-block;margin-top:8px;color:#a78bfa">'+data.badge+'</div>':"");
+
+    document.getElementById("soloFeedbackBox").innerHTML =
+      '<div class="f" style="color:#a78bfa;margin-bottom:6px;font-size:.95rem">💬 משוב השופט</div>'
+      +'<div style="color:var(--tx);line-height:1.6;margin-bottom:10px">'+data.feedback+'</div>'
+      +(data.tip?'<div style="color:var(--mu);font-size:.85rem;border-top:1px solid var(--brd);padding-top:8px">💡 טיפ: '+data.tip+'</div>':"");
+
+    document.getElementById("soloDrawingBox").innerHTML =
+      '<img src="'+drawing+'" style="width:100%;border-radius:8px;border:2px solid var(--brd)"/>';
+
+    var nb = document.getElementById("soloNextBtn");
+    nb.textContent = soloRound >= SOLO_ROUNDS ? "🏆 ראה תוצאות" : "➡️ נושא הבא";
+
+  } catch(e) {
+    document.getElementById("soloScoreBox").innerHTML = '<div style="color:var(--mu)">שגיאה בשיפוט</div>';
+  }
+}
+
+function showSoloResults() {
+  document.getElementById("soloGame").style.display = "none";
+  document.getElementById("soloFeedback").style.display = "none";
+  document.getElementById("soloResults").style.display = "block";
+
+  var total = soloScores.reduce(function(s,r){ return s+r.score; }, 0);
+  var avg = Math.round(total/soloScores.length);
+  var medals = ["🥇","🥈","🥉","4️⃣","5️⃣"];
+
+  document.getElementById("soloFinalScore").innerHTML =
+    'ציון ממוצע: <span class="f" style="color:#a78bfa;font-size:1.3rem">'+avg+'/10</span>';
+
+  document.getElementById("soloFinalList").innerHTML = soloScores.map(function(r,i){
+    return '<div class="frow">'
+      +'<span style="font-size:1.1rem;width:28px">'+medals[i]+'</span>'
+      +'<span style="flex:1;font-weight:700">'+r.topic+'</span>'
+      +'<span style="color:#a78bfa;font-weight:700">'+r.score+'/10</span>'
+      +'</div>';
+  }).join("");
+}
+
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
 var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
