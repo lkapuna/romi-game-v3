@@ -96,7 +96,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div style="background:var(--card);border-radius:14px;padding:14px 18px;margin-bottom:20px;border:1px solid var(--brd);color:var(--mu);font-size:.9rem;line-height:1.7;text-align:center">
     פתחו חדר ועדכנו את חבריכם להצטרף אליכם. כולם מציירים את אותו הנושא בו זמנית.<br/>
     בסיום הסיבוב שופט AI בוחר את הציור הקרוב ביותר לנושא.<br/>
-    <span style="color:var(--tx);font-weight:700">5 סיבובים - מי שזוכה בהכי הרבה נקודות הוא מלך הציור 👑</span>
+    <span style="color:var(--tx);font-weight:700">5 סיבובים — מי שזוכה בהכי הרבה נקודות הוא מלך הציור 👑</span>
   </div>
 
 
@@ -198,7 +198,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
             <input type="range" id="soloBSize" min="2" max="30" value="6" style="accent-color:#a78bfa;width:72px"/>
             <div id="soloSwatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
           </div>
-          <canvas id="soloCv" width="1000" height="800"></canvas>
+          <canvas id="soloCv" width="1000" height="560"></canvas>
           <div class="cact" style="margin-top:10px">
             <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
             <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
@@ -668,7 +668,7 @@ function initSoloCanvas() {
 
   var sw = document.getElementById("soloSwatches");
   sw.innerHTML = COLS.map(function(c){
-  sw.innerHTML = COLS.map(function(c){ return '<div class="sw'+(c===soloCol?' on':'')+'" style="background:'+c+'" onclick="setSoloCol(this,\''+c+'\')" ></div>'; }).join("");
+  sw.innerHTML = COLS.map(function(c,i){ return '<div class="sw" style="background:'+c+';width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid '+(c===soloCol?'#fff':'transparent')+';flex-shrink:0" onclick="setSoloCol('+i+')"></div>'; }).join("");
   }).join("");
 
   document.getElementById("soloBSize").oninput = function(e){ soloBsz = +e.target.value; };
@@ -703,10 +703,11 @@ function setSoloTool(t) {
   document.getElementById("soloErBtn").classList.toggle("on",t==="eraser");
 }
 
-function setSoloCol(c) {
-  soloCol=c; setSoloTool("pen");
-  document.querySelectorAll("#soloSwatches .sw").forEach(function(s){
-    s.classList.toggle("on", s.style.background===c||s.style.background===hex2rgb(c));
+function setSoloCol(i) {
+  soloCol = COLS[i];
+  setSoloTool("pen");
+  document.querySelectorAll("#soloSwatches div").forEach(function(s,j){
+    s.style.border = j===i ? "2px solid #fff" : "2px solid transparent";
   });
 }
 
@@ -718,12 +719,23 @@ function clearSoloCv() {
 
 async function submitSolo() {
   if (soloSubmitted) return;
+
+  // Check if canvas is empty
+  var cv = document.getElementById("soloCv");
+  var ctx = cv.getContext("2d");
+  var pixels = ctx.getImageData(0,0,cv.width,cv.height).data;
+  var isEmpty = true;
+  for (var i=0; i<pixels.length; i+=4) {
+    if (pixels[i]<250||pixels[i+1]<250||pixels[i+2]<250) { isEmpty=false; break; }
+  }
+  if (isEmpty) { toast("צייר משהו קודם! 🎨"); return; }
+
   soloSubmitted = true;
   if (soloTimer) { clearInterval(soloTimer); soloTimer = null; }
   document.getElementById("soloSubmitBtn").disabled = true;
 
   var topic = document.getElementById("soloTopic").getAttribute("data-topic");
-  var drawing = document.getElementById("soloCv").toDataURL("image/png");
+  var drawing = cv.toDataURL("image/png");
 
   document.getElementById("soloGame").style.display = "none";
   document.getElementById("soloFeedback").style.display = "block";
