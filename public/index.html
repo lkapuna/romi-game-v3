@@ -156,9 +156,22 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     </div>
   </div>
 
+  <!-- LEADERBOARD -->
+  <div id="sLeader" class="screen fu">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">&#8594; חזרה</button>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem">&#127942; טבלת מובילים</h2>
+      </div>
+      <div id="leaderList"><div style="text-align:center;padding:20px;color:var(--mu)">טוען...</div></div>
+    </div>
+  </div>
+
   <!-- HOME -->
   <div id="sHome" class="screen fu">
     <div class="card">
+      <button class="btn" style="background:linear-gradient(135deg,var(--y),#ff8c42);color:#111;font-family:'Fredoka One',cursive;margin-bottom:14px" onclick="openLeaderboard()">&#127942; טבלת מובילים</button>
+      <div id="myBadges" style="display:none;margin-bottom:14px;flex-wrap:wrap;gap:6px"></div>
       <div class="tabs">
         <div class="tab on" id="t1" onclick="switchTab('create')">פתח חדר חדש</div>
         <div class="tab" id="t2" onclick="switchTab('join')">הצטרף לחדר</div>
@@ -262,6 +275,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <p id="finalMsg" style="color:var(--mu);margin-bottom:22px"></p>
     <div class="card" style="text-align:right"><div id="finalList"></div></div>
     <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()">&#127968; משחק חדש</button>
+    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()">&#128279; שתף תוצאות</button>
+    <div id="newBadgesWrap" style="margin-top:16px;display:none">
+      <div class="f" style="color:var(--y);margin-bottom:8px;font-size:1rem">&#127881; תג חדש!</div>
+      <div id="newBadgesList" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
+    </div>
   </div>
 </div>
 
@@ -388,6 +406,7 @@ async function doReset() {
 }
 
 function prefillNames() {
+  showMyBadges();
   if (currentUser) {
     var cn = document.getElementById("cName");
     var jn = document.getElementById("jName");
@@ -401,6 +420,69 @@ function showUserBar() {
   bar.style.display = "flex";
   document.getElementById("userBarName").textContent = "שלום, " + currentUser.username + "!";
   document.getElementById("userBarStats").textContent = "ניצחונות: " + (currentUser.wins||0) + " | משחקים: " + (currentUser.gamesPlayed||0);
+}
+
+// ── Leaderboard & Badges ─────────────────────────────────────────────
+async function openLeaderboard() {
+  go("sLeader");
+  try {
+    var res = await fetch("/leaderboard");
+    var data = await res.json();
+    var medals = ["&#129351;","&#129352;","&#129353;"];
+    document.getElementById("leaderList").innerHTML = data.length === 0
+      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
+      : data.map(function(u, i) {
+          return "<div class='frow'>"
+            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
+            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
+            +"<span style='color:var(--y);font-size:.85rem'>"+u.wins+" &#9733;</span>"
+            +(u.badges&&u.badges.length?"<span style='font-size:.75rem;margin-right:6px'>"+getBadgeEmojis(u.badges)+"</span>":"")
+            +"</div>";
+        }).join("");
+  } catch(e) {
+    document.getElementById("leaderList").innerHTML = "<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
+  }
+}
+
+function getBadgeEmojis(badges) {
+  var map = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
+  return badges.map(function(b){ return map[b]||""; }).join("");
+}
+
+function showMyBadges() {
+  if (!currentUser || !currentUser.badges || currentUser.badges.length === 0) return;
+  var el = document.getElementById("myBadges");
+  var map = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
+  el.style.display = "flex";
+  el.innerHTML = currentUser.badges.map(function(b){
+    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.8rem'>"+(map[b]||b)+"</span>";
+  }).join("");
+}
+
+function shareResult() {
+  if (!curRoom) return;
+  var sorted = curRoom.players.slice().sort(function(a,b){ return (b.score||0)-(a.score||0); });
+  var winner = sorted[0];
+  var text = "&#127912; שיחקתי תחרות ציורים של רומי!
+"
+    +"&#127942; "+winner.name+" ניצח עם "+winner.score+" נקודות!
+"
+    +"בוא לשחק: "+location.origin;
+  if (navigator.share) {
+    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
+  } else {
+    navigator.clipboard.writeText(text).then(function(){ toast("הטקסט הועתק לשיתוף! &#128203;"); });
+  }
+}
+
+function showNewBadges(badges) {
+  if (!badges || badges.length === 0) return;
+  var wrap = document.getElementById("newBadgesWrap");
+  var list = document.getElementById("newBadgesList");
+  wrap.style.display = "block";
+  list.innerHTML = badges.map(function(b){
+    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
+  }).join("");
 }
 
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
@@ -647,6 +729,11 @@ function renderResults(room){
 }
 
 function renderFinal(room){
+  // show new badges if any
+  if (currentUser && room.lastWinner && room.lastWinner.id) {
+    var myPlayer = room.players.find(function(p){ return p.userId === currentUser.id; });
+    if (myPlayer && room.lastWinner.newBadges) showNewBadges(room.lastWinner.newBadges);
+  }
   var sorted=room.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
   var top=sorted[0];
   var tied=sorted.filter(function(p){return(p.score||0)===(top.score||0);});
