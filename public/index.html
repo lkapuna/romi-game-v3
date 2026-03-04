@@ -206,7 +206,10 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- LOBBY -->
   <div id="sLobby" class="screen fu">
     <div class="card">
-      <h2 class="f" style="color:var(--y);margin-bottom:14px;font-size:1.2rem">&#127918; ממתינים לשחקנים...</h2>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="leaveRoom()" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem">🎮 ממתינים לשחקנים...</h2>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="color:var(--mu);font-size:.82rem">שחקנים שהצטרפו</span>
         <span class="f" style="color:var(--y)" id="progTxt">0/0</span>
@@ -733,10 +736,59 @@ function showUserBar() {
   showMyBadges();
 }
 
+function leaveRoom() {
+  if (socket && myRoomId) {
+    socket.emit("leave_room");
+    myRoomId = null;
+  }
+  go("sHome");
+}
+
 function prefillNames() {
   if (!currentUser) return;
   var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
   var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
+}
+
+// ════════════════════════════════════════════════
+// SHARE & INSTALL
+// ════════════════════════════════════════════════
+var deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  var btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "block";
+});
+
+window.addEventListener("appinstalled", function() {
+  var btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "none";
+  toast("האפליקציה הותקנה! 🎉");
+});
+
+function shareGame() {
+  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  if (navigator.share) {
+    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
+  } else {
+    navigator.clipboard.writeText(location.origin).then(function(){ toast("הקישור הועתק! 📋"); });
+  }
+}
+
+function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(function(result) {
+      if (result.outcome === "accepted") toast("מתקין... 📱");
+      deferredInstallPrompt = null;
+      var btn = document.getElementById("installBtn");
+      if (btn) btn.style.display = "none";
+    });
+  } else {
+    toast("ב-Safari: לחץ שתף ← הוסף למסך הבית 📱");
+  }
 }
 
 // ════════════════════════════════════════════════
