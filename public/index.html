@@ -693,7 +693,11 @@ function initSoloCanvas() {
 
   var sw = document.getElementById("soloSwatches");
   sw.innerHTML = COLS.map(function(c){
-  sw.innerHTML = COLS.map(function(c,i){ return '<div class="sw" style="background:'+c+';width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid '+(c===soloCol?'#fff':'transparent')+';flex-shrink:0" onclick="setSoloCol('+i+')"></div>'; }).join("");
+  var swColors = ["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
+  sw.innerHTML = swColors.map(function(c,i){ 
+    var border = c===soloCol ? '2px solid #fff' : '2px solid transparent';
+    return '<div style="background:'+c+';width:24px;height:24px;border-radius:50%;cursor:pointer;border:'+border+';flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.4)" onclick="setSoloCol('+i+')"></div>'; 
+  }).join("");
   }).join("");
 
   document.getElementById("soloBSize").oninput = function(e){ soloBsz = +e.target.value; };
@@ -729,7 +733,8 @@ function setSoloTool(t) {
 }
 
 function setSoloCol(i) {
-  soloCol = COLS[i];
+  var swColors = ["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
+  soloCol = swColors[i];
   setSoloTool("pen");
   document.querySelectorAll("#soloSwatches div").forEach(function(s,j){
     s.style.border = j===i ? "2px solid #fff" : "2px solid transparent";
