@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a0918"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="ציורים של רומי"/>
+<meta name="apple-mobile-web-app-title" content="הציורים של רומי"/>
 <link rel="manifest" href="/manifest.json"/>
 <link rel="apple-touch-icon" href="/icon-192.png"/>
 <title>תחרות הציורים של רומי</title>
@@ -96,7 +96,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div style="background:var(--card);border-radius:14px;padding:14px 18px;margin-bottom:20px;border:1px solid var(--brd);color:var(--mu);font-size:.9rem;line-height:1.7;text-align:center">
     פתחו חדר ועדכנו את חבריכם להצטרף אליכם. כולם מציירים את אותו הנושא בו זמנית.<br/>
     בסיום הסיבוב שופט AI בוחר את הציור הקרוב ביותר לנושא.<br/>
-    <span style="color:var(--tx);font-weight:700">5 סיבובים — מי שזוכה בהכי הרבה נקודות הוא מלך הציור 👑</span>
+    <span style="color:var(--tx);font-weight:700">5 סיבובים - מי שזוכה בהכי הרבה נקודות הוא מלך הציור 👑</span>
   </div>
 
 
@@ -198,7 +198,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
             <input type="range" id="soloBSize" min="2" max="30" value="6" style="accent-color:#a78bfa;width:72px"/>
             <div id="soloSwatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
           </div>
-          <canvas id="soloCv" width="1000" height="560"></canvas>
+          <canvas id="soloCv" width="1000" height="800"></canvas>
           <div class="cact" style="margin-top:10px">
             <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
             <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
@@ -243,6 +243,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <input class="inp" id="cName" placeholder="הכנס שם..."/>
         <label class="lbl">כמה שחקנים?</label>
         <div class="mpgrid">
+          <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa">🎨 יחיד</div>
           <div class="mpbtn on" id="mp2" onclick="setMax(2)">2 שחקנים</div>
           <div class="mpbtn" id="mp3" onclick="setMax(3)">3 שחקנים</div>
         </div>
