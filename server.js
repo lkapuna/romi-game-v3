@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
   pin: String,
   wins: { type: Number, default: 0 },
   gamesPlayed: { type: Number, default: 0 },
+  streak: { type: Number, default: 0 },
+  maxStreak: { type: Number, default: 0 },
+  badges: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -69,6 +72,14 @@ app.post("/auth/login", async function(req, res) {
   }
 });
 
+// Leaderboard
+app.get("/leaderboard", async function(req, res) {
+  try {
+    var top = await User.find({}, "username wins gamesPlayed badges").sort({ wins: -1 }).limit(20);
+    res.json(top);
+  } catch(e) { res.json([]); }
+});
+
 app.post("/auth/find-by-phone", async function(req, res) {
   try {
     var phone = (req.body.phone || "").replace(/[^0-9]/g, "");
@@ -101,6 +112,33 @@ app.get("/auth/check/:username", async function(req, res) {
     res.json({ exists: false });
   }
 });
+
+// ── Badge Logic ──────────────────────────────────────────────────────
+var BADGES = [
+  { id:"first_win", label:"🥇 ניצחון ראשון", check: function(u){ return u.wins >= 1; } },
+  { id:"10_wins", label:"🏆 מלך הציור", check: function(u){ return u.wins >= 10; } },
+  { id:"50_wins", label:"🌟 אגדת הציור", check: function(u){ return u.wins >= 50; } },
+  { id:"streak3", label:"🔥 3 ברצף", check: function(u){ return u.maxStreak >= 3; } },
+  { id:"streak5", label:"⚡ 5 ברצף", check: function(u){ return u.maxStreak >= 5; } },
+  { id:"10_games", label:"🎮 שחקן מנוסה", check: function(u){ return u.gamesPlayed >= 10; } },
+  { id:"50_games", label:"🎨 אמן אמיתי", check: function(u){ return u.gamesPlayed >= 50; } },
+];
+
+async function checkAndAwardBadges(userId) {
+  try {
+    var user = await User.findById(userId);
+    if (!user) return [];
+    var newBadges = [];
+    BADGES.forEach(function(b) {
+      if (!user.badges.includes(b.id) && b.check(user)) {
+        user.badges.push(b.id);
+        newBadges.push(b);
+      }
+    });
+    if (newBadges.length > 0) await user.save();
+    return newBadges;
+  } catch(e) { return []; }
+}
 
 // ── Game State ────────────────────────────────────────────────────────
 const rooms = {};
@@ -194,10 +232,28 @@ async function judge(roomId) {
     winner.score = (winner.score||0) + 1;
     r.lastWinner = { id:winner.id, name:winner.name, color:winner.color, reason:parsed.reason };
 
-    // Update stats in DB
+    // Update stats + streak + badges
     if (winner.userId) {
-      User.findByIdAndUpdate(winner.userId, { $inc:{ wins:1 } }).catch(function(){});
+      var updatedUser = await User.findByIdAndUpdate(
+        winner.userId,
+        { $inc: { wins: 1, streak: 1 } },
+        { new: true }
+      );
+      if (updatedUser && updatedUser.streak > updatedUser.maxStreak) {
+        await User.findByIdAndUpdate(winner.userId, { maxStreak: updatedUser.streak });
+        updatedUser.maxStreak = updatedUser.streak;
+      }
+      var newBadges = await checkAndAwardBadges(winner.userId);
+      if (newBadges.length > 0) {
+        r.lastWinner.newBadges = newBadges.map(function(b){ return b.label; });
+      }
     }
+    // Reset streak for losers
+    r.players.forEach(function(p) {
+      if (p.userId && p.id !== winner.id) {
+        User.findByIdAndUpdate(p.userId, { streak: 0 }).catch(function(){});
+      }
+    });
   } catch(e) {
     console.error("judge error:", e.message);
     var w = drawers[Math.floor(Math.random()*drawers.length)];
