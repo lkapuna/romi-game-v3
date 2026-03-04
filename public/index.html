@@ -125,6 +125,16 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <input class="inp" id="rPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
         <label class="lbl">קוד סודי (4 ספרות)</label>
         <input class="inp" id="rPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+        <label class="lbl">שאלת אבטחה</label>
+        <select class="inp" id="rQuestion" style="margin-bottom:8px">
+          <option value="">-- בחר שאלה --</option>
+          <option value="pet">מה שם החיה שלך?</option>
+          <option value="food">מה האוכל האהוב עליך?</option>
+          <option value="city">באיזה עיר נולדת?</option>
+          <option value="friend">מה שם החבר הכי טוב שלך?</option>
+          <option value="color">מה הצבע האהוב עליך?</option>
+        </select>
+        <input class="inp" id="rAnswer" placeholder="תשובה לשאלת האבטחה..."/>
         <button class="btn btn-green" onclick="doRegister()">✨ צור חשבון</button>
         <div id="regErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
@@ -133,8 +143,12 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <label class="lbl">מספר טלפון שנרשמת איתו</label>
         <input class="inp" id="resetPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
         <div id="resetStep2" style="display:none">
-          <label class="lbl">קוד סודי חדש (4 ספרות)</label>
-          <input class="inp" id="resetPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+          <label class="lbl" id="resetQuestionLbl" style="color:var(--y);font-weight:700"></label>
+          <input class="inp" id="resetAnswer" placeholder="התשובה שלך..."/>
+          <div id="resetStep3" style="display:none">
+            <label class="lbl">קוד סודי חדש (4 ספרות)</label>
+            <input class="inp" id="resetPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+          </div>
         </div>
         <button class="btn btn-yel" id="resetBtn" onclick="doReset()">🔍 מצא חשבון</button>
         <div id="resetErr" style="margin-top:8px;text-align:center;font-size:.88rem"></div>
@@ -159,7 +173,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- HOME -->
   <div id="sHome" class="screen fu">
     <div class="card">
-      <button class="btn btn-yel" style="margin-bottom:12px" onclick="openLeaderboard()">🏆 טבלת מובילים</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+        <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px">🏆 מובילים</button>
+        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף משחק</button>
+        <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
+      </div>
       <div id="myBadges" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
       <div class="tabs">
         <div class="tab on" id="t1" onclick="switchTab('create')">פתח חדר חדש</div>
@@ -633,9 +651,13 @@ async function doRegister() {
   if (!username || !pin || !phone) { errEl.textContent = "מלא את כל השדות"; return; }
   if (username.length < 2) { errEl.textContent = "שם חייב להיות לפחות 2 תווים"; return; }
   if (phone.length < 9) { errEl.textContent = "מספר טלפון לא תקין"; return; }
+  var question = document.getElementById("rQuestion").value;
+  var answer = document.getElementById("rAnswer").value.trim().toLowerCase();
   if (!/^[0-9]{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
+  if (!question) { errEl.textContent = "בחר שאלת אבטחה"; return; }
+  if (!answer) { errEl.textContent = "הכנס תשובה לשאלת האבטחה"; return; }
   try {
-    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone})});
+    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone,question,answer})});
     var data = await res.json();
     if (!data.ok) { errEl.textContent = data.error; return; }
     currentUser = data.user;
@@ -650,7 +672,9 @@ async function doReset() {
   var errEl = document.getElementById("resetErr");
   var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
   errEl.textContent = "";
+
   if (step === "find") {
+    // Step 1: find by phone
     var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
     if (phone.length < 9) { errEl.style.color="var(--r)"; errEl.textContent="מספר לא תקין"; return; }
     try {
@@ -658,19 +682,37 @@ async function doReset() {
       var data = await res.json();
       if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
       resetUserId = data.userId;
+      var qMap = {"pet":"מה שם החיה שלך?","food":"מה האוכל האהוב עליך?","city":"באיזה עיר נולדת?","friend":"מה שם החבר הכי טוב שלך?","color":"מה הצבע האהוב עליך?"};
+      document.getElementById("resetQuestionLbl").textContent = qMap[data.question] || data.question;
       document.getElementById("resetStep2").style.display="block";
-      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
-      document.getElementById("resetBtn").setAttribute("data-step","save");
+      document.getElementById("resetBtn").textContent="✔ אמת תשובה";
+      document.getElementById("resetBtn").setAttribute("data-step","verify");
       errEl.style.color="var(--g)"; errEl.textContent="נמצא: "+data.username;
     } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+
+  } else if (step === "verify") {
+    // Step 2: verify security answer
+    var answer = document.getElementById("resetAnswer").value.trim().toLowerCase();
+    if (!answer) { errEl.style.color="var(--r)"; errEl.textContent="הכנס תשובה"; return; }
+    try {
+      var res = await fetch("/auth/verify-answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,answer})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent="תשובה שגויה ❌"; return; }
+      document.getElementById("resetStep3").style.display="block";
+      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
+      document.getElementById("resetBtn").setAttribute("data-step","save");
+      errEl.style.color="var(--g)"; errEl.textContent="התשובה נכונה! ✅";
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+
   } else {
+    // Step 3: save new pin
     var pin = document.getElementById("resetPin").value.trim();
     if (!/^[0-9]{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent="4 ספרות בלבד"; return; }
     try {
       var res = await fetch("/auth/reset-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,pin})});
       var data = await res.json();
       if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
-      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש";
+      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש ✅";
       setTimeout(function(){ authTab("login"); }, 2000);
     } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
   }
