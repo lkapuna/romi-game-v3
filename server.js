@@ -29,6 +29,8 @@ const UserSchema = new mongoose.Schema({
   streak: { type: Number, default: 0 },
   maxStreak: { type: Number, default: 0 },
   badges: { type: [String], default: [] },
+  securityQuestion: { type: String, default: "" },
+  securityAnswer: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -50,8 +52,12 @@ app.post("/auth/register", async function(req, res) {
     var phoneExists = await User.findOne({ phone: phone });
     if (phoneExists) return res.json({ ok: false, error: "מספר טלפון זה כבר רשום" });
 
+    var answer = (req.body.answer || "").trim().toLowerCase();
+    var question = (req.body.question || "").trim();
+    if (!question || !answer) return res.json({ ok: false, error: "חסרה שאלת אבטחה" });
     var hashed = await bcrypt.hash(pin, 10);
-    var user = await User.create({ username: username, pin: hashed, phone: phone });
+    var answerHashed = await bcrypt.hash(answer, 10);
+    var user = await User.create({ username: username, pin: hashed, phone: phone, securityQuestion: question, securityAnswer: answerHashed });
     res.json({ ok: true, user: { id: user._id, username: user.username, wins: 0, gamesPlayed: 0 } });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
@@ -85,9 +91,22 @@ app.post("/auth/find-by-phone", async function(req, res) {
     var phone = (req.body.phone || "").replace(/[^0-9]/g, "");
     var user = await User.findOne({ phone: phone });
     if (!user) return res.json({ ok: false, error: "לא נמצא חשבון עם מספר זה" });
-    res.json({ ok: true, userId: user._id, username: user.username });
+    res.json({ ok: true, userId: user._id, username: user.username, question: user.securityQuestion });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
+  }
+});
+
+app.post("/auth/verify-answer", async function(req, res) {
+  try {
+    var user = await User.findById(req.body.userId);
+    if (!user) return res.json({ ok: false, error: "משתמש לא נמצא" });
+    var answer = (req.body.answer || "").trim().toLowerCase();
+    var match = await bcrypt.compare(answer, user.securityAnswer);
+    if (!match) return res.json({ ok: false, error: "תשובה שגויה" });
+    res.json({ ok: true });
+  } catch(e) {
+    res.json({ ok: false, error: "שגיאה" });
   }
 });
 
