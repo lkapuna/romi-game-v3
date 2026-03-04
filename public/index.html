@@ -6,16 +6,16 @@
 <meta name="theme-color" content="#0a0918"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="ציורים של רומי"/>
+<meta name="apple-mobile-web-app-title" content="הציורים של רומי"/>
 <link rel="manifest" href="/manifest.json"/>
 <link rel="apple-touch-icon" href="/icon-192.png"/>
-<title>תחרות הציורים של רומי</title>
+<title>מציירים ביחד</title>
 <script src="/socket.io/socket.io.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Heebo:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0918;--card:#1e1b38;--surf:#14122a;--brd:rgba(255,255,255,0.08);--r:#ff6b6b;--y:#ffd93d;--g:#6bcb77;--bl:#4d96ff;--tx:#f0eeff;--mu:#7b79a0}
-body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;direction:rtl}
+:root{--bg:#0d0d1a;--card:#1a1a2e;--surf:#16213e;--brd:rgba(255,255,255,0.10);--r:#ff4757;--y:#ffd32a;--g:#2ed573;--bl:#1e90ff;--pu:#a855f7;--pk:#ff6b9d;--tx:#ffffff;--mu:#8892b0;--glow-y:rgba(255,211,42,0.15);--glow-b:rgba(30,144,255,0.15)}
+body{font-family:'Heebo',sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 50%,rgba(168,85,247,0.08) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(30,144,255,0.08) 0%,transparent 50%),radial-gradient(circle at 60% 80%,rgba(255,75,87,0.06) 0%,transparent 50%);color:var(--tx);min-height:100vh;direction:rtl}
 input,button{font-family:inherit}
 .f{font-family:'Fredoka One',cursive!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -28,7 +28,7 @@ input,button{font-family:inherit}
 .bo{animation:bounce 1s ease infinite}
 .wrap{max-width:800px;margin:0 auto;padding:20px 14px}
 .screen{display:none}.screen.active{display:block}
-.card{background:var(--card);border-radius:18px;padding:22px;border:1px solid var(--brd);margin-bottom:14px}
+.card{background:var(--card);border-radius:18px;padding:22px;border:1px solid var(--brd);margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
 .title{font-size:clamp(1.6rem,5vw,2.5rem);text-align:center;margin-bottom:4px;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#4d96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .sub{text-align:center;color:var(--mu);margin-bottom:24px;font-size:.9rem}
 .inp{width:100%;background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:11px 14px;color:var(--tx);font-size:1rem;margin-bottom:12px}
@@ -37,16 +37,16 @@ input,button{font-family:inherit}
 .btn{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;font-size:1.05rem;font-family:'Fredoka One',cursive;transition:all .2s}
 .btn:hover{transform:translateY(-2px)}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-.btn-blue{background:linear-gradient(135deg,var(--bl),#7b2fff);color:#fff}
-.btn-green{background:linear-gradient(135deg,var(--g),#2ea04b);color:#fff}
-.btn-yel{background:linear-gradient(135deg,var(--y),#ff8c42);color:#111}
+.btn-blue{background:linear-gradient(135deg,#1e90ff,#a855f7);color:#fff;box-shadow:0 4px 15px rgba(30,144,255,0.3)}
+.btn-green{background:linear-gradient(135deg,#2ed573,#17c0eb);color:#111;box-shadow:0 4px 15px rgba(46,213,115,0.3)}
+.btn-yel{background:linear-gradient(135deg,#ffd32a,#ff6b35);color:#111;box-shadow:0 4px 15px rgba(255,211,42,0.3)}
 .mpgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .mpbtn{padding:9px;border-radius:9px;border:2px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;text-align:center;font-weight:700;font-size:.88rem;transition:all .2s}
-.mpbtn.on{border-color:var(--y);color:var(--y);background:rgba(255,217,61,.1)}
+.mpbtn.on{border-color:#ffd32a;color:#ffd32a;background:rgba(255,211,42,.15);box-shadow:0 0 10px rgba(255,211,42,.2)}
 .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
 .tab{padding:10px;border-radius:10px;border:2px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;text-align:center;font-weight:700;transition:all .2s}
-.tab.on{border-color:var(--bl);color:var(--bl);background:rgba(77,150,255,.1)}
+.tab.on{border-color:#1e90ff;color:#1e90ff;background:rgba(30,144,255,.15);box-shadow:0 0 12px rgba(30,144,255,.2)}
 .room-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;min-height:60px}
 .room-item{display:flex;align-items:center;gap:12px;background:var(--surf);border-radius:10px;padding:12px 16px;border:1px solid var(--brd);cursor:pointer;transition:all .2s}
 .room-item:hover{border-color:var(--bl)}
@@ -61,9 +61,9 @@ input,button{font-family:inherit}
 .prog-bg{background:var(--surf);border-radius:20px;height:8px;overflow:hidden;margin-bottom:14px}
 .prog-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--bl),#7b2fff);transition:width .4s}
 .scores{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
-.sc{display:flex;align-items:center;gap:6px;flex:1;min-width:85px;background:var(--surf);border-radius:9px;padding:6px 10px}
+.sc{display:flex;align-items:center;gap:6px;flex:1;min-width:85px;background:var(--surf);border-radius:9px;padding:6px 10px;border:1px solid var(--brd)}
 .round-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.topic-box{background:var(--surf);border-radius:10px;padding:9px 14px;margin-bottom:11px;display:flex;gap:7px;align-items:center;border:1px solid var(--brd)}
+.topic-box{background:linear-gradient(135deg,rgba(30,144,255,.1),rgba(168,85,247,.1));border-radius:10px;padding:9px 14px;margin-bottom:11px;display:flex;gap:7px;align-items:center;border:1px solid rgba(168,85,247,.3)}
 .tnum{font-size:2.4rem;display:inline-block}
 .tnum.red{color:var(--r);animation:bounce .5s ease infinite}
 .tools{display:flex;align-items:center;gap:6px;margin-bottom:9px;flex-wrap:wrap}
@@ -78,9 +78,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 .witem{display:flex;align-items:center;gap:8px;background:var(--surf);border-radius:9px;padding:7px 12px;font-size:.87rem}
 .dgrid{display:grid;gap:10px;margin-bottom:16px}
 .dcard{background:var(--surf);border-radius:10px;padding:10px;text-align:center;border:2px solid transparent;transition:all .35s}
-.dcard.win{border-color:var(--y);box-shadow:0 0 18px rgba(255,217,61,.25)}
+.dcard.win{border-color:#ffd32a;box-shadow:0 0 24px rgba(255,211,42,.4),inset 0 0 20px rgba(255,211,42,.05)}
 .dcard img{width:100%;border-radius:7px;margin-bottom:6px}
-.vbox{background:var(--surf);border-radius:12px;padding:16px;border-right:4px solid var(--y);margin-bottom:14px}
+.vbox{background:var(--surf);border-radius:12px;padding:16px;border-right:4px solid #ffd32a;margin-bottom:14px;box-shadow:0 0 15px rgba(255,211,42,.1)}
 .frow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--brd)}
 .frow:last-child{border:none}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--r);color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;z-index:999;animation:fadeUp .3s ease;white-space:nowrap}
@@ -91,12 +91,37 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 <body>
 <div id="conf"></div>
 <div class="wrap">
-  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><h1 class="f title fu">&#127912; תחרות הציורים של רומי</h1>
-  <p class="sub">צייר, התחרה, נצח!</p>
-  <div style="background:var(--card);border-radius:14px;padding:14px 18px;margin-bottom:20px;border:1px solid var(--brd);color:var(--mu);font-size:.9rem;line-height:1.7;text-align:center">
-    פתחו חדר ועדכנו את חבריכם להצטרף אליכם. כולם מציירים את אותו הנושא בו זמנית.<br/>
-    בסיום הסיבוב שופט AI בוחר את הציור הקרוב ביותר לנושא.<br/>
-    <span style="color:var(--tx);font-weight:700">5 סיבובים — מי שזוכה בהכי הרבה נקודות הוא מלך הציור 👑</span>
+  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
+      <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <!-- Fan of color swatches -->
+        <g transform="translate(24,36)">
+          <path d="M0,0 L-18,-28 Q-20,-32 -16,-34 L-10,-22 Z" fill="#ff4757" opacity="0.95"/>
+          <path d="M0,0 L-9,-30 Q-10,-34 -6,-35 L-3,-22 Z" fill="#ffd32a" opacity="0.95"/>
+          <path d="M0,0 L0,-31 Q0,-35 4,-35 L4,-22 Z" fill="#2ed573" opacity="0.95"/>
+          <path d="M0,0 L9,-30 Q10,-34 14,-33 L10,-21 Z" fill="#1e90ff" opacity="0.95"/>
+          <path d="M0,0 L18,-28 Q20,-32 23,-30 L16,-19 Z" fill="#a855f7" opacity="0.95"/>
+          <!-- Handle -->
+          <ellipse cx="0" cy="2" rx="5" ry="7" fill="#8B5E3C"/>
+          <ellipse cx="0" cy="-1" rx="4" ry="5" fill="#A0714F"/>
+        </g>
+        <!-- Paint dots -->
+        <circle cx="8" cy="8" r="3.5" fill="#ff4757" opacity="0.8"/>
+        <circle cx="40" cy="10" r="3" fill="#ffd32a" opacity="0.8"/>
+        <circle cx="6" cy="30" r="2.5" fill="#2ed573" opacity="0.8"/>
+        <circle cx="42" cy="28" r="3" fill="#1e90ff" opacity="0.8"/>
+        <circle cx="22" cy="5" r="2" fill="#a855f7" opacity="0.8"/>
+      </svg>
+      <h1 class="f fu" style="font-size:clamp(2rem,6vw,3rem);background:linear-gradient(135deg,#ff4757 0%,#ffd32a 25%,#2ed573 50%,#1e90ff 75%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0;line-height:1.1">מציירים ביחד</h1>
+    </div>
+    <p style="color:#8892b0;font-size:.92rem;margin:0;text-align:center">תחרות הציורים של רומי</p>
+  </div>
+  <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(30,144,255,0.1));border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1px solid rgba(168,85,247,0.25);font-size:.82rem;line-height:1.9">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7">אימון יחיד</strong> <span style="color:var(--mu)">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff">פתחו חדר</strong> <span style="color:var(--mu)">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573">הצטרפו לחדר</strong> <span style="color:var(--mu)">— הצטרפו למשחק פתוח של חבר</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a">מובילים</strong> <span style="color:var(--mu)">— ראו את השחקנים הטובים ביותר</span></span></div>
+    <div style="border-top:1px solid var(--brd);margin-top:8px;padding-top:8px;color:var(--mu);text-align:center;font-size:.8rem">כולם מציירים את אותו הנושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות <strong style="color:var(--y)">מנצח! 👑</strong></div>
   </div>
 
 
@@ -170,6 +195,61 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     </div>
   </div>
 
+
+  <!-- SOLO -->
+  <div id="sSolo" class="screen fu">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
+        <h2 class="f" style="color:#a78bfa;font-size:1.2rem">🎨 אימון יחיד</h2>
+      </div>
+      <div id="soloStart">
+        <p style="color:var(--mu);margin-bottom:16px;line-height:1.6">צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!</p>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()">🚀 התחל אתגר!</button>
+      </div>
+      <div id="soloGame" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="f" style="color:#a78bfa" id="soloRoundLbl"></span>
+          <div><span class="tnum f" id="soloTimer" style="font-size:2rem">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+        </div>
+        <div class="topic-box">
+          <span style="color:var(--mu);font-size:.8rem">צייר:</span>
+          <strong id="soloTopic" style="font-size:1.1rem"></strong>
+        </div>
+        <div class="card" style="padding:14px;position:relative">
+          <div class="tools">
+            <button class="tbtn on" id="soloPenBtn" onclick="setSoloTool('pen')">✏️ עט</button>
+            <button class="tbtn" id="soloErBtn" onclick="setSoloTool('eraser')">🧹 מחק</button>
+            <input type="range" id="soloBSize" min="2" max="30" value="6" style="accent-color:#a78bfa;width:72px"/>
+            <div id="soloSwatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+          </div>
+          <canvas id="soloCv" width="1000" height="800"></canvas>
+          <div class="cact" style="margin-top:10px">
+            <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
+            <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
+          </div>
+        </div>
+      </div>
+      <div id="soloFeedback" style="display:none">
+        <div id="soloScoreBox" style="text-align:center;padding:20px 0"></div>
+        <div id="soloFeedbackBox" class="vbox" style="margin-bottom:14px"></div>
+        <div id="soloDrawingBox" style="margin-bottom:14px"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" style="flex:1;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="go('sHome')">🏠 בית</button>
+          <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloNextBtn" onclick="nextSolo()">➡️ נושא הבא</button>
+        </div>
+      </div>
+      <div id="soloResults" style="display:none;text-align:center">
+        <div class="bo" style="font-size:3rem;margin-bottom:10px">🎨</div>
+        <h2 class="f" style="font-size:1.8rem;margin-bottom:6px;color:#a78bfa">סיימת!</h2>
+        <div id="soloFinalScore" style="font-size:1.1rem;color:var(--mu);margin-bottom:20px"></div>
+        <div id="soloFinalList" class="card" style="text-align:right;margin-bottom:14px"></div>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;max-width:240px" onclick="startSolo()">🔄 שחק שוב</button>
+        <button class="btn btn-blue" style="margin-top:8px;max-width:240px" onclick="go('sHome')">🏠 חזור לבית</button>
+      </div>
+    </div>
+  </div>
+
   <!-- HOME -->
   <div id="sHome" class="screen fu">
     <div class="card">
@@ -188,6 +268,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <input class="inp" id="cName" placeholder="הכנס שם..."/>
         <label class="lbl">כמה שחקנים?</label>
         <div class="mpgrid">
+          <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa">🎨 יחיד</div>
           <div class="mpbtn on" id="mp2" onclick="setMax(2)">2 שחקנים</div>
           <div class="mpbtn" id="mp3" onclick="setMax(3)">3 שחקנים</div>
         </div>
@@ -240,7 +321,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div id="swatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       </div>
       <div style="position:relative">
-        <canvas id="cv" width="1000" height="560"></canvas>
+        <canvas id="cv" width="1000" height="800"></canvas>
         <div class="sub-over" id="subOver">
           <span>&#9989;</span><span>הציור נשלח!</span>
           <span style="color:var(--mu);font-family:'Heebo',sans-serif;font-size:.85rem">ממתין לשאר...</span>
@@ -286,7 +367,463 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   </div>
 </div>
 
+
+
 <script>
+
+// ════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════
+var currentUser = null;
+var resetUserId = null;
+
+// Auto-login from localStorage
+(function() {
+  var saved = localStorage.getItem("romi_user");
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showUserBar();
+      // go to sHome after socket connects
+      setTimeout(function(){ go("sHome"); prefillNames(); }, 100);
+    } catch(e) { localStorage.removeItem("romi_user"); }
+  }
+})();
+
+function authTab(t) {
+  ["login","register","reset"].forEach(function(tab) {
+    var tabEl = document.getElementById("ta"+({login:1,register:2,reset:3}[tab]||1));
+    var panelEl = document.getElementById("p"+tab.charAt(0).toUpperCase()+tab.slice(1));
+    if (tabEl) tabEl.classList.toggle("on", tab===t);
+    if (panelEl) panelEl.style.display = tab===t ? "block" : "none";
+  });
+  if (t==="reset") {
+    document.getElementById("resetStep2").style.display="none";
+    document.getElementById("resetBtn").textContent="🔍 מצא חשבון";
+    document.getElementById("resetBtn").setAttribute("data-step","find");
+    document.getElementById("resetErr").textContent="";
+  }
+}
+
+async function doLogin() {
+  var username = document.getElementById("lUser").value.trim();
+  var pin = document.getElementById("lPin").value.trim();
+  var errEl = document.getElementById("loginErr");
+  errEl.textContent = "";
+  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
+  try {
+    var res = await fetch("/auth/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin})});
+    var data = await res.json();
+    if (!data.ok) { errEl.textContent = data.error; return; }
+    currentUser = data.user;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    showUserBar();
+    go("sHome");
+    prefillNames();
+  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+}
+
+async function doRegister() {
+  var username = document.getElementById("rUser").value.trim();
+  var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
+  var pin = document.getElementById("rPin").value.trim();
+  var errEl = document.getElementById("regErr");
+  errEl.textContent = "";
+  if (!username || !pin || !phone) { errEl.textContent = "מלא את כל השדות"; return; }
+  if (username.length < 2) { errEl.textContent = "שם חייב להיות לפחות 2 תווים"; return; }
+  if (phone.length < 9) { errEl.textContent = "מספר טלפון לא תקין"; return; }
+  var question = document.getElementById("rQuestion").value;
+  var answer = document.getElementById("rAnswer").value.trim().toLowerCase();
+  if (!/^[0-9]{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
+  if (!question) { errEl.textContent = "בחר שאלת אבטחה"; return; }
+  if (!answer) { errEl.textContent = "הכנס תשובה לשאלת האבטחה"; return; }
+  try {
+    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone,question,answer})});
+    var data = await res.json();
+    if (!data.ok) { errEl.textContent = data.error; return; }
+    currentUser = data.user;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    showUserBar();
+    go("sHome");
+    prefillNames();
+  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+}
+
+async function doReset() {
+  var errEl = document.getElementById("resetErr");
+  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
+  errEl.textContent = "";
+
+  if (step === "find") {
+    // Step 1: find by phone
+    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
+    if (phone.length < 9) { errEl.style.color="var(--r)"; errEl.textContent="מספר לא תקין"; return; }
+    try {
+      var res = await fetch("/auth/find-by-phone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
+      resetUserId = data.userId;
+      var qMap = {"pet":"מה שם החיה שלך?","food":"מה האוכל האהוב עליך?","city":"באיזה עיר נולדת?","friend":"מה שם החבר הכי טוב שלך?","color":"מה הצבע האהוב עליך?"};
+      document.getElementById("resetQuestionLbl").textContent = qMap[data.question] || data.question;
+      document.getElementById("resetStep2").style.display="block";
+      document.getElementById("resetBtn").textContent="✔ אמת תשובה";
+      document.getElementById("resetBtn").setAttribute("data-step","verify");
+      errEl.style.color="var(--g)"; errEl.textContent="נמצא: "+data.username;
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+
+  } else if (step === "verify") {
+    // Step 2: verify security answer
+    var answer = document.getElementById("resetAnswer").value.trim().toLowerCase();
+    if (!answer) { errEl.style.color="var(--r)"; errEl.textContent="הכנס תשובה"; return; }
+    try {
+      var res = await fetch("/auth/verify-answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,answer})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent="תשובה שגויה ❌"; return; }
+      document.getElementById("resetStep3").style.display="block";
+      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
+      document.getElementById("resetBtn").setAttribute("data-step","save");
+      errEl.style.color="var(--g)"; errEl.textContent="התשובה נכונה! ✅";
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+
+  } else {
+    // Step 3: save new pin
+    var pin = document.getElementById("resetPin").value.trim();
+    if (!/^[0-9]{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent="4 ספרות בלבד"; return; }
+    try {
+      var res = await fetch("/auth/reset-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,pin})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
+      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש ✅";
+      setTimeout(function(){ authTab("login"); }, 2000);
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem("romi_user");
+  document.getElementById("userBar").style.display="none";
+  go("sAuth");
+}
+
+function showUserBar() {
+  var bar = document.getElementById("userBar");
+  bar.style.display="flex";
+  document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
+  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
+  showMyBadges();
+}
+
+function leaveRoom() {
+  if (socket && myRoomId) {
+    socket.emit("leave_room");
+    myRoomId = null;
+  }
+  go("sHome");
+}
+
+function prefillNames() {
+  if (!currentUser) return;
+  var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
+  var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
+}
+
+// ════════════════════════════════════════════════
+// SHARE & INSTALL
+// ════════════════════════════════════════════════
+var deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  var btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "block";
+});
+
+window.addEventListener("appinstalled", function() {
+  var btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "none";
+  toast("האפליקציה הותקנה! 🎉");
+});
+
+function shareGame() {
+  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  if (navigator.share) {
+    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
+  } else {
+    navigator.clipboard.writeText(location.origin).then(function(){ toast("הקישור הועתק! 📋"); });
+  }
+}
+
+function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(function(result) {
+      if (result.outcome === "accepted") toast("מתקין... 📱");
+      deferredInstallPrompt = null;
+      var btn = document.getElementById("installBtn");
+      if (btn) btn.style.display = "none";
+    });
+  } else {
+    toast("ב-Safari: לחץ שתף ← הוסף למסך הבית 📱");
+  }
+}
+
+// ════════════════════════════════════════════════
+// LEADERBOARD & BADGES
+// ════════════════════════════════════════════════
+var BADGE_MAP = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
+var BADGE_EMOJI = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
+
+async function openLeaderboard() {
+  go("sLeader");
+  try {
+    var res = await fetch("/leaderboard");
+    var data = await res.json();
+    var medals = ["🥇","🥈","🥉"];
+    document.getElementById("leaderList").innerHTML = data.length===0
+      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
+      : data.map(function(u,i){
+          var badgeEmojis = (u.badges||[]).map(function(b){return BADGE_EMOJI[b]||"";}).join("");
+          return "<div class='frow'>"
+            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
+            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
+            +"<span style='color:var(--y);font-size:.85rem;margin-left:6px'>"+u.wins+" ⭐</span>"
+            +(badgeEmojis?"<span style='font-size:.8rem;margin-right:4px'>"+badgeEmojis+"</span>":"")
+            +"</div>";
+        }).join("");
+  } catch(e) {
+    document.getElementById("leaderList").innerHTML="<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
+  }
+}
+
+function showMyBadges() {
+  if (!currentUser||!currentUser.badges||currentUser.badges.length===0) return;
+  var el=document.getElementById("myBadges");
+  el.style.display="flex";
+  el.innerHTML=currentUser.badges.map(function(b){
+    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.78rem'>"+(BADGE_MAP[b]||b)+"</span>";
+  }).join("");
+}
+
+function showNewBadges(badges) {
+  if(!badges||!badges.length) return;
+  var wrap=document.getElementById("newBadgesWrap");
+  var list=document.getElementById("newBadgesList");
+  if(!wrap||!list) return;
+  wrap.style.display="block";
+  list.innerHTML=badges.map(function(b){
+    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
+  }).join("");
+}
+
+function shareResult() {
+  if(!curRoom) return;
+  var sorted=curRoom.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+  var winner=sorted[0];
+  var text="🎨 שיחקתי תחרות הציורים של רומי!\n🏆 "+winner.name+" ניצח עם "+winner.score+" נקודות!\nבוא לשחק: "+location.origin;
+  if(navigator.share){ navigator.share({title:"תחרות הציורים של רומי",text:text,url:location.origin}); }
+  else { navigator.clipboard.writeText(text).then(function(){toast("הועתק לשיתוף! 📋");}); }
+}
+
+if("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/sw.js").then(function(reg) {
+      console.log("SW registered");
+    }).catch(function(err) {
+      console.log("SW error:", err);
+    });
+  });
+}
+
+
+// ════════════════════════════════════════════════
+// SOLO MODE
+// ════════════════════════════════════════════════
+var SOLO_TOPICS = ["חתול","בית","עץ","מכונית","שמש","דג","ציפור","פרח","כוכב","רובוט","עוגה","רקטה","בלון","ים","הר","פרפר","ספינה","מטוס","דינוזאור","גשר","כלב","סוס","צב","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה"];
+var soloRound = 0, soloScores = [], soloTool = "pen", soloCol = "#000", soloBsz = 6;
+var soloDrawing = false, soloLx = 0, soloLy = 0, soloSubmitted = false, soloTimer = null;
+var SOLO_ROUNDS = 5;
+
+function startSolo() {
+  soloRound = 0;
+  soloScores = [];
+  document.getElementById("soloStart").style.display = "none";
+  document.getElementById("soloGame").style.display = "block";
+  document.getElementById("soloFeedback").style.display = "none";
+  document.getElementById("soloResults").style.display = "none";
+  nextSolo();
+}
+
+function nextSolo() {
+  if (soloRound >= SOLO_ROUNDS) { showSoloResults(); return; }
+  soloRound++;
+  soloSubmitted = false;
+  document.getElementById("soloGame").style.display = "block";
+  document.getElementById("soloFeedback").style.display = "none";
+  document.getElementById("soloSubmitBtn").disabled = false;
+  document.getElementById("soloRoundLbl").textContent = "סיבוב " + soloRound + " מתוך " + SOLO_ROUNDS;
+
+  // Pick random topic
+  var topic = SOLO_TOPICS[Math.floor(Math.random() * SOLO_TOPICS.length)];
+  document.getElementById("soloTopic").textContent = topic;
+  document.getElementById("soloTopic").setAttribute("data-topic", topic);
+
+  // Init canvas
+  initSoloCanvas();
+
+  // Timer
+  var timeLeft = 60;
+  document.getElementById("soloTimer").textContent = timeLeft;
+  document.getElementById("soloTimer").className = "tnum f";
+  if (soloTimer) clearInterval(soloTimer);
+  soloTimer = setInterval(function() {
+    timeLeft--;
+    var el = document.getElementById("soloTimer");
+    if (el) { el.textContent = timeLeft; el.className = "tnum f" + (timeLeft<=10?" red":""); }
+    if (timeLeft <= 0) { clearInterval(soloTimer); soloTimer = null; submitSolo(); }
+  }, 1000);
+}
+
+function initSoloCanvas() {
+  var cv = document.getElementById("soloCv");
+  var ctx = cv.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0,0,cv.width,cv.height);
+
+  var sw = document.getElementById("soloSwatches");
+  sw.innerHTML = COLS.map(function(c){
+  sw.innerHTML = COLS.map(function(c,i){ return '<div class="sw" style="background:'+c+';width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid '+(c===soloCol?'#fff':'transparent')+';flex-shrink:0" onclick="setSoloCol('+i+')"></div>'; }).join("");
+  }).join("");
+
+  document.getElementById("soloBSize").oninput = function(e){ soloBsz = +e.target.value; };
+
+  function pos(e) {
+    var rect = cv.getBoundingClientRect();
+    var sx = cv.width/rect.width, sy = cv.height/rect.height;
+    var cx = e.touches?e.touches[0].clientX:e.clientX;
+    var cy = e.touches?e.touches[0].clientY:e.clientY;
+    return {x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
+  }
+
+  cv.onmousedown = function(e){ if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
+  cv.onmousemove = function(e){ if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
+  cv.onmouseup = cv.onmouseleave = function(){ soloDrawing=false; };
+  cv.ontouchstart = function(e){ e.preventDefault(); if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
+  cv.ontouchmove = function(e){ e.preventDefault(); if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
+  cv.ontouchend = function(){ soloDrawing=false; };
+}
+
+function paintSolo(ctx, p) {
+  ctx.beginPath(); ctx.moveTo(soloLx,soloLy); ctx.lineTo(p.x,p.y);
+  ctx.strokeStyle = soloTool==="eraser"?"#fff":soloCol;
+  ctx.lineWidth = soloTool==="eraser"?soloBsz*3:soloBsz;
+  ctx.lineCap="round"; ctx.lineJoin="round"; ctx.stroke();
+  soloLx=p.x; soloLy=p.y;
+}
+
+function setSoloTool(t) {
+  soloTool=t;
+  document.getElementById("soloPenBtn").classList.toggle("on",t==="pen");
+  document.getElementById("soloErBtn").classList.toggle("on",t==="eraser");
+}
+
+function setSoloCol(i) {
+  soloCol = COLS[i];
+  setSoloTool("pen");
+  document.querySelectorAll("#soloSwatches div").forEach(function(s,j){
+    s.style.border = j===i ? "2px solid #fff" : "2px solid transparent";
+  });
+}
+
+function clearSoloCv() {
+  if(soloSubmitted)return;
+  var cv=document.getElementById("soloCv"),ctx=cv.getContext("2d");
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,cv.width,cv.height);
+}
+
+async function submitSolo() {
+  if (soloSubmitted) return;
+
+  // Check if canvas is empty
+  var cv = document.getElementById("soloCv");
+  var ctx = cv.getContext("2d");
+  var pixels = ctx.getImageData(0,0,cv.width,cv.height).data;
+  var isEmpty = true;
+  for (var i=0; i<pixels.length; i+=4) {
+    if (pixels[i]<250||pixels[i+1]<250||pixels[i+2]<250) { isEmpty=false; break; }
+  }
+  if (isEmpty) { toast("צייר משהו קודם! 🎨"); return; }
+
+  soloSubmitted = true;
+  if (soloTimer) { clearInterval(soloTimer); soloTimer = null; }
+  document.getElementById("soloSubmitBtn").disabled = true;
+
+  var topic = document.getElementById("soloTopic").getAttribute("data-topic");
+  var drawing = cv.toDataURL("image/png");
+
+  document.getElementById("soloGame").style.display = "none";
+  document.getElementById("soloFeedback").style.display = "block";
+  document.getElementById("soloScoreBox").innerHTML = '<div class="spinner" style="margin:0 auto"></div><p style="color:var(--mu);margin-top:10px">השופט בוחן...</p>';
+  document.getElementById("soloFeedbackBox").innerHTML = "";
+  document.getElementById("soloDrawingBox").innerHTML = "";
+
+  try {
+    var res = await fetch("/solo/judge", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({topic:topic, drawing:drawing})
+    });
+    var data = await res.json();
+    var score = data.score || 5;
+    soloScores.push({round:soloRound, topic:topic, score:score, feedback:data.feedback, tip:data.tip, drawing:drawing});
+
+    // Score display
+    var stars = "";
+    for(var i=1;i<=10;i++) stars += i<=score ? "⭐" : "☆";
+    var color = score>=8?"var(--g)":score>=5?"var(--y)":"var(--r)";
+    document.getElementById("soloScoreBox").innerHTML =
+      '<div class="f" style="font-size:3rem;color:'+color+'">'+score+'/10</div>'
+      +'<div style="font-size:1.1rem;margin:4px 0">'+stars+'</div>'
+      +(data.badge?'<div style="background:rgba(167,139,250,.15);border:1px solid #a78bfa;border-radius:20px;padding:6px 16px;display:inline-block;margin-top:8px;color:#a78bfa">'+data.badge+'</div>':"");
+
+    document.getElementById("soloFeedbackBox").innerHTML =
+      '<div class="f" style="color:#a78bfa;margin-bottom:6px;font-size:.95rem">💬 משוב השופט</div>'
+      +'<div style="color:var(--tx);line-height:1.6;margin-bottom:10px">'+data.feedback+'</div>'
+      +(data.tip?'<div style="color:var(--mu);font-size:.85rem;border-top:1px solid var(--brd);padding-top:8px">💡 טיפ: '+data.tip+'</div>':"");
+
+    document.getElementById("soloDrawingBox").innerHTML =
+      '<img src="'+drawing+'" style="width:100%;border-radius:8px;border:2px solid var(--brd)"/>';
+
+    var nb = document.getElementById("soloNextBtn");
+    nb.textContent = soloRound >= SOLO_ROUNDS ? "🏆 ראה תוצאות" : "➡️ נושא הבא";
+
+  } catch(e) {
+    document.getElementById("soloScoreBox").innerHTML = '<div style="color:var(--mu)">שגיאה בשיפוט</div>';
+  }
+}
+
+function showSoloResults() {
+  document.getElementById("soloGame").style.display = "none";
+  document.getElementById("soloFeedback").style.display = "none";
+  document.getElementById("soloResults").style.display = "block";
+
+  var total = soloScores.reduce(function(s,r){ return s+r.score; }, 0);
+  var avg = Math.round(total/soloScores.length);
+  var medals = ["🥇","🥈","🥉","4️⃣","5️⃣"];
+
+  document.getElementById("soloFinalScore").innerHTML =
+    'ציון ממוצע: <span class="f" style="color:#a78bfa;font-size:1.3rem">'+avg+'/10</span>';
+
+  document.getElementById("soloFinalList").innerHTML = soloScores.map(function(r,i){
+    return '<div class="frow">'
+      +'<span style="font-size:1.1rem;width:28px">'+medals[i]+'</span>'
+      +'<span style="flex:1;font-weight:700">'+r.topic+'</span>'
+      +'<span style="color:#a78bfa;font-weight:700">'+r.score+'/10</span>'
+      +'</div>';
+  }).join("");
+}
+
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
 var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
@@ -590,273 +1127,8 @@ function confetti(){
   }
   setTimeout(function(){c.innerHTML="";},4500);
 }
+
 </script>
-<script>
 
-// ════════════════════════════════════════════════
-// AUTH
-// ════════════════════════════════════════════════
-var currentUser = null;
-var resetUserId = null;
-
-// Auto-login from localStorage
-(function() {
-  var saved = localStorage.getItem("romi_user");
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      showUserBar();
-      // go to sHome after socket connects
-      setTimeout(function(){ go("sHome"); prefillNames(); }, 100);
-    } catch(e) { localStorage.removeItem("romi_user"); }
-  }
-})();
-
-function authTab(t) {
-  ["login","register","reset"].forEach(function(tab) {
-    var tabEl = document.getElementById("ta"+({login:1,register:2,reset:3}[tab]||1));
-    var panelEl = document.getElementById("p"+tab.charAt(0).toUpperCase()+tab.slice(1));
-    if (tabEl) tabEl.classList.toggle("on", tab===t);
-    if (panelEl) panelEl.style.display = tab===t ? "block" : "none";
-  });
-  if (t==="reset") {
-    document.getElementById("resetStep2").style.display="none";
-    document.getElementById("resetBtn").textContent="🔍 מצא חשבון";
-    document.getElementById("resetBtn").setAttribute("data-step","find");
-    document.getElementById("resetErr").textContent="";
-  }
-}
-
-async function doLogin() {
-  var username = document.getElementById("lUser").value.trim();
-  var pin = document.getElementById("lPin").value.trim();
-  var errEl = document.getElementById("loginErr");
-  errEl.textContent = "";
-  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
-  try {
-    var res = await fetch("/auth/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin})});
-    var data = await res.json();
-    if (!data.ok) { errEl.textContent = data.error; return; }
-    currentUser = data.user;
-    localStorage.setItem("romi_user", JSON.stringify(currentUser));
-    showUserBar();
-    go("sHome");
-    prefillNames();
-  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-}
-
-async function doRegister() {
-  var username = document.getElementById("rUser").value.trim();
-  var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
-  var pin = document.getElementById("rPin").value.trim();
-  var errEl = document.getElementById("regErr");
-  errEl.textContent = "";
-  if (!username || !pin || !phone) { errEl.textContent = "מלא את כל השדות"; return; }
-  if (username.length < 2) { errEl.textContent = "שם חייב להיות לפחות 2 תווים"; return; }
-  if (phone.length < 9) { errEl.textContent = "מספר טלפון לא תקין"; return; }
-  var question = document.getElementById("rQuestion").value;
-  var answer = document.getElementById("rAnswer").value.trim().toLowerCase();
-  if (!/^[0-9]{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
-  if (!question) { errEl.textContent = "בחר שאלת אבטחה"; return; }
-  if (!answer) { errEl.textContent = "הכנס תשובה לשאלת האבטחה"; return; }
-  try {
-    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone,question,answer})});
-    var data = await res.json();
-    if (!data.ok) { errEl.textContent = data.error; return; }
-    currentUser = data.user;
-    localStorage.setItem("romi_user", JSON.stringify(currentUser));
-    showUserBar();
-    go("sHome");
-    prefillNames();
-  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-}
-
-async function doReset() {
-  var errEl = document.getElementById("resetErr");
-  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
-  errEl.textContent = "";
-
-  if (step === "find") {
-    // Step 1: find by phone
-    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
-    if (phone.length < 9) { errEl.style.color="var(--r)"; errEl.textContent="מספר לא תקין"; return; }
-    try {
-      var res = await fetch("/auth/find-by-phone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone})});
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
-      resetUserId = data.userId;
-      var qMap = {"pet":"מה שם החיה שלך?","food":"מה האוכל האהוב עליך?","city":"באיזה עיר נולדת?","friend":"מה שם החבר הכי טוב שלך?","color":"מה הצבע האהוב עליך?"};
-      document.getElementById("resetQuestionLbl").textContent = qMap[data.question] || data.question;
-      document.getElementById("resetStep2").style.display="block";
-      document.getElementById("resetBtn").textContent="✔ אמת תשובה";
-      document.getElementById("resetBtn").setAttribute("data-step","verify");
-      errEl.style.color="var(--g)"; errEl.textContent="נמצא: "+data.username;
-    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
-
-  } else if (step === "verify") {
-    // Step 2: verify security answer
-    var answer = document.getElementById("resetAnswer").value.trim().toLowerCase();
-    if (!answer) { errEl.style.color="var(--r)"; errEl.textContent="הכנס תשובה"; return; }
-    try {
-      var res = await fetch("/auth/verify-answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,answer})});
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent="תשובה שגויה ❌"; return; }
-      document.getElementById("resetStep3").style.display="block";
-      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
-      document.getElementById("resetBtn").setAttribute("data-step","save");
-      errEl.style.color="var(--g)"; errEl.textContent="התשובה נכונה! ✅";
-    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
-
-  } else {
-    // Step 3: save new pin
-    var pin = document.getElementById("resetPin").value.trim();
-    if (!/^[0-9]{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent="4 ספרות בלבד"; return; }
-    try {
-      var res = await fetch("/auth/reset-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,pin})});
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
-      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש ✅";
-      setTimeout(function(){ authTab("login"); }, 2000);
-    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
-  }
-}
-
-function doLogout() {
-  currentUser = null;
-  localStorage.removeItem("romi_user");
-  document.getElementById("userBar").style.display="none";
-  go("sAuth");
-}
-
-function showUserBar() {
-  var bar = document.getElementById("userBar");
-  bar.style.display="flex";
-  document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
-  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
-  showMyBadges();
-}
-
-function leaveRoom() {
-  if (socket && myRoomId) {
-    socket.emit("leave_room");
-    myRoomId = null;
-  }
-  go("sHome");
-}
-
-function prefillNames() {
-  if (!currentUser) return;
-  var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
-  var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
-}
-
-// ════════════════════════════════════════════════
-// SHARE & INSTALL
-// ════════════════════════════════════════════════
-var deferredInstallPrompt = null;
-
-window.addEventListener("beforeinstallprompt", function(e) {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  var btn = document.getElementById("installBtn");
-  if (btn) btn.style.display = "block";
-});
-
-window.addEventListener("appinstalled", function() {
-  var btn = document.getElementById("installBtn");
-  if (btn) btn.style.display = "none";
-  toast("האפליקציה הותקנה! 🎉");
-});
-
-function shareGame() {
-  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
-  if (navigator.share) {
-    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
-  } else {
-    navigator.clipboard.writeText(location.origin).then(function(){ toast("הקישור הועתק! 📋"); });
-  }
-}
-
-function installApp() {
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then(function(result) {
-      if (result.outcome === "accepted") toast("מתקין... 📱");
-      deferredInstallPrompt = null;
-      var btn = document.getElementById("installBtn");
-      if (btn) btn.style.display = "none";
-    });
-  } else {
-    toast("ב-Safari: לחץ שתף ← הוסף למסך הבית 📱");
-  }
-}
-
-// ════════════════════════════════════════════════
-// LEADERBOARD & BADGES
-// ════════════════════════════════════════════════
-var BADGE_MAP = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
-var BADGE_EMOJI = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
-
-async function openLeaderboard() {
-  go("sLeader");
-  try {
-    var res = await fetch("/leaderboard");
-    var data = await res.json();
-    var medals = ["🥇","🥈","🥉"];
-    document.getElementById("leaderList").innerHTML = data.length===0
-      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
-      : data.map(function(u,i){
-          var badgeEmojis = (u.badges||[]).map(function(b){return BADGE_EMOJI[b]||"";}).join("");
-          return "<div class='frow'>"
-            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
-            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
-            +"<span style='color:var(--y);font-size:.85rem;margin-left:6px'>"+u.wins+" ⭐</span>"
-            +(badgeEmojis?"<span style='font-size:.8rem;margin-right:4px'>"+badgeEmojis+"</span>":"")
-            +"</div>";
-        }).join("");
-  } catch(e) {
-    document.getElementById("leaderList").innerHTML="<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
-  }
-}
-
-function showMyBadges() {
-  if (!currentUser||!currentUser.badges||currentUser.badges.length===0) return;
-  var el=document.getElementById("myBadges");
-  el.style.display="flex";
-  el.innerHTML=currentUser.badges.map(function(b){
-    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.78rem'>"+(BADGE_MAP[b]||b)+"</span>";
-  }).join("");
-}
-
-function showNewBadges(badges) {
-  if(!badges||!badges.length) return;
-  var wrap=document.getElementById("newBadgesWrap");
-  var list=document.getElementById("newBadgesList");
-  if(!wrap||!list) return;
-  wrap.style.display="block";
-  list.innerHTML=badges.map(function(b){
-    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
-  }).join("");
-}
-
-function shareResult() {
-  if(!curRoom) return;
-  var sorted=curRoom.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
-  var winner=sorted[0];
-  var text="🎨 שיחקתי תחרות הציורים של רומי!\n🏆 "+winner.name+" ניצח עם "+winner.score+" נקודות!\nבוא לשחק: "+location.origin;
-  if(navigator.share){ navigator.share({title:"תחרות הציורים של רומי",text:text,url:location.origin}); }
-  else { navigator.clipboard.writeText(text).then(function(){toast("הועתק לשיתוף! 📋");}); }
-}
-
-if("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker.register("/sw.js").then(function(reg) {
-      console.log("SW registered");
-    }).catch(function(err) {
-      console.log("SW error:", err);
-    });
-  });
-}
-</script>
 </body>
 </html>
