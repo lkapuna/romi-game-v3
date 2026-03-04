@@ -106,6 +106,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div class="tabs">
         <div class="tab on" id="ta1" onclick="authTab('login')">כניסה</div>
         <div class="tab" id="ta2" onclick="authTab('register')">הרשמה</div>
+        <div class="tab" id="ta3" onclick="authTab('reset')" style="display:none"></div>
       </div>
 
       <!-- LOGIN -->
@@ -117,6 +118,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
           <input class="inp" id="lPin" type="password" maxlength="4" inputmode="numeric" placeholder="&#9679;&#9679;&#9679;&#9679;" style="margin-bottom:0;font-size:1.4rem;letter-spacing:6px;text-align:center"/>
         </div>
         <button class="btn btn-blue" onclick="doLogin()">&#128274; כנס למשחק</button>
+        <div style="text-align:center;margin-top:10px">
+          <span onclick="authTab('reset')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline">שכחתי את הקוד</span>
+        </div>
         <div id="loginErr" style="color:var(--r);text-align:center;margin-top:10px;font-size:.88rem"></div>
       </div>
 
@@ -124,6 +128,8 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div id="pRegister" style="display:none">
         <label class="lbl">בחר שם משתמש</label>
         <input class="inp" id="rUser" placeholder="למשל: רומי123"/>
+        <label class="lbl">מספר טלפון</label>
+        <input class="inp" id="rPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX" style="margin-bottom:12px"/>
         <label class="lbl">בחר קוד סודי (4 ספרות)</label>
         <div style="display:flex;gap:8px;margin-bottom:16px">
           <input class="inp" id="rPin" type="password" maxlength="4" inputmode="numeric" placeholder="&#9679;&#9679;&#9679;&#9679;" style="margin-bottom:0;font-size:1.4rem;letter-spacing:6px;text-align:center"/>
@@ -131,6 +137,22 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn btn-green" onclick="doRegister()">&#10024; צור חשבון</button>
         <div id="regErr" style="color:var(--r);text-align:center;margin-top:10px;font-size:.88rem"></div>
       </div>
+      <!-- RESET -->
+      <div id="pReset" style="display:none">
+        <h3 class="f" style="color:var(--y);margin-bottom:14px;font-size:1.1rem">&#128273; איפוס קוד סודי</h3>
+        <label class="lbl">מספר טלפון שנרשמת איתו</label>
+        <input class="inp" id="resetPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
+        <div id="resetStep2" style="display:none">
+          <label class="lbl">קוד סודי חדש (4 ספרות)</label>
+          <input class="inp" id="resetPin" type="password" maxlength="4" inputmode="numeric" placeholder="&#9679;&#9679;&#9679;&#9679;" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
+        </div>
+        <button class="btn btn-yel" onclick="doReset()" id="resetBtn">&#128269; מצא חשבון</button>
+        <div id="resetErr" style="color:var(--r);text-align:center;margin-top:10px;font-size:.88rem"></div>
+        <div style="text-align:center;margin-top:10px">
+          <span onclick="authTab('login')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline">חזרה לכניסה</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -265,6 +287,14 @@ function authTab(t) {
   document.getElementById("ta2").classList.toggle("on", t==="register");
   document.getElementById("pLogin").style.display = t==="login"?"block":"none";
   document.getElementById("pRegister").style.display = t==="register"?"block":"none";
+  document.getElementById("pReset").style.display = t==="reset"?"block":"none";
+  // reset state
+  if (t==="reset") {
+    document.getElementById("resetStep2").style.display="none";
+    document.getElementById("resetBtn").textContent="&#128269; מצא חשבון";
+    document.getElementById("resetBtn").setAttribute("data-step","find");
+    document.getElementById("resetErr").textContent="";
+  }
 }
 
 async function doLogin() {
@@ -293,7 +323,9 @@ async function doRegister() {
   if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
   if (!/^\d{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות בדיוק 4 ספרות"; return; }
   try {
-    var res = await fetch("/auth/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username,pin}) });
+    var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
+  if (!phone || phone.length < 9) { errEl.textContent = "הכנס מספר טלפון תקין"; return; }
+  var res = await fetch("/auth/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username,pin,phone}) });
     var data = await res.json();
     if (!data.ok) { errEl.textContent = data.error; return; }
     currentUser = data.user;
@@ -318,6 +350,41 @@ function leaveRoom() {
     myRoomId = null;
   }
   go("sHome");
+}
+
+var resetUserId = null;
+
+async function doReset() {
+  var errEl = document.getElementById("resetErr");
+  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
+  errEl.textContent = "";
+
+  if (step === "find") {
+    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
+    if (!phone || phone.length < 9) { errEl.textContent = "הכנס מספר טלפון תקין"; return; }
+    try {
+      var res = await fetch("/auth/find-by-phone", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({phone}) });
+      var data = await res.json();
+      if (!data.ok) { errEl.textContent = data.error; return; }
+      resetUserId = data.userId;
+      document.getElementById("resetStep2").style.display = "block";
+      document.getElementById("resetBtn").textContent = "&#128273; שמור קוד חדש";
+      document.getElementById("resetBtn").setAttribute("data-step","save");
+      errEl.style.color = "var(--g)";
+      errEl.textContent = "נמצא חשבון: " + data.username;
+    } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+  } else {
+    var pin = document.getElementById("resetPin").value.trim();
+    if (!/^\d{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
+    try {
+      var res = await fetch("/auth/reset-pin", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({userId:resetUserId, pin}) });
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent = data.error; return; }
+      errEl.style.color = "var(--g)";
+      errEl.textContent = "הקוד עודכן! כנס עם הקוד החדש";
+      setTimeout(function(){ authTab("login"); }, 2000);
+    } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+  }
 }
 
 function prefillNames() {
