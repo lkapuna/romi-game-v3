@@ -159,6 +159,44 @@ async function checkAndAwardBadges(userId) {
   } catch(e) { return []; }
 }
 
+// ── Solo Judge ───────────────────────────────────────────────────────
+app.post("/solo/judge", async function(req, res) {
+  try {
+    var topic = req.body.topic;
+    var drawing = req.body.drawing;
+
+    var response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
+        body:JSON.stringify({
+          model:"meta-llama/llama-4-scout-17b-16e-instruct",
+          max_tokens:400,
+          messages:[{
+            role:"user",
+            content:[
+              { type:"image_url", image_url:{ url: drawing } },
+              { type:"text", text:"אתה שופט ציורים לילדים. הנושא היה: ""+topic+"".
+תן משוב עידוד בעברית.
+ענה JSON בלבד: {"score":מספר_1_עד_10,"feedback":"משוב_חיובי_ומעודד","tip":"טיפ_לשיפור","badge":"תג_מיוחד_אם_ציון_8_ומעלה_או_null"}" }
+            ]
+          }]
+        })
+      }
+    );
+    var data = await response.json();
+    var text = (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content) || "";
+    var m = text.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error("no JSON");
+    var parsed = JSON.parse(m[0]);
+    res.json({ score: parsed.score||5, feedback: parsed.feedback||"ציור יפה!", tip: parsed.tip||"", badge: parsed.badge||null });
+  } catch(e) {
+    console.error("solo judge error:", e.message);
+    res.json({ score: 5, feedback: "ציור יפה! המשך לצייר!", tip: "נסה להוסיף פרטים", badge: null });
+  }
+});
+
 // ── Game State ────────────────────────────────────────────────────────
 const rooms = {};
 const COLORS = ["#ff6b6b","#4d96ff","#ffd93d","#6bcb77","#a78bfa","#ff6fc8"];
