@@ -21,6 +21,7 @@ mongoose.connect(process.env.MONGO_URI).then(function() {
 });
 
 const UserSchema = new mongoose.Schema({
+  phone: { type: String, unique: true, sparse: true },
   username: { type: String, unique: true, trim: true },
   pin: String,
   wins: { type: Number, default: 0 },
@@ -35,14 +36,19 @@ app.post("/auth/register", async function(req, res) {
   try {
     var username = (req.body.username || "").trim();
     var pin = (req.body.pin || "").trim();
+    var phone = (req.body.phone || "").replace(/[^0-9]/g, "");
     if (!username || username.length < 2) return res.json({ ok: false, error: "שם חייב להיות לפחות 2 תווים" });
     if (!/^\d{4}$/.test(pin)) return res.json({ ok: false, error: "הקוד חייב להיות 4 ספרות" });
+    if (!phone || phone.length < 9) return res.json({ ok: false, error: "מספר טלפון לא תקין" });
 
     var exists = await User.findOne({ username: { $regex: new RegExp("^"+username+"$", "i") } });
     if (exists) return res.json({ ok: false, error: "שם זה כבר תפוס, בחר שם אחר" });
 
+    var phoneExists = await User.findOne({ phone: phone });
+    if (phoneExists) return res.json({ ok: false, error: "מספר טלפון זה כבר רשום" });
+
     var hashed = await bcrypt.hash(pin, 10);
-    var user = await User.create({ username: username, pin: hashed });
+    var user = await User.create({ username: username, pin: hashed, phone: phone });
     res.json({ ok: true, user: { id: user._id, username: user.username, wins: 0, gamesPlayed: 0 } });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
@@ -58,6 +64,30 @@ app.post("/auth/login", async function(req, res) {
     var match = await bcrypt.compare(pin, user.pin);
     if (!match) return res.json({ ok: false, error: "קוד שגוי" });
     res.json({ ok: true, user: { id: user._id, username: user.username, wins: user.wins, gamesPlayed: user.gamesPlayed } });
+  } catch(e) {
+    res.json({ ok: false, error: "שגיאה, נסה שוב" });
+  }
+});
+
+app.post("/auth/find-by-phone", async function(req, res) {
+  try {
+    var phone = (req.body.phone || "").replace(/[^0-9]/g, "");
+    var user = await User.findOne({ phone: phone });
+    if (!user) return res.json({ ok: false, error: "לא נמצא חשבון עם מספר זה" });
+    res.json({ ok: true, userId: user._id, username: user.username });
+  } catch(e) {
+    res.json({ ok: false, error: "שגיאה, נסה שוב" });
+  }
+});
+
+app.post("/auth/reset-pin", async function(req, res) {
+  try {
+    var userId = req.body.userId;
+    var pin = (req.body.pin || "").trim();
+    if (!/^\d{4}$/.test(pin)) return res.json({ ok: false, error: "קוד לא תקין" });
+    var hashed = await bcrypt.hash(pin, 10);
+    await User.findByIdAndUpdate(userId, { pin: hashed });
+    res.json({ ok: true });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
   }
