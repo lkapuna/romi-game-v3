@@ -177,9 +177,9 @@ app.post("/solo/judge", async function(req, res) {
             role:"user",
             content:[
               { type:"image_url", image_url:{ url: drawing } },
-              { type:"text", text:"אתה שופט ציורים לילדים. הנושא היה: ""+topic+"".
-תן משוב עידוד בעברית.
-ענה JSON בלבד: {"score":מספר_1_עד_10,"feedback":"משוב_חיובי_ומעודד","tip":"טיפ_לשיפור","badge":"תג_מיוחד_אם_ציון_8_ומעלה_או_null"}" }
+              { type:"text", text:"אתה שופט ציורים לילדים. הנושא היה: "+topic+". תן ציון ומשוב מעודד בעברית. ענה JSON בלבד: {score:מספר,feedback:משוב,tip:טיפ,badge:תג_או_null}" }
+
+
             ]
           }]
         })
