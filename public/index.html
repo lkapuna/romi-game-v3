@@ -341,7 +341,275 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   </div>
 </div>
 
+
+
 <script>
+
+// ════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════
+var currentUser = null;
+var resetUserId = null;
+
+// Auto-login from localStorage
+(function() {
+  var saved = localStorage.getItem("romi_user");
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showUserBar();
+      // go to sHome after socket connects
+      setTimeout(function(){ go("sHome"); prefillNames(); }, 100);
+    } catch(e) { localStorage.removeItem("romi_user"); }
+  }
+})();
+
+function authTab(t) {
+  ["login","register","reset"].forEach(function(tab) {
+    var tabEl = document.getElementById("ta"+({login:1,register:2,reset:3}[tab]||1));
+    var panelEl = document.getElementById("p"+tab.charAt(0).toUpperCase()+tab.slice(1));
+    if (tabEl) tabEl.classList.toggle("on", tab===t);
+    if (panelEl) panelEl.style.display = tab===t ? "block" : "none";
+  });
+  if (t==="reset") {
+    document.getElementById("resetStep2").style.display="none";
+    document.getElementById("resetBtn").textContent="🔍 מצא חשבון";
+    document.getElementById("resetBtn").setAttribute("data-step","find");
+    document.getElementById("resetErr").textContent="";
+  }
+}
+
+async function doLogin() {
+  var username = document.getElementById("lUser").value.trim();
+  var pin = document.getElementById("lPin").value.trim();
+  var errEl = document.getElementById("loginErr");
+  errEl.textContent = "";
+  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
+  try {
+    var res = await fetch("/auth/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin})});
+    var data = await res.json();
+    if (!data.ok) { errEl.textContent = data.error; return; }
+    currentUser = data.user;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    showUserBar();
+    go("sHome");
+    prefillNames();
+  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+}
+
+async function doRegister() {
+  var username = document.getElementById("rUser").value.trim();
+  var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
+  var pin = document.getElementById("rPin").value.trim();
+  var errEl = document.getElementById("regErr");
+  errEl.textContent = "";
+  if (!username || !pin || !phone) { errEl.textContent = "מלא את כל השדות"; return; }
+  if (username.length < 2) { errEl.textContent = "שם חייב להיות לפחות 2 תווים"; return; }
+  if (phone.length < 9) { errEl.textContent = "מספר טלפון לא תקין"; return; }
+  var question = document.getElementById("rQuestion").value;
+  var answer = document.getElementById("rAnswer").value.trim().toLowerCase();
+  if (!/^[0-9]{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
+  if (!question) { errEl.textContent = "בחר שאלת אבטחה"; return; }
+  if (!answer) { errEl.textContent = "הכנס תשובה לשאלת האבטחה"; return; }
+  try {
+    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone,question,answer})});
+    var data = await res.json();
+    if (!data.ok) { errEl.textContent = data.error; return; }
+    currentUser = data.user;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    showUserBar();
+    go("sHome");
+    prefillNames();
+  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
+}
+
+async function doReset() {
+  var errEl = document.getElementById("resetErr");
+  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
+  errEl.textContent = "";
+
+  if (step === "find") {
+    // Step 1: find by phone
+    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
+    if (phone.length < 9) { errEl.style.color="var(--r)"; errEl.textContent="מספר לא תקין"; return; }
+    try {
+      var res = await fetch("/auth/find-by-phone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
+      resetUserId = data.userId;
+      var qMap = {"pet":"מה שם החיה שלך?","food":"מה האוכל האהוב עליך?","city":"באיזה עיר נולדת?","friend":"מה שם החבר הכי טוב שלך?","color":"מה הצבע האהוב עליך?"};
+      document.getElementById("resetQuestionLbl").textContent = qMap[data.question] || data.question;
+      document.getElementById("resetStep2").style.display="block";
+      document.getElementById("resetBtn").textContent="✔ אמת תשובה";
+      document.getElementById("resetBtn").setAttribute("data-step","verify");
+      errEl.style.color="var(--g)"; errEl.textContent="נמצא: "+data.username;
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+
+  } else if (step === "verify") {
+    // Step 2: verify security answer
+    var answer = document.getElementById("resetAnswer").value.trim().toLowerCase();
+    if (!answer) { errEl.style.color="var(--r)"; errEl.textContent="הכנס תשובה"; return; }
+    try {
+      var res = await fetch("/auth/verify-answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,answer})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent="תשובה שגויה ❌"; return; }
+      document.getElementById("resetStep3").style.display="block";
+      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
+      document.getElementById("resetBtn").setAttribute("data-step","save");
+      errEl.style.color="var(--g)"; errEl.textContent="התשובה נכונה! ✅";
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+
+  } else {
+    // Step 3: save new pin
+    var pin = document.getElementById("resetPin").value.trim();
+    if (!/^[0-9]{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent="4 ספרות בלבד"; return; }
+    try {
+      var res = await fetch("/auth/reset-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,pin})});
+      var data = await res.json();
+      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
+      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש ✅";
+      setTimeout(function(){ authTab("login"); }, 2000);
+    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem("romi_user");
+  document.getElementById("userBar").style.display="none";
+  go("sAuth");
+}
+
+function showUserBar() {
+  var bar = document.getElementById("userBar");
+  bar.style.display="flex";
+  document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
+  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
+  showMyBadges();
+}
+
+function leaveRoom() {
+  if (socket && myRoomId) {
+    socket.emit("leave_room");
+    myRoomId = null;
+  }
+  go("sHome");
+}
+
+function prefillNames() {
+  if (!currentUser) return;
+  var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
+  var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
+}
+
+// ════════════════════════════════════════════════
+// SHARE & INSTALL
+// ════════════════════════════════════════════════
+var deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  var btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "block";
+});
+
+window.addEventListener("appinstalled", function() {
+  var btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "none";
+  toast("האפליקציה הותקנה! 🎉");
+});
+
+function shareGame() {
+  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  if (navigator.share) {
+    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
+  } else {
+    navigator.clipboard.writeText(location.origin).then(function(){ toast("הקישור הועתק! 📋"); });
+  }
+}
+
+function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(function(result) {
+      if (result.outcome === "accepted") toast("מתקין... 📱");
+      deferredInstallPrompt = null;
+      var btn = document.getElementById("installBtn");
+      if (btn) btn.style.display = "none";
+    });
+  } else {
+    toast("ב-Safari: לחץ שתף ← הוסף למסך הבית 📱");
+  }
+}
+
+// ════════════════════════════════════════════════
+// LEADERBOARD & BADGES
+// ════════════════════════════════════════════════
+var BADGE_MAP = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
+var BADGE_EMOJI = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
+
+async function openLeaderboard() {
+  go("sLeader");
+  try {
+    var res = await fetch("/leaderboard");
+    var data = await res.json();
+    var medals = ["🥇","🥈","🥉"];
+    document.getElementById("leaderList").innerHTML = data.length===0
+      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
+      : data.map(function(u,i){
+          var badgeEmojis = (u.badges||[]).map(function(b){return BADGE_EMOJI[b]||"";}).join("");
+          return "<div class='frow'>"
+            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
+            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
+            +"<span style='color:var(--y);font-size:.85rem;margin-left:6px'>"+u.wins+" ⭐</span>"
+            +(badgeEmojis?"<span style='font-size:.8rem;margin-right:4px'>"+badgeEmojis+"</span>":"")
+            +"</div>";
+        }).join("");
+  } catch(e) {
+    document.getElementById("leaderList").innerHTML="<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
+  }
+}
+
+function showMyBadges() {
+  if (!currentUser||!currentUser.badges||currentUser.badges.length===0) return;
+  var el=document.getElementById("myBadges");
+  el.style.display="flex";
+  el.innerHTML=currentUser.badges.map(function(b){
+    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.78rem'>"+(BADGE_MAP[b]||b)+"</span>";
+  }).join("");
+}
+
+function showNewBadges(badges) {
+  if(!badges||!badges.length) return;
+  var wrap=document.getElementById("newBadgesWrap");
+  var list=document.getElementById("newBadgesList");
+  if(!wrap||!list) return;
+  wrap.style.display="block";
+  list.innerHTML=badges.map(function(b){
+    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
+  }).join("");
+}
+
+function shareResult() {
+  if(!curRoom) return;
+  var sorted=curRoom.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
+  var winner=sorted[0];
+  var text="🎨 שיחקתי תחרות הציורים של רומי!\n🏆 "+winner.name+" ניצח עם "+winner.score+" נקודות!\nבוא לשחק: "+location.origin;
+  if(navigator.share){ navigator.share({title:"תחרות הציורים של רומי",text:text,url:location.origin}); }
+  else { navigator.clipboard.writeText(text).then(function(){toast("הועתק לשיתוף! 📋");}); }
+}
+
+if("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/sw.js").then(function(reg) {
+      console.log("SW registered");
+    }).catch(function(err) {
+      console.log("SW error:", err);
+    });
+  });
+}
+
 
 // ════════════════════════════════════════════════
 // SOLO MODE
@@ -399,7 +667,7 @@ function initSoloCanvas() {
 
   var sw = document.getElementById("soloSwatches");
   sw.innerHTML = COLS.map(function(c){
-    return '<div class="sw'+(c===soloCol?" on":"")+'" style="background:'+c+'" onclick="setSoloCol(''+c+'')"></div>';
+  sw.innerHTML = COLS.map(function(c){ return '<div class="sw'+(c===soloCol?' on':'')+'" style="background:'+c+'" onclick="setSoloCol(this,\''+c+'\')" ></div>'; }).join("");
   }).join("");
 
   document.getElementById("soloBSize").oninput = function(e){ soloBsz = +e.target.value; };
@@ -821,273 +1089,8 @@ function confetti(){
   }
   setTimeout(function(){c.innerHTML="";},4500);
 }
+
 </script>
-<script>
 
-// ════════════════════════════════════════════════
-// AUTH
-// ════════════════════════════════════════════════
-var currentUser = null;
-var resetUserId = null;
-
-// Auto-login from localStorage
-(function() {
-  var saved = localStorage.getItem("romi_user");
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      showUserBar();
-      // go to sHome after socket connects
-      setTimeout(function(){ go("sHome"); prefillNames(); }, 100);
-    } catch(e) { localStorage.removeItem("romi_user"); }
-  }
-})();
-
-function authTab(t) {
-  ["login","register","reset"].forEach(function(tab) {
-    var tabEl = document.getElementById("ta"+({login:1,register:2,reset:3}[tab]||1));
-    var panelEl = document.getElementById("p"+tab.charAt(0).toUpperCase()+tab.slice(1));
-    if (tabEl) tabEl.classList.toggle("on", tab===t);
-    if (panelEl) panelEl.style.display = tab===t ? "block" : "none";
-  });
-  if (t==="reset") {
-    document.getElementById("resetStep2").style.display="none";
-    document.getElementById("resetBtn").textContent="🔍 מצא חשבון";
-    document.getElementById("resetBtn").setAttribute("data-step","find");
-    document.getElementById("resetErr").textContent="";
-  }
-}
-
-async function doLogin() {
-  var username = document.getElementById("lUser").value.trim();
-  var pin = document.getElementById("lPin").value.trim();
-  var errEl = document.getElementById("loginErr");
-  errEl.textContent = "";
-  if (!username || !pin) { errEl.textContent = "מלא את כל השדות"; return; }
-  try {
-    var res = await fetch("/auth/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin})});
-    var data = await res.json();
-    if (!data.ok) { errEl.textContent = data.error; return; }
-    currentUser = data.user;
-    localStorage.setItem("romi_user", JSON.stringify(currentUser));
-    showUserBar();
-    go("sHome");
-    prefillNames();
-  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-}
-
-async function doRegister() {
-  var username = document.getElementById("rUser").value.trim();
-  var phone = document.getElementById("rPhone").value.trim().replace(/[^0-9]/g,"");
-  var pin = document.getElementById("rPin").value.trim();
-  var errEl = document.getElementById("regErr");
-  errEl.textContent = "";
-  if (!username || !pin || !phone) { errEl.textContent = "מלא את כל השדות"; return; }
-  if (username.length < 2) { errEl.textContent = "שם חייב להיות לפחות 2 תווים"; return; }
-  if (phone.length < 9) { errEl.textContent = "מספר טלפון לא תקין"; return; }
-  var question = document.getElementById("rQuestion").value;
-  var answer = document.getElementById("rAnswer").value.trim().toLowerCase();
-  if (!/^[0-9]{4}$/.test(pin)) { errEl.textContent = "הקוד חייב להיות 4 ספרות"; return; }
-  if (!question) { errEl.textContent = "בחר שאלת אבטחה"; return; }
-  if (!answer) { errEl.textContent = "הכנס תשובה לשאלת האבטחה"; return; }
-  try {
-    var res = await fetch("/auth/register", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,pin,phone,question,answer})});
-    var data = await res.json();
-    if (!data.ok) { errEl.textContent = data.error; return; }
-    currentUser = data.user;
-    localStorage.setItem("romi_user", JSON.stringify(currentUser));
-    showUserBar();
-    go("sHome");
-    prefillNames();
-  } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
-}
-
-async function doReset() {
-  var errEl = document.getElementById("resetErr");
-  var step = document.getElementById("resetBtn").getAttribute("data-step") || "find";
-  errEl.textContent = "";
-
-  if (step === "find") {
-    // Step 1: find by phone
-    var phone = document.getElementById("resetPhone").value.trim().replace(/[^0-9]/g,"");
-    if (phone.length < 9) { errEl.style.color="var(--r)"; errEl.textContent="מספר לא תקין"; return; }
-    try {
-      var res = await fetch("/auth/find-by-phone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone})});
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
-      resetUserId = data.userId;
-      var qMap = {"pet":"מה שם החיה שלך?","food":"מה האוכל האהוב עליך?","city":"באיזה עיר נולדת?","friend":"מה שם החבר הכי טוב שלך?","color":"מה הצבע האהוב עליך?"};
-      document.getElementById("resetQuestionLbl").textContent = qMap[data.question] || data.question;
-      document.getElementById("resetStep2").style.display="block";
-      document.getElementById("resetBtn").textContent="✔ אמת תשובה";
-      document.getElementById("resetBtn").setAttribute("data-step","verify");
-      errEl.style.color="var(--g)"; errEl.textContent="נמצא: "+data.username;
-    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
-
-  } else if (step === "verify") {
-    // Step 2: verify security answer
-    var answer = document.getElementById("resetAnswer").value.trim().toLowerCase();
-    if (!answer) { errEl.style.color="var(--r)"; errEl.textContent="הכנס תשובה"; return; }
-    try {
-      var res = await fetch("/auth/verify-answer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,answer})});
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent="תשובה שגויה ❌"; return; }
-      document.getElementById("resetStep3").style.display="block";
-      document.getElementById("resetBtn").textContent="🔑 שמור קוד חדש";
-      document.getElementById("resetBtn").setAttribute("data-step","save");
-      errEl.style.color="var(--g)"; errEl.textContent="התשובה נכונה! ✅";
-    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
-
-  } else {
-    // Step 3: save new pin
-    var pin = document.getElementById("resetPin").value.trim();
-    if (!/^[0-9]{4}$/.test(pin)) { errEl.style.color="var(--r)"; errEl.textContent="4 ספרות בלבד"; return; }
-    try {
-      var res = await fetch("/auth/reset-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:resetUserId,pin})});
-      var data = await res.json();
-      if (!data.ok) { errEl.style.color="var(--r)"; errEl.textContent=data.error; return; }
-      errEl.style.color="var(--g)"; errEl.textContent="הקוד עודכן! כנס עם הקוד החדש ✅";
-      setTimeout(function(){ authTab("login"); }, 2000);
-    } catch(e) { errEl.style.color="var(--r)"; errEl.textContent="שגיאה"; }
-  }
-}
-
-function doLogout() {
-  currentUser = null;
-  localStorage.removeItem("romi_user");
-  document.getElementById("userBar").style.display="none";
-  go("sAuth");
-}
-
-function showUserBar() {
-  var bar = document.getElementById("userBar");
-  bar.style.display="flex";
-  document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
-  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
-  showMyBadges();
-}
-
-function leaveRoom() {
-  if (socket && myRoomId) {
-    socket.emit("leave_room");
-    myRoomId = null;
-  }
-  go("sHome");
-}
-
-function prefillNames() {
-  if (!currentUser) return;
-  var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
-  var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
-}
-
-// ════════════════════════════════════════════════
-// SHARE & INSTALL
-// ════════════════════════════════════════════════
-var deferredInstallPrompt = null;
-
-window.addEventListener("beforeinstallprompt", function(e) {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  var btn = document.getElementById("installBtn");
-  if (btn) btn.style.display = "block";
-});
-
-window.addEventListener("appinstalled", function() {
-  var btn = document.getElementById("installBtn");
-  if (btn) btn.style.display = "none";
-  toast("האפליקציה הותקנה! 🎉");
-});
-
-function shareGame() {
-  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
-  if (navigator.share) {
-    navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
-  } else {
-    navigator.clipboard.writeText(location.origin).then(function(){ toast("הקישור הועתק! 📋"); });
-  }
-}
-
-function installApp() {
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then(function(result) {
-      if (result.outcome === "accepted") toast("מתקין... 📱");
-      deferredInstallPrompt = null;
-      var btn = document.getElementById("installBtn");
-      if (btn) btn.style.display = "none";
-    });
-  } else {
-    toast("ב-Safari: לחץ שתף ← הוסף למסך הבית 📱");
-  }
-}
-
-// ════════════════════════════════════════════════
-// LEADERBOARD & BADGES
-// ════════════════════════════════════════════════
-var BADGE_MAP = {"first_win":"🥇 ניצחון ראשון","10_wins":"🏆 מלך הציור","50_wins":"🌟 אגדת הציור","streak3":"🔥 3 ברצף","streak5":"⚡ 5 ברצף","10_games":"🎮 שחקן מנוסה","50_games":"🎨 אמן אמיתי"};
-var BADGE_EMOJI = {"first_win":"🥇","10_wins":"🏆","50_wins":"🌟","streak3":"🔥","streak5":"⚡","10_games":"🎮","50_games":"🎨"};
-
-async function openLeaderboard() {
-  go("sLeader");
-  try {
-    var res = await fetch("/leaderboard");
-    var data = await res.json();
-    var medals = ["🥇","🥈","🥉"];
-    document.getElementById("leaderList").innerHTML = data.length===0
-      ? "<div style='text-align:center;color:var(--mu);padding:20px'>אין שחקנים עדיין</div>"
-      : data.map(function(u,i){
-          var badgeEmojis = (u.badges||[]).map(function(b){return BADGE_EMOJI[b]||"";}).join("");
-          return "<div class='frow'>"
-            +"<span class='f' style='font-size:1.2rem;width:30px;text-align:center'>"+(medals[i]||(i+1))+"</span>"
-            +"<span style='flex:1;font-weight:700'>"+u.username+"</span>"
-            +"<span style='color:var(--y);font-size:.85rem;margin-left:6px'>"+u.wins+" ⭐</span>"
-            +(badgeEmojis?"<span style='font-size:.8rem;margin-right:4px'>"+badgeEmojis+"</span>":"")
-            +"</div>";
-        }).join("");
-  } catch(e) {
-    document.getElementById("leaderList").innerHTML="<div style='text-align:center;color:var(--mu)'>שגיאה בטעינה</div>";
-  }
-}
-
-function showMyBadges() {
-  if (!currentUser||!currentUser.badges||currentUser.badges.length===0) return;
-  var el=document.getElementById("myBadges");
-  el.style.display="flex";
-  el.innerHTML=currentUser.badges.map(function(b){
-    return "<span style='background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;font-size:.78rem'>"+(BADGE_MAP[b]||b)+"</span>";
-  }).join("");
-}
-
-function showNewBadges(badges) {
-  if(!badges||!badges.length) return;
-  var wrap=document.getElementById("newBadgesWrap");
-  var list=document.getElementById("newBadgesList");
-  if(!wrap||!list) return;
-  wrap.style.display="block";
-  list.innerHTML=badges.map(function(b){
-    return "<span style='background:rgba(255,217,61,.15);border:1px solid var(--y);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--y)'>"+b+"</span>";
-  }).join("");
-}
-
-function shareResult() {
-  if(!curRoom) return;
-  var sorted=curRoom.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
-  var winner=sorted[0];
-  var text="🎨 שיחקתי תחרות הציורים של רומי!\n🏆 "+winner.name+" ניצח עם "+winner.score+" נקודות!\nבוא לשחק: "+location.origin;
-  if(navigator.share){ navigator.share({title:"תחרות הציורים של רומי",text:text,url:location.origin}); }
-  else { navigator.clipboard.writeText(text).then(function(){toast("הועתק לשיתוף! 📋");}); }
-}
-
-if("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker.register("/sw.js").then(function(reg) {
-      console.log("SW registered");
-    }).catch(function(err) {
-      console.log("SW error:", err);
-    });
-  });
-}
-</script>
 </body>
 </html>
