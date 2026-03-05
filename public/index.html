@@ -567,7 +567,7 @@ window.addEventListener("appinstalled", function() {
 });
 
 function shareGame() {
-  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  var text = "🎨 בוא לשחק בתחרות הציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
   if (navigator.share) {
     navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
   } else {
@@ -660,7 +660,7 @@ if("serviceWorker" in navigator) {
 // ════════════════════════════════════════════════
 // SOLO MODE
 // ════════════════════════════════════════════════
-var SOLO_TOPICS = ["חתול","בית","עץ","מכונית","שמש","דג","ציפור","פרח","כוכב","רובוט","עוגה","רקטה","בלון","ים","הר","פרפר","ספינה","מטוס","דינוזאור","גשר","כלב","סוס","צב","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה"];
+var SOLO_TOPICS = ["חתול","כלב","סוס","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה","צב","דג","ציפור","פרפר","תוכי","ג'ירפה","קוף","זאב","דב","נחש","תמנון","ינשוף","פיצה","גלידה","המבורגר","תות","אבטיח","עוגה","תפוח","גזר","עץ","פרח","שמש","ים","הר","ענן","קשת","וולקן","יער","ירח","כוכב","מכונית","רקטה","ספינה","מטוס","אופניים","צוללת","רכבת","חללית","בית","בלון","גשר","רובוט","כיסא","מנורה","טלפון","כובע","נעל","שעון","דינוזאור","פיראט","קוסם","נסיכה","דרקון","חייזר","כדורגל","גיטרה","תוף","שחמט","גלישה"];
 var soloRound = 0, soloScores = [], soloTool = "pen", soloCol = "#000", soloBsz = 6;
 var soloDrawing = false, soloLx = 0, soloLy = 0, soloSubmitted = false, soloTimer = null;
 var SOLO_ROUNDS = 5;
@@ -988,7 +988,7 @@ function renderRoomList(list){
     return '<div class="room-item'+(r.id===selRoomId?" sel":"")+'" data-id="'+r.id+'" onclick="selectRoom(this,\''+r.id+'\')">'
       +'<span style="font-size:1.3rem">&#127918;</span>'
       +'<div style="flex:1"><div style="font-weight:700">החדר של '+r.host+'</div>'
-      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים</div></div>'
+      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים'+(r.category&&r.category!=='הכל'?' · '+r.category:'')+'</div></div>'
       +'<span style="color:var(--g);font-size:.8rem">פתוח ✅</span>'
       +'</div>';
   }).join("");
