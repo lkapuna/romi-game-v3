@@ -91,8 +91,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 <body>
 <div id="conf"></div>
 <div class="wrap">
-  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div id="homeHeader">
-  <div style="text-align:center;margin-bottom:16px">
+  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
       <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <!-- Fan of color swatches -->
@@ -117,13 +116,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     </div>
     <p style="color:#8892b0;font-size:.92rem;margin:0;text-align:center">תחרות הציורים של רומי</p>
   </div>
-  <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(30,144,255,0.1));border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1px solid rgba(168,85,247,0.25);font-size:.82rem;line-height:1.9">
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7">אימון יחיד</strong> <span style="color:var(--mu)">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff">פתחו חדר</strong> <span style="color:var(--mu)">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573">הצטרפו לחדר</strong> <span style="color:var(--mu)">— הצטרפו למשחק פתוח של חבר</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a">מובילים</strong> <span style="color:var(--mu)">— ראו את השחקנים הטובים ביותר</span></span></div>
-    <div style="border-top:1px solid var(--brd);margin-top:8px;padding-top:8px;color:var(--mu);text-align:center;font-size:.8rem">כולם מציירים את אותו הנושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות <strong style="color:var(--y)">מנצח! 👑</strong></div>
-  </div>
+
 
 
   <!-- AUTH -->
@@ -254,7 +247,6 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- HOME -->
   <div id="sHome" class="screen fu">
     <div class="card">
-  </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
         <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px">🏆 מובילים</button>
         <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף משחק</button>
@@ -283,6 +275,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div class="room-list" id="roomList"><div class="no-rooms">אין חדרים פתוחים כרגע...</div></div>
         <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled>&#128682; הצטרף</button>
       </div>
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(30,144,255,0.1));border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1px solid rgba(168,85,247,0.25);font-size:.82rem;line-height:1.9">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7">אימון יחיד</strong> <span style="color:var(--mu)">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff">פתחו חדר</strong> <span style="color:var(--mu)">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573">הצטרפו לחדר</strong> <span style="color:var(--mu)">— הצטרפו למשחק פתוח של חבר</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a">מובילים</strong> <span style="color:var(--mu)">— ראו את השחקנים הטובים ביותר</span></span></div>
+    <div style="border-top:1px solid var(--brd);margin-top:8px;padding-top:8px;color:var(--mu);text-align:center;font-size:.8rem">כולם מציירים את אותו הנושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות <strong style="color:var(--y)">מנצח! 👑</strong></div>
+  </div>
     </div>
   </div>
 
@@ -711,7 +710,6 @@ function initSoloCanvas() {
   ctx.fillRect(0,0,cv.width,cv.height);
 
   var sw = document.getElementById("soloSwatches");
-  sw.innerHTML = COLS.map(function(c){
   var swColors = ["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
   sw.innerHTML = swColors.map(function(c,i){ 
     var border = c===soloCol ? '2px solid #fff' : '2px solid transparent';
@@ -1121,9 +1119,7 @@ function renderFinal(room){
 function go(id){
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
   document.getElementById(id).classList.add("active");
-  // Hide home header during game, show it on home
-  var hdr = document.getElementById("homeHeader");
-  if (hdr) hdr.style.display = (id==="sHome") ? "block" : "none";
+
   if(id==="sDraw"){
     submitted=false;canvasInited=false;
     document.getElementById("subOver").style.display="none";
