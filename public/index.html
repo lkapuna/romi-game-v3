@@ -308,7 +308,10 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="scores" id="scores1"></div>
     <div class="round-row">
       <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
-      <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
+        <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+      </div>
     </div>
     <div class="topic-box">
       <span style="color:var(--mu);font-size:.8rem">נושא:</span>
@@ -519,6 +522,16 @@ function showUserBar() {
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
   document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
   showMyBadges();
+}
+
+function confirmLeave() {
+  if (confirm("לצאת מהמשחק?")) {
+    if (socket && myRoomId) {
+      socket.emit("leave_room");
+      myRoomId = null;
+    }
+    location.reload();
+  }
 }
 
 function leaveRoom() {
@@ -887,6 +900,10 @@ function doJoin(){
 
 function submitDraw(){
   if(submitted)return;
+  var cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+  var px=ctx.getImageData(0,0,cv.width,cv.height).data,empty=true;
+  for(var i=0;i<px.length;i+=4){if(px[i]<250||px[i+1]<250||px[i+2]<250){empty=false;break;}}
+  if(empty){toast("צייר משהו קודם! 🎨");return;}
   var data=document.getElementById("cv").toDataURL("image/png");
   socket.emit("draw",{drawing:data});
   submitted=true;
