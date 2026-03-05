@@ -116,13 +116,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     </div>
     <p style="color:#8892b0;font-size:.92rem;margin:0;text-align:center">תחרות הציורים של רומי</p>
   </div>
-  <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(30,144,255,0.1));border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1px solid rgba(168,85,247,0.25);font-size:.82rem;line-height:1.9">
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7">אימון יחיד</strong> <span style="color:var(--mu)">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff">פתחו חדר</strong> <span style="color:var(--mu)">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573">הצטרפו לחדר</strong> <span style="color:var(--mu)">— הצטרפו למשחק פתוח של חבר</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a">מובילים</strong> <span style="color:var(--mu)">— ראו את השחקנים הטובים ביותר</span></span></div>
-    <div style="border-top:1px solid var(--brd);margin-top:8px;padding-top:8px;color:var(--mu);text-align:center;font-size:.8rem">כולם מציירים את אותו הנושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות <strong style="color:var(--y)">מנצח! 👑</strong></div>
-  </div>
+
 
 
   <!-- AUTH -->
@@ -281,6 +275,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div class="room-list" id="roomList"><div class="no-rooms">אין חדרים פתוחים כרגע...</div></div>
         <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled>&#128682; הצטרף</button>
       </div>
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(30,144,255,0.1));border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1px solid rgba(168,85,247,0.25);font-size:.82rem;line-height:1.9">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7">אימון יחיד</strong> <span style="color:var(--mu)">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff">פתחו חדר</strong> <span style="color:var(--mu)">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573">הצטרפו לחדר</strong> <span style="color:var(--mu)">— הצטרפו למשחק פתוח של חבר</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a">מובילים</strong> <span style="color:var(--mu)">— ראו את השחקנים הטובים ביותר</span></span></div>
+    <div style="border-top:1px solid var(--brd);margin-top:8px;padding-top:8px;color:var(--mu);text-align:center;font-size:.8rem">כולם מציירים את אותו הנושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות <strong style="color:var(--y)">מנצח! 👑</strong></div>
+  </div>
     </div>
   </div>
 
@@ -307,7 +308,10 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="scores" id="scores1"></div>
     <div class="round-row">
       <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
-      <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
+        <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+      </div>
     </div>
     <div class="topic-box">
       <span style="color:var(--mu);font-size:.8rem">נושא:</span>
@@ -369,7 +373,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
 
 
+
+
+
+
 <script>
+
+
 
 // ════════════════════════════════════════════════
 // AUTH
@@ -512,6 +522,16 @@ function showUserBar() {
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
   document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
   showMyBadges();
+}
+
+function confirmLeave() {
+  if (confirm("לצאת מהמשחק?")) {
+    if (socket && myRoomId) {
+      socket.emit("leave_room");
+      myRoomId = null;
+    }
+    location.reload();
+  }
 }
 
 function leaveRoom() {
@@ -692,8 +712,10 @@ function initSoloCanvas() {
   ctx.fillRect(0,0,cv.width,cv.height);
 
   var sw = document.getElementById("soloSwatches");
-  sw.innerHTML = COLS.map(function(c){
-  sw.innerHTML = COLS.map(function(c,i){ return '<div class="sw" style="background:'+c+';width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid '+(c===soloCol?'#fff':'transparent')+';flex-shrink:0" onclick="setSoloCol('+i+')"></div>'; }).join("");
+  var swColors = ["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
+  sw.innerHTML = swColors.map(function(c,i){ 
+    var border = c===soloCol ? '2px solid #fff' : '2px solid transparent';
+    return '<div style="background:'+c+';width:24px;height:24px;border-radius:50%;cursor:pointer;border:'+border+';flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.4)" onclick="setSoloCol('+i+')"></div>'; 
   }).join("");
 
   document.getElementById("soloBSize").oninput = function(e){ soloBsz = +e.target.value; };
@@ -729,7 +751,8 @@ function setSoloTool(t) {
 }
 
 function setSoloCol(i) {
-  soloCol = COLS[i];
+  var swColors = ["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
+  soloCol = swColors[i];
   setSoloTool("pen");
   document.querySelectorAll("#soloSwatches div").forEach(function(s,j){
     s.style.border = j===i ? "2px solid #fff" : "2px solid transparent";
@@ -877,6 +900,10 @@ function doJoin(){
 
 function submitDraw(){
   if(submitted)return;
+  var cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+  var px=ctx.getImageData(0,0,cv.width,cv.height).data,empty=true;
+  for(var i=0;i<px.length;i+=4){if(px[i]<250||px[i+1]<250||px[i+2]<250){empty=false;break;}}
+  if(empty){toast("צייר משהו קודם! 🎨");return;}
   var data=document.getElementById("cv").toDataURL("image/png");
   socket.emit("draw",{drawing:data});
   submitted=true;
@@ -1088,6 +1115,7 @@ function renderFinal(room){
 function go(id){
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
   document.getElementById(id).classList.add("active");
+
   if(id==="sDraw"){
     submitted=false;canvasInited=false;
     document.getElementById("subOver").style.display="none";
@@ -1128,7 +1156,8 @@ function confetti(){
   setTimeout(function(){c.innerHTML="";},4500);
 }
 
-</script>
 
+
+</script>
 </body>
 </html>
