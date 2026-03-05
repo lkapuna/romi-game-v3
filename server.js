@@ -200,14 +200,24 @@ app.post("/solo/judge", async function(req, res) {
 // ── Game State ────────────────────────────────────────────────────────
 const rooms = {};
 const COLORS = ["#ff6b6b","#4d96ff","#ffd93d","#6bcb77","#a78bfa","#ff6fc8"];
-const TOPICS = ["חתול","בית","עץ","מכונית","שמש","דג","ציפור","פרח","כוכב","רובוט","עוגה","רקטה","בלון","ים","הר","פרפר","ספינה","מטוס","דינוזאור","גשר","כלב","סוס","צב","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה"];
+const TOPICS_BY_CAT = {
+  "חיות": ["חתול","כלב","סוס","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה","צב","דג","ציפור","פרפר","תוכי","ג'ירפה","קוף","זאב","דב","נחש","תמנון","סוס ים","ינשוף","סרטן"],
+  "אוכל": ["עוגה","פיצה","גלידה","המבורגר","סושי","תות","אבטיח","ביצה","עוגיה","לחם","תפוח","גזר","ענבים","גלידה","סלט"],
+  "טבע": ["עץ","פרח","שמש","ים","הר","ענן","קשת","הר געש","מדבר","יער","נהר","מערה","אי","חורף","ירח","כוכב"],
+  "רכבים": ["מכונית","רקטה","ספינה","מטוס","אופניים","קטנוע","טנק","צוללת","רכבת","טרקטור","מסוק","חללית"],
+  "חפצים": ["בית","בלון","גשר","רובוט","כיסא","מנורה","טלפון","מחשב","מטרייה","כובע","נעל","שעון","מפתח"],
+  "פנטזיה": ["דינוזאור","כוכב","פיראט","קוסם","נסיכה","דרקון","חייזר","ניינג'ה","שד","מכשפה"],
+  "ספורט": ["כדורגל","כדורסל","טניס","שחמט","קשת וחץ","גלישה"]
+};
+const ALL_TOPICS = Object.values(TOPICS_BY_CAT).flat();
+const TOPICS = ALL_TOPICS; // default
 const DRAW_TIME = 60;
 const MAX_ROUNDS = 5;
 
 function getLobbyList() {
   return Object.values(rooms)
     .filter(function(r) { return r.phase === "lobby"; })
-    .map(function(r) { return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers }; });
+    .map(function(r) { return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers, category:r.category||"הכל" }; });
 }
 
 function pushLobby() { io.emit("lobby_list", getLobbyList()); }
@@ -227,7 +237,8 @@ function startRound(roomId) {
   r.phase = "drawing";
   r.drawings = {};
   r.lastWinner = null;
-  r.topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+  var topicList = r.category && TOPICS_BY_CAT[r.category] ? TOPICS_BY_CAT[r.category] : ALL_TOPICS;
+  r.topic = topicList[Math.floor(Math.random() * topicList.length)];
   r.timeLeft = DRAW_TIME;
   broadcast(r);
   pushLobby();
@@ -338,8 +349,9 @@ io.on("connection", function(socket) {
 
     var id = Math.random().toString(36).slice(2,8).toUpperCase();
     var max = Math.min(Math.max(+(data.maxPlayers)||2, 2), 3);
+    var cat = data.category || null;
     rooms[id] = {
-      id:id, hostId:socket.id, maxPlayers:max,
+      id:id, hostId:socket.id, maxPlayers:max, category:cat,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
       phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now()
     };
