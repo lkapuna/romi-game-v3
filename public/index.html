@@ -304,14 +304,19 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
   <!-- DRAW -->
   <div id="sDraw" class="screen fu">
-    <div class="scores" id="scores1"></div>
-    <div class="round-row">
-      <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
-      <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+    <div id="drawTopBar">
+      <div class="scores" id="scores1"></div>
+      <div class="round-row">
+        <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
+        <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+      </div>
     </div>
-    <div class="topic-box">
-      <span style="color:var(--mu);font-size:.8rem">נושא:</span>
-      <strong id="topicEl" style="font-size:1.05rem"></strong>
+    <div class="topic-box" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <span style="color:var(--mu);font-size:.8rem">נושא:</span>
+        <strong id="topicEl" style="font-size:1.05rem"></strong>
+      </div>
+      <button id="toggleTopBar" onclick="toggleDrawTop()" style="background:none;border:1px solid var(--brd);color:var(--mu);border-radius:8px;padding:3px 10px;cursor:pointer;font-size:.75rem">הסתר ▲</button>
     </div>
     <div class="card" style="padding:14px;position:relative">
       <div class="tools">
@@ -512,6 +517,18 @@ function showUserBar() {
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
   document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
   showMyBadges();
+}
+
+function toggleDrawTop() {
+  var bar = document.getElementById("drawTopBar");
+  var btn = document.getElementById("toggleTopBar");
+  if (bar.style.display === "none") {
+    bar.style.display = "block";
+    btn.textContent = "הסתר ▲";
+  } else {
+    bar.style.display = "none";
+    btn.textContent = "הצג ▼";
+  }
 }
 
 function leaveRoom() {
@@ -849,7 +866,16 @@ socket.on("state",function(room){
   amHost=(myId===room.hostId);
   renderScores(room);
   if(room.phase==="lobby"){goSafe("sLobby");renderLobby(room);}
-  if(room.phase==="drawing"){goSafe("sDraw");renderDraw(room);}
+  if(room.phase==="drawing"){
+    goSafe("sDraw");
+    renderDraw(room);
+    // Auto-hide top bar to maximize canvas space
+    setTimeout(function(){
+      var bar = document.getElementById("drawTopBar");
+      var btn = document.getElementById("toggleTopBar");
+      if(bar && btn){ bar.style.display="none"; btn.textContent="הצג ▼"; }
+    }, 100);
+  }
   if(room.phase==="judging"){goSafe("sJudge");renderJudging(room);}
   if(room.phase==="results"){goSafe("sJudge");renderResults(room);}
   if(room.phase==="done"){go("sFinal");renderFinal(room);confetti();}
