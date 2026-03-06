@@ -250,8 +250,8 @@ async function judge(roomId) {
   if (!drawers.length) {
     r.phase = "results";
     r.lastWinner = { name:"אף אחד", color:"#aaa", reason:"אף אחד לא צייר!" };
-    broadcast(r);
     io.to(r.id).emit("drawings", r.drawings);
+    broadcast(r);
     return;
   }
 
@@ -320,8 +320,8 @@ async function judge(roomId) {
   }
 
   r.phase = "results";
-  broadcast(r);
   io.to(r.id).emit("drawings", r.drawings);
+  broadcast(r);
 }
 
 // ── Sockets ───────────────────────────────────────────────────────────
