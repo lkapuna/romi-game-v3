@@ -927,6 +927,19 @@ socket.on("drawings",function(d){
 
 socket.on("err",function(msg){toast(msg);});
 
+socket.on("player_left", function(data) {
+  // Show overlay with message and button to go home
+  var overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;";
+  overlay.innerHTML = '<div style="background:var(--surf);border:2px solid var(--brd);border-radius:18px;padding:30px;text-align:center;max-width:300px">'
+    + '<div style="font-size:2.5rem;margin-bottom:12px">😢</div>'
+    + '<div class="f" style="font-size:1.2rem;color:var(--y);margin-bottom:8px">' + data.name + ' עזב את המשחק</div>'
+    + '<div style="color:var(--mu);font-size:.9rem;margin-bottom:20px">המשחק הסתיים</div>'
+    + '<button onclick="location.reload()" style="background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;width:100%">🏠 חזרה לתפריט</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+});
+
 function doCreate(){
   var name=(currentUser&&currentUser.username)||document.getElementById("cName").value.trim()||"מארח";
   socket.emit("create",{name:name,maxPlayers:maxPl,userId:currentUser&&currentUser.id});
