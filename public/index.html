@@ -124,7 +124,6 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
 
   <!-- AUTH -->
-  <div id="floatingEmojis" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden"></div>
   <div id="sAuth" class="screen active fu">
     <div class="card">
       <div class="tabs">
@@ -341,13 +340,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()">&#128465; נקה</button>
         <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()">&#9989; שלח ציור!</button>
       </div>
-      <div style="display:flex;gap:5px;justify-content:center;margin-top:8px">
-        <button onclick="sendEmoji('👍')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:6px 11px;font-size:1.3rem;cursor:pointer">👍</button>
-        <button onclick="sendEmoji('😂')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:6px 11px;font-size:1.3rem;cursor:pointer">😂</button>
-        <button onclick="sendEmoji('🔥')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:6px 11px;font-size:1.3rem;cursor:pointer">🔥</button>
-        <button onclick="sendEmoji('😮')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:6px 11px;font-size:1.3rem;cursor:pointer">😮</button>
-        <button onclick="sendEmoji('❤️')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:6px 11px;font-size:1.3rem;cursor:pointer">❤️</button>
-      </div>
+
       </div>
     </div>
     <div class="wlist" id="wlist"></div>
@@ -557,61 +550,6 @@ function inviteToRoom() {
     var wa = "https://wa.me/?text=" + encodeURIComponent(text);
     window.open(wa, "_blank");
   }
-}
-
-// ── Emoji Reactions ─────────────────────────────────────────────────
-function sendEmoji(emoji) {
-  if (socket && myRoomId) socket.emit("emoji", { emoji: emoji });
-  showFloatingEmoji(emoji, 50);
-}
-
-function showFloatingEmoji(emoji, xPct) {
-  var container = document.getElementById("floatingEmojis");
-  if (!container) return;
-  var el = document.createElement("div");
-  el.className = "emoji-float";
-  el.textContent = emoji;
-  el.style.left = (xPct || Math.random()*80+10) + "%";
-  el.style.bottom = "80px";
-  container.appendChild(el);
-  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 2600);
-}
-
-// ── Suspense Reveal ──────────────────────────────────────────────────
-function showJudgeReveal(room) {
-  go("sJudge");
-  document.getElementById("judgeStep1").style.display = "block";
-  document.getElementById("judgeStep2").style.display = "none";
-  document.getElementById("judgeVerdict").style.display = "none";
-
-  // Show all drawings
-  var dr = document.getElementById("drawingsReveal");
-  dr.innerHTML = room.drawings ? room.drawings.map(function(d) {
-    return '<div style="text-align:center">'
-      +'<div style="color:var(--mu);font-size:.8rem;margin-bottom:4px">'+d.name+'</div>'
-      +'<img src="'+d.drawing+'" style="width:130px;border-radius:8px;border:2px solid var(--brd)"/>'
-      +'</div>';
-  }).join("") : "";
-
-  // After 3s show drumroll
-  setTimeout(function() {
-    document.getElementById("judgeStep1").style.display = "none";
-    document.getElementById("judgeStep2").style.display = "block";
-
-    // Show winner after 2s more
-    setTimeout(function() {
-      if (room.winner) {
-        document.getElementById("winnerRevealName").textContent = "🏆 " + room.winner.name + "!";
-        var winnerDrawing = room.drawings && room.drawings.find(function(d){ return d.name===room.winner.name; });
-        if (winnerDrawing) document.getElementById("winnerRevealImg").src = winnerDrawing.drawing;
-      }
-      // Show verdict after another 2s
-      setTimeout(function() {
-        document.getElementById("judgeVerdict").style.display = "block";
-        renderJudge(room);
-      }, 2000);
-    }, 2000);
-  }, 3000);
 }
 
 function confirmLeave() {
@@ -944,10 +882,6 @@ var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
 var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
 
 socket=io();
-socket.on("emoji", function(data) {
-  showFloatingEmoji(data.emoji, Math.random()*80+10);
-});
-
 socket.on("connect",function(){
   if (window.pendingRoomId) {
     var name = (currentUser&&currentUser.username)||"שחקן";
