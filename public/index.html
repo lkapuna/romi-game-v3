@@ -783,7 +783,7 @@ async function submitSolo() {
   document.getElementById("soloSubmitBtn").disabled = true;
 
   var topic = document.getElementById("soloTopic").getAttribute("data-topic");
-  var drawing = cv.toDataURL("image/png");
+  var drawing = cv.toDataURL("image/jpeg", 0.6);
 
   document.getElementById("soloGame").style.display = "none";
   document.getElementById("soloFeedback").style.display = "block";
