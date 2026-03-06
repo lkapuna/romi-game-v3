@@ -338,15 +338,17 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         </div>
       </div>
       <div class="cact">
-        <div style="display:flex;gap:5px;justify-content:center;margin-bottom:8px">
+        <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()">&#128465; נקה</button>
+        <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()">&#9989; שלח ציור!</button>
+        </div>
+        <div style="display:flex;gap:5px;justify-content:center;margin-top:8px">
           <button onclick="sendEmoji('👍')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">👍</button>
           <button onclick="sendEmoji('😂')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">😂</button>
           <button onclick="sendEmoji('🔥')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">🔥</button>
           <button onclick="sendEmoji('😮')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">😮</button>
           <button onclick="sendEmoji('❤️')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">❤️</button>
         </div>
-        <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()">&#128465; נקה</button>
-        <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()">&#9989; שלח ציור!</button>
+        <div class="cact" style="display:none">
       </div>
     </div>
     <div class="wlist" id="wlist"></div>
@@ -354,24 +356,19 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
   <!-- JUDGE -->
   <div id="sJudge" class="screen fu">
-    <div class="card" style="text-align:center">
-      <div id="judgeReveal">
-        <div id="judgeStep1">
-          <div style="font-size:3rem;margin-bottom:16px">🎨</div>
-          <h2 class="f" style="color:var(--y);font-size:1.4rem;margin-bottom:8px">השופט בוחן את הציורים...</h2>
-          <div style="display:flex;justify-content:center;gap:6px;margin:16px 0">
-            <div class="dot-pulse"></div><div class="dot-pulse" style="animation-delay:.2s"></div><div class="dot-pulse" style="animation-delay:.4s"></div>
-          </div>
-          <div id="drawingsReveal" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px"></div>
-        </div>
-        <div id="judgeStep2" style="display:none">
-          <div style="font-size:2.5rem;margin-bottom:8px">🥁🥁🥁</div>
-          <h2 class="f" style="color:var(--y);font-size:1.3rem;margin-bottom:4px">והמנצח הוא...</h2>
-          <div id="winnerRevealName" style="font-size:2rem;font-weight:700;margin:12px 0"></div>
-          <img id="winnerRevealImg" src="" style="width:100%;border-radius:12px;border:3px solid var(--y);box-shadow:0 0 30px rgba(255,211,42,.4);margin-top:8px"/>
+    <div class="card">
+      <div id="drawingsGrid"></div>
+      <div id="judgeSpinner" style="text-align:center;padding:16px;display:none">
+        <div style="font-size:2rem;margin-bottom:8px">🤔</div>
+        <div class="f" style="color:var(--y)">השופט בוחן...</div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:10px">
+          <div class="dot-pulse"></div><div class="dot-pulse" style="animation-delay:.2s"></div><div class="dot-pulse" style="animation-delay:.4s"></div>
         </div>
       </div>
-      <div id="judgeVerdict" style="display:none;margin-top:14px"></div>
+      <div id="verdictWrap" style="display:none">
+        <div class="vbox" id="vbox"></div>
+        <button class="btn btn-blue" id="nextBtn" style="display:none;width:100%;margin-top:8px"></button>
+      </div>
     </div>
   </div>
 
@@ -1191,23 +1188,15 @@ function renderResults(room){
   var vw=document.getElementById("verdictWrap");
   var nb=document.getElementById("nextBtn");
   if(sp) sp.style.display="none";
-  if(vw) vw.style.display="none";
-
-  // Suspense: show "והמנצח הוא..." after 1.5s then reveal
-  setTimeout(function(){
-    var vbox=document.getElementById("vbox");
-    if(vbox) vbox.innerHTML='<div class="f" style="font-size:1.4rem;color:var(--y);text-align:center">🥁🥁🥁 והמנצח הוא...</div>';
+  var w=room.lastWinner;
+  if(w){
+    document.getElementById("vbox").innerHTML=
+      '<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">🏆 '+w.name+' ניצח!</div>'
+      +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
     if(vw) vw.style.display="block";
-    setTimeout(function(){
-      var w=room.lastWinner;
-      if(w && vbox){
-        vbox.innerHTML='<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">🏆 '+w.name+' ניצח!</div>'
-          +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
-      }
-      if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
-      else if(nb){nb.style.display="none";}
-    }, 2000);
-  }, 1500);
+    if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
+    else if(nb){nb.style.display="none";}
+  }
 }
 
 function renderFinal(room){
