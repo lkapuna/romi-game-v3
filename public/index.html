@@ -15,6 +15,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d0d1a;--card:#1a1a2e;--surf:#16213e;--brd:rgba(255,255,255,0.10);--r:#ff4757;--y:#ffd32a;--g:#2ed573;--bl:#1e90ff;--pu:#a855f7;--pk:#ff6b9d;--tx:#ffffff;--mu:#8892b0;--glow-y:rgba(255,211,42,0.15);--glow-b:rgba(30,144,255,0.15)}
+.dot-pulse{width:12px;height:12px;border-radius:50%;background:var(--y);animation:pulse 1s infinite ease-in-out}
+@keyframes pulse{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.2);opacity:1}}
+.emoji-float{position:absolute;font-size:2rem;animation:floatUp 2.5s ease-out forwards;pointer-events:none}
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-300px) scale(1.5);opacity:0}}
 body{font-family:'Heebo',sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 50%,rgba(168,85,247,0.08) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(30,144,255,0.08) 0%,transparent 50%),radial-gradient(circle at 60% 80%,rgba(255,75,87,0.06) 0%,transparent 50%);color:var(--tx);min-height:100vh;direction:rtl}
 input,button{font-family:inherit}
 .f{font-family:'Fredoka One',cursive!important}
@@ -120,6 +124,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
 
   <!-- AUTH -->
+  <div id="floatingEmojis" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden"></div>
   <div id="sAuth" class="screen active fu">
     <div class="card">
       <div class="tabs">
@@ -342,22 +347,28 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
   <!-- JUDGE -->
   <div id="sJudge" class="screen fu">
-    <div class="scores" id="scores2"></div>
-    <div class="card">
-      <h2 class="f" style="text-align:center;font-size:1.6rem;margin-bottom:18px;background:linear-gradient(135deg,#ff6b6b,#ffd93d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">&#9878; השופט שופט...</h2>
-      <div class="dgrid" id="dgrid"></div>
-      <div id="judgeSpinner" style="text-align:center;padding:16px">
-        <div class="spinner" style="margin:0 auto 10px"></div>
-        <p style="color:var(--mu)">השופט AI בוחן...</p>
+    <div class="card" style="text-align:center">
+      <div id="judgeReveal">
+        <div id="judgeStep1">
+          <div style="font-size:3rem;margin-bottom:16px">🎨</div>
+          <h2 class="f" style="color:var(--y);font-size:1.4rem;margin-bottom:8px">השופט בוחן את הציורים...</h2>
+          <div style="display:flex;justify-content:center;gap:6px;margin:16px 0">
+            <div class="dot-pulse"></div><div class="dot-pulse" style="animation-delay:.2s"></div><div class="dot-pulse" style="animation-delay:.4s"></div>
+          </div>
+          <div id="drawingsReveal" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px"></div>
+        </div>
+        <div id="judgeStep2" style="display:none">
+          <div style="font-size:2.5rem;margin-bottom:8px">🥁🥁🥁</div>
+          <h2 class="f" style="color:var(--y);font-size:1.3rem;margin-bottom:4px">והמנצח הוא...</h2>
+          <div id="winnerRevealName" style="font-size:2rem;font-weight:700;margin:12px 0"></div>
+          <img id="winnerRevealImg" src="" style="width:100%;border-radius:12px;border:3px solid var(--y);box-shadow:0 0 30px rgba(255,211,42,.4);margin-top:8px"/>
+        </div>
       </div>
-      <div id="verdictWrap" style="display:none">
-        <div class="vbox" id="vbox"></div>
-        <button class="btn btn-yel" id="nextBtn" onclick="socket.emit('next')" style="display:none;margin-top:4px"></button>
-      </div>
+      <div id="judgeVerdict" style="display:none;margin-top:14px"></div>
     </div>
   </div>
 
-  <!-- FINAL -->
+
   <div id="sFinal" class="screen fu" style="text-align:center">
     <div class="bo" style="font-size:3.8rem;margin-bottom:12px">&#127942;</div>
     <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">המשחק הסתיים!</h2>
@@ -543,6 +554,61 @@ function inviteToRoom() {
     var wa = "https://wa.me/?text=" + encodeURIComponent(text);
     window.open(wa, "_blank");
   }
+}
+
+// ── Emoji Reactions ─────────────────────────────────────────────────
+function sendEmoji(emoji) {
+  if (socket && myRoomId) socket.emit("emoji", { emoji: emoji });
+  showFloatingEmoji(emoji, 50);
+}
+
+function showFloatingEmoji(emoji, xPct) {
+  var container = document.getElementById("floatingEmojis");
+  if (!container) return;
+  var el = document.createElement("div");
+  el.className = "emoji-float";
+  el.textContent = emoji;
+  el.style.left = (xPct || Math.random()*80+10) + "%";
+  el.style.bottom = "80px";
+  container.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 2600);
+}
+
+// ── Suspense Reveal ──────────────────────────────────────────────────
+function showJudgeReveal(room) {
+  go("sJudge");
+  document.getElementById("judgeStep1").style.display = "block";
+  document.getElementById("judgeStep2").style.display = "none";
+  document.getElementById("judgeVerdict").style.display = "none";
+
+  // Show all drawings
+  var dr = document.getElementById("drawingsReveal");
+  dr.innerHTML = room.drawings ? room.drawings.map(function(d) {
+    return '<div style="text-align:center">'
+      +'<div style="color:var(--mu);font-size:.8rem;margin-bottom:4px">'+d.name+'</div>'
+      +'<img src="'+d.drawing+'" style="width:130px;border-radius:8px;border:2px solid var(--brd)"/>'
+      +'</div>';
+  }).join("") : "";
+
+  // After 3s show drumroll
+  setTimeout(function() {
+    document.getElementById("judgeStep1").style.display = "none";
+    document.getElementById("judgeStep2").style.display = "block";
+
+    // Show winner after 2s more
+    setTimeout(function() {
+      if (room.winner) {
+        document.getElementById("winnerRevealName").textContent = "🏆 " + room.winner.name + "!";
+        var winnerDrawing = room.drawings && room.drawings.find(function(d){ return d.name===room.winner.name; });
+        if (winnerDrawing) document.getElementById("winnerRevealImg").src = winnerDrawing.drawing;
+      }
+      // Show verdict after another 2s
+      setTimeout(function() {
+        document.getElementById("judgeVerdict").style.display = "block";
+        renderJudge(room);
+      }, 2000);
+    }, 2000);
+  }, 3000);
 }
 
 function confirmLeave() {
@@ -875,6 +941,10 @@ var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
 var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
 
 socket=io();
+socket.on("emoji", function(data) {
+  showFloatingEmoji(data.emoji, Math.random()*80+10);
+});
+
 socket.on("connect",function(){
   if (window.pendingRoomId) {
     var name = (currentUser&&currentUser.username)||"שחקן";
