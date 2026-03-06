@@ -11,7 +11,8 @@ const httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
 app.use(express.static("public"));
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
 // ── MongoDB ───────────────────────────────────────────────────────────
 mongoose.connect(process.env.MONGO_URI).then(function() {
@@ -200,7 +201,7 @@ app.post("/solo/judge", async function(req, res) {
 // ── Game State ────────────────────────────────────────────────────────
 const rooms = {};
 const COLORS = ["#ff6b6b","#4d96ff","#ffd93d","#6bcb77","#a78bfa","#ff6fc8"];
-const TOPICS = ["חתול","כלב","סוס","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה","צב","דג","ציפור","פרפר","תוכי","קוף","זאב","דב","נחש","תמנון","ינשוף","עוגה","פיצה","גלידה","המבורגר","תות","אבטיח","תפוח","גזר","עץ","פרח","שמש","ים","הר","ענן","קשת","וולקן","יער","ירח","כוכב","מכונית","רקטה","ספינה","מטוס","אופניים","צוללת","רכבת","חללית","בית","בלון","גשר","רובוט","כיסא","טלפון","כובע","נעל","שעון","דינוזאור","פיראט","קוסם","נסיכה","דרקון","חייזר","כדורגל","גיטרה","תוף","שחמט","גלישה"];
+const TOPICS = ["חתול","כלב","סוס","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה","צב","דג","ציפור","פרפר","תוכי","קוף","זאב","דב","נחש","תמנון","ינשוף","עוגה","פיצה","גלידה","המבורגר","תות","אבטיח","עוגיה","ענבים","תפוח","גזר","עץ","פרח","שמש","ים","הר","ענן","קשת בענן","וולקן","יער","ירח","כוכב","חורף","קיץ","מכונית","רקטה","ספינה","מטוס","אופניים","צוללת","רכבת","מסוק","חללית","בית","בלון","גשר","רובוט","כיסא","מנורה","טלפון","מחשב","מטרייה","כובע","נעל","תיק","שעון","דינוזאור","פיראט","פיראטים","קוסם","נסיכה","דרדסים","דרקון","חייזר","כדורגל","כדורסל","גיטרה","תוף","שחמט","גלישה","מערה","זיקוקים","בלונים"];
 const DRAW_TIME = 60;
 const MAX_ROUNDS = 5;
 
@@ -216,7 +217,7 @@ function broadcast(r) {
   io.to(r.id).emit("state", {
     id:r.id, hostId:r.hostId, maxPlayers:r.maxPlayers,
     players:r.players, phase:r.phase, round:r.round, topic:r.topic,
-    submitted:Object.keys(r.drawings), lastWinner:r.lastWinner
+    submitted:Object.keys(r.drawings), lastWinner:r.lastWinner, drawings:r.namedDrawings||[]
   });
 }
 
@@ -319,8 +320,10 @@ async function judge(roomId) {
   }
 
   r.phase = "results";
+  var namedDrawings = r.players.filter(function(p){ return r.drawings[p.id]; }).map(function(p){ return {name:p.name, drawing:r.drawings[p.id]}; });
+  r.namedDrawings = namedDrawings;
   broadcast(r);
-  io.to(r.id).emit("drawings", r.drawings);
+  io.to(r.id).emit("drawings", namedDrawings);
 }
 
 // ── Sockets ───────────────────────────────────────────────────────────
