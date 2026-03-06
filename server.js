@@ -217,7 +217,7 @@ function broadcast(r) {
   io.to(r.id).emit("state", {
     id:r.id, hostId:r.hostId, maxPlayers:r.maxPlayers,
     players:r.players, phase:r.phase, round:r.round, topic:r.topic,
-    submitted:Object.keys(r.drawings), lastWinner:r.lastWinner, drawings:r.namedDrawings||[]
+    submitted:Object.keys(r.drawings), lastWinner:r.lastWinner
   });
 }
 
@@ -261,12 +261,9 @@ async function judge(roomId) {
     });
     var names = drawers.map(function(p,i) { return "ציור "+(i+1)+": "+p.name; }).join("\n");
 
-    var controller = new AbortController();
-    var timeoutId = setTimeout(function(){ controller.abort(); }, 12000);
     var res = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
-        signal: controller.signal,
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
         body:JSON.stringify({
@@ -282,7 +279,6 @@ async function judge(roomId) {
         })
       }
     );
-    clearTimeout(timeoutId);
     var data = await res.json();
     var text = (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content) || "";
     var m = text.match(/\{[\s\S]*\}/);
@@ -324,10 +320,8 @@ async function judge(roomId) {
   }
 
   r.phase = "results";
-  var namedDrawings = r.players.filter(function(p){ return r.drawings[p.id]; }).map(function(p){ return {name:p.name, drawing:r.drawings[p.id]}; });
-  r.namedDrawings = namedDrawings;
   broadcast(r);
-  io.to(r.id).emit("drawings", namedDrawings);
+  io.to(r.id).emit("drawings", r.drawings);
 }
 
 // ── Sockets ───────────────────────────────────────────────────────────
