@@ -359,7 +359,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       </div>
       <div id="verdictWrap" style="display:none">
         <div class="vbox" id="vbox"></div>
-        <button class="btn btn-blue" id="nextBtn" style="display:none;width:100%;margin-top:8px"></button>
+        <button class="btn btn-blue" id="nextBtn" style="display:none;width:100%;margin-top:8px" onclick="socket.emit('next')"></button>
       </div>
     </div>
   </div>
