@@ -261,9 +261,12 @@ async function judge(roomId) {
     });
     var names = drawers.map(function(p,i) { return "ציור "+(i+1)+": "+p.name; }).join("\n");
 
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 12000);
     var res = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
+        signal: controller.signal,
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
         body:JSON.stringify({
@@ -279,6 +282,7 @@ async function judge(roomId) {
         })
       }
     );
+    clearTimeout(timeoutId);
     var data = await res.json();
     var text = (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content) || "";
     var m = text.match(/\{[\s\S]*\}/);
