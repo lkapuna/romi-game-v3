@@ -918,7 +918,11 @@ socket.on("tick",function(t){
 
 socket.on("drawings",function(d){
   shownDrawings=d;
-  if(curRoom)renderDrawingsGrid(curRoom);
+  // Also update curRoom with drawings so they survive re-renders
+  if(curRoom){
+    curRoom.shownDrawings=d;
+    renderDrawingsGrid(curRoom);
+  }
 });
 
 socket.on("err",function(msg){toast(msg);});
@@ -1104,15 +1108,10 @@ function renderDrawingsGrid(room){
   var grid=document.getElementById("dgrid");
   if(!grid)return;
   grid.style.gridTemplateColumns="repeat("+cols+",1fr)";
+  var drawings = room.shownDrawings || shownDrawings;
   grid.innerHTML=room.players.map(function(p){
     var isWin=room.lastWinner&&room.lastWinner.id===p.id;
-    return'<div class="dcard'+(isWin?" win":"")+'">'
-      +(shownDrawings[p.id]?'<img src="'+shownDrawings[p.id]+'" alt="'+p.name+'"/>'
-        :'<div style="height:90px;display:flex;align-items:center;justify-content:center;color:var(--mu)">&#9203;</div>')
-      +'<div style="font-weight:700;font-size:.87rem;color:'+p.color+'">'+p.name+'</div>'
-      +(isWin?'<div style="font-size:1rem;margin-top:3px">&#127942;</div>':"")
-      +'</div>';
-  }).join("");
+    return'<div class="dcard'+(isWin?" win":"")+'">'      +(drawings[p.id]?'<img src="'+drawings[p.id]+'" alt="'+p.name+'"/>'        :'<div style="height:90px;display:flex;align-items:center;justify-content:center;color:var(--mu)">&#9203;</div>')      +'<div style="font-weight:700;font-size:.87rem;color:'+p.color+'">'+p.name+'</div>'      +(isWin?'<div style="font-size:1rem;margin-top:3px">&#127942;</div>':"")      +'</div>';  }).join("");
 }
 
 function renderResults(room){
