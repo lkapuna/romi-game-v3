@@ -292,6 +292,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button onclick="leaveRoom()" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
         <h2 class="f" style="color:var(--y);font-size:1.2rem">🎮 ממתינים לשחקנים...</h2>
       </div>
+      <button onclick="inviteToRoom()" style="width:100%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;border:none;border-radius:12px;padding:10px;font-size:1rem;cursor:pointer;margin-bottom:12px">📲 הזמן חברים לחדר זה</button>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="color:var(--mu);font-size:.82rem">שחקנים שהצטרפו</span>
         <span class="f" style="color:var(--y)" id="progTxt">0/0</span>
@@ -386,6 +387,15 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 // ════════════════════════════════════════════════
 var currentUser = null;
 var resetUserId = null;
+
+// Auto-join from URL param
+(function() {
+  var params = new URLSearchParams(location.search);
+  var roomParam = params.get("room");
+  if (roomParam) {
+    window.pendingRoomId = roomParam;
+  }
+})();
 
 // Auto-login from localStorage
 (function() {
@@ -522,6 +532,17 @@ function showUserBar() {
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
   document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
   showMyBadges();
+}
+
+function inviteToRoom() {
+  var url = location.origin + "?room=" + myRoomId;
+  var text = "🎨 בוא לשחק מציירים ביחד!\nנכנס לחדר שלי ישירות: " + url;
+  if (navigator.share) {
+    navigator.share({ title:"מציירים ביחד", text:text, url:url });
+  } else {
+    var wa = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.open(wa, "_blank");
+  }
 }
 
 function confirmLeave() {
@@ -783,7 +804,8 @@ async function submitSolo() {
   document.getElementById("soloSubmitBtn").disabled = true;
 
   var topic = document.getElementById("soloTopic").getAttribute("data-topic");
-  var drawing = cv.toDataURL("image/png");
+  // Compress to JPEG at lower quality to reduce payload size
+  var drawing = cv.toDataURL("image/jpeg", 0.6);
 
   document.getElementById("soloGame").style.display = "none";
   document.getElementById("soloFeedback").style.display = "block";
@@ -853,7 +875,14 @@ var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
 var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
 
 socket=io();
-socket.on("connect",function(){myId=socket.id;});
+socket.on("connect",function(){
+  if (window.pendingRoomId) {
+    var name = (currentUser&&currentUser.username)||"שחקן";
+    socket.emit("join",{roomId:window.pendingRoomId, name:name, userId:currentUser&&currentUser.id});
+    window.pendingRoomId = null;
+    // Remove ?room= from URL
+    history.replaceState({}, "", location.pathname);
+  }myId=socket.id;});
 
 socket.on("lobby_list",function(list){renderRoomList(list);});
 
