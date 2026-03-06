@@ -338,6 +338,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         </div>
       </div>
       <div class="cact">
+        <div style="display:flex;gap:5px;justify-content:center;margin-bottom:8px">
+          <button onclick="sendEmoji('👍')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">👍</button>
+          <button onclick="sendEmoji('😂')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">😂</button>
+          <button onclick="sendEmoji('🔥')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">🔥</button>
+          <button onclick="sendEmoji('😮')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">😮</button>
+          <button onclick="sendEmoji('❤️')" style="background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:5px 9px;font-size:1.2rem;cursor:pointer">❤️</button>
+        </div>
         <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()">&#128465; נקה</button>
         <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()">&#9989; שלח ציור!</button>
       </div>
@@ -1180,17 +1187,27 @@ function renderDrawingsGrid(room){
 
 function renderResults(room){
   renderDrawingsGrid(room);
-  document.getElementById("judgeSpinner").style.display="none";
-  var w=room.lastWinner;
-  if(w){
-    document.getElementById("vbox").innerHTML=
-      '<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">&#127942; '+w.name+' ניצח!</div>'
-      +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
-    document.getElementById("verdictWrap").style.display="block";
-    var nb=document.getElementById("nextBtn");
-    if(amHost){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
-    else{nb.style.display="none";}
-  }
+  var sp=document.getElementById("judgeSpinner");
+  var vw=document.getElementById("verdictWrap");
+  var nb=document.getElementById("nextBtn");
+  if(sp) sp.style.display="none";
+  if(vw) vw.style.display="none";
+
+  // Suspense: show "והמנצח הוא..." after 1.5s then reveal
+  setTimeout(function(){
+    var vbox=document.getElementById("vbox");
+    if(vbox) vbox.innerHTML='<div class="f" style="font-size:1.4rem;color:var(--y);text-align:center">🥁🥁🥁 והמנצח הוא...</div>';
+    if(vw) vw.style.display="block";
+    setTimeout(function(){
+      var w=room.lastWinner;
+      if(w && vbox){
+        vbox.innerHTML='<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">🏆 '+w.name+' ניצח!</div>'
+          +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
+      }
+      if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
+      else if(nb){nb.style.display="none";}
+    }, 2000);
+  }, 1500);
 }
 
 function renderFinal(room){
