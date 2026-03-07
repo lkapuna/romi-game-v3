@@ -973,6 +973,10 @@ socket.on("time_bonus", function(data) {
   toast("⏱️ "+data.name+" קנה +30 שניות!");
 });
 
+socket.on("player_joined", function(data) {
+  toast("👋 " + data.name + " הצטרף למשחק!");
+});
+
 socket.on("player_left", function(data) {
   // Show overlay with message and button to go home
   var overlay = document.createElement("div");
