@@ -210,7 +210,7 @@ function getLobbyList() {
   return Object.values(rooms)
     .filter(function(r) { return r.phase !== "done" && r.phase !== "abandoned"; })
     .map(function(r) {
-      var canJoin = r.phase === "lobby" || (r.phase === "results" && r.players.length < r.maxPlayers && r.maxPlayers >= 3);
+      var canJoin = r.phase !== "done" && r.phase !== "abandoned" && r.players.length < r.maxPlayers;
       return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers, phase:r.phase, canJoin:canJoin };
     });
 }
@@ -362,6 +362,7 @@ io.on("connection", function(socket) {
     if (r.phase !== "lobby") return socket.emit("err", "המשחק כבר התחיל");
     if (r.players.length >= r.maxPlayers) return socket.emit("err", "החדר מלא");
     r.players.push({ id:socket.id, name:data.name||"שחקן", color:COLORS[r.players.length%COLORS.length], score:0, userId:data.userId||null });
+    io.to(r.id).emit("player_joined", { name: data.name||"שחקן" });
     socket.join(data.roomId);
     socket.data.roomId = data.roomId;
     socket.emit("joined", data.roomId);
