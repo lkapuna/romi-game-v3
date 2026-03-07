@@ -916,8 +916,28 @@ socket.on("state",function(room){
     if(btn) btn.style.display=currentUser?"block":"none";
   }
   if(room.phase==="judging"){goSafe("sJudge");renderJudging(room);}
-  if(room.phase==="results"){goSafe("sJudge");renderResults(room);}
-  if(room.phase==="done"){go("sFinal");renderFinal(room);confetti();}
+  if(room.phase==="results"){
+    goSafe("sJudge");renderResults(room);
+    // Update coins display if current user won this round
+    if(currentUser && room.lastWinner && room.lastWinner.id===myId) {
+      currentUser.coins = (currentUser.coins||0) + 1;
+      localStorage.setItem("romi_user", JSON.stringify(currentUser));
+      document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+currentUser.coins;
+    }
+  }
+  if(room.phase==="done"){
+    go("sFinal");renderFinal(room);confetti();
+    // Top scorer gets 5 bonus coins
+    if(currentUser && room.players) {
+      var top = room.players.reduce(function(a,b){ return (a.score||0)>=(b.score||0)?a:b; });
+      if(top.id === myId) {
+        currentUser.coins = (currentUser.coins||0) + 5;
+        localStorage.setItem("romi_user", JSON.stringify(currentUser));
+        document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+currentUser.coins;
+        toast("🎉 +5 מטבעות על ניצחון במשחק!");
+      }
+    }
+  }
 });
 
 socket.on("tick",function(t){
@@ -940,12 +960,15 @@ socket.on("err",function(msg){toast(msg);});
 
 socket.on("buy_time_result", function(data) {
   if (!data.ok) { toast(data.reason || "לא ניתן לקנות זמן"); return; }
-  if (currentUser) { currentUser.coins = data.coinsLeft; document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+data.coinsLeft; }
+  if (currentUser) {
+    currentUser.coins = data.coinsLeft;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+data.coinsLeft;
+  }
   toast("✅ קיבלת +30 שניות!");
 });
 
 socket.on("time_bonus", function(data) {
-  document.getElementById("timerEl").textContent = data.timeLeft;
   toast("⏱️ "+data.name+" קנה +30 שניות!");
 });
 
