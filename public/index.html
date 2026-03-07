@@ -541,6 +541,12 @@ function showUserBar() {
   showMyBadges();
 }
 
+function buyTime() {
+  if (!currentUser) return toast("צריך להתחבר כדי לקנות זמן");
+  if ((currentUser.coins||0) < 5) return toast("אין מספיק מטבעות! צריך 5 🪙");
+  socket.emit("buy_time");
+}
+
 function inviteToRoom() {
   var url = location.origin + "?room=" + myRoomId;
   var text = "🎨 בוא לשחק מציירים ביחד!\nנכנס לחדר שלי ישירות: " + url;
@@ -903,7 +909,11 @@ socket.on("state",function(room){
   amHost=(myId===room.hostId);
   renderScores(room);
   if(room.phase==="lobby"){goSafe("sLobby");renderLobby(room);}
-  if(room.phase==="drawing"){goSafe("sDraw");renderDraw(room);}
+  if(room.phase==="drawing"){
+    goSafe("sDraw");renderDraw(room);
+    var btn=document.getElementById("buyTimeBtn");
+    if(btn) btn.style.display=currentUser?"block":"none";
+  }
   if(room.phase==="judging"){goSafe("sJudge");renderJudging(room);}
   if(room.phase==="results"){goSafe("sJudge");renderResults(room);}
   if(room.phase==="done"){go("sFinal");renderFinal(room);confetti();}
@@ -927,6 +937,17 @@ socket.on("drawings",function(d){
 
 socket.on("err",function(msg){toast(msg);});
 
+socket.on("buy_time_result", function(data) {
+  if (!data.ok) { toast(data.reason || "לא ניתן לקנות זמן"); return; }
+  if (currentUser) { currentUser.coins = data.coinsLeft; document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+data.coinsLeft; }
+  toast("✅ קיבלת +30 שניות!");
+});
+
+socket.on("time_bonus", function(data) {
+  document.getElementById("timerEl").textContent = data.timeLeft;
+  toast("⏱️ "+data.name+" קנה +30 שניות!");
+});
+
 socket.on("player_left", function(data) {
   // Show overlay with message and button to go home
   var overlay = document.createElement("div");
@@ -935,7 +956,7 @@ socket.on("player_left", function(data) {
     + '<div style="font-size:2.5rem;margin-bottom:12px">😢</div>'
     + '<div class="f" style="font-size:1.2rem;color:var(--y);margin-bottom:8px">' + data.name + ' עזב את המשחק</div>'
     + '<div style="color:var(--mu);font-size:.9rem;margin-bottom:20px">המשחק הסתיים</div>'
-    + '<button onclick="location.reload()" style="background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;width:100%">🏠 חזרה לתפריט</button>'
+    + '<button onclick="location.reload()" style="background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:Fredoka One,cursive;font-size:1rem;cursor:pointer;width:100%">🏠 חזרה לתפריט</button>'
     + '</div>';
   document.body.appendChild(overlay);
 });
