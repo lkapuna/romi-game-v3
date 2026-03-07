@@ -392,15 +392,17 @@ io.on("connection", function(socket) {
     if (!r || r.phase !== 'drawing') return socket.emit('buy_time_result', { ok:false, reason:'אפשר לקנות זמן רק בזמן ציור' });
     var player = r.players.find(function(p){ return p.id===socket.id; });
     if (!player || !player.userId) return socket.emit('buy_time_result', { ok:false, reason:'צריך להתחבר כדי לקנות זמן' });
-    User.findById(player.userId, function(err, user) {
-      if (err || !user || (user.coins||0) < 5) return socket.emit('buy_time_result', { ok:false, reason:'אין מספיק מטבעות (צריך 5 🪙)' });
-      User.findByIdAndUpdate(player.userId, { $inc: { coins: -5 } }, function() {
+    User.findById(player.userId).then(function(user) {
+      if (!user || (user.coins||0) < 5) return socket.emit('buy_time_result', { ok:false, reason:'אין מספיק מטבעות (צריך 5 🪙)' });
+      return User.findByIdAndUpdate(player.userId, { $inc: { coins: -5 } }).then(function() {
         r.timeLeft = (r.timeLeft||0) + 30;
-        // Emit the new timeLeft to all players so their display updates
         io.to(r.id).emit('tick', r.timeLeft);
         io.to(r.id).emit('time_bonus', { name: player.name });
         socket.emit('buy_time_result', { ok:true, coinsLeft: (user.coins||0) - 5 });
       });
+    }).catch(function(err) {
+      console.error('buy_time error:', err.message);
+      socket.emit('buy_time_result', { ok:false, reason:'שגיאה בשרת' });
     });
   });
 
