@@ -1266,7 +1266,7 @@ function switchTab(t){
 
 function setMax(n){
   maxPl=n;
-  [2,3].forEach(function(i){document.getElementById("mp"+i).classList.toggle("on",i===n);});
+  [2,3,4].forEach(function(i){document.getElementById("mp"+i).classList.toggle("on",i===n);});
 }
 
 function toast(msg){
