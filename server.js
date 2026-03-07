@@ -442,9 +442,23 @@ io.on("connection", function(socket) {
   socket.on("disconnect", function() {
     var r = rooms[socket.data&&socket.data.roomId];
     if (!r) return;
+    var leftPlayer = r.players.find(function(p){ return p.id === socket.id; });
+    var leftName = leftPlayer ? leftPlayer.name : "שחקן";
     r.players = r.players.filter(function(p){ return p.id !== socket.id; });
-    if (r.players.length === 0) { clearInterval(r.timer); delete rooms[r.id]; }
-    else { if (r.hostId === socket.id) r.hostId = r.players[0].id; broadcast(r); }
+    if (r.players.length === 0) {
+      clearInterval(r.timer);
+      delete rooms[r.id];
+    } else {
+      if (r.hostId === socket.id) r.hostId = r.players[0].id;
+      // אם המשחק היה פעיל — עצור ושלח הודעה לשאר
+      if (r.phase === "drawing" || r.phase === "judging" || r.phase === "results") {
+        clearInterval(r.timer);
+        r.timer = null;
+        r.phase = "abandoned";
+      }
+      io.to(r.id).emit("player_left", { name: leftName });
+      broadcast(r);
+    }
     pushLobby();
   });
 });
