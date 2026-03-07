@@ -359,7 +359,7 @@ io.on("connection", function(socket) {
   socket.on("join", function(data) {
     var r = rooms[data.roomId];
     if (!r) return socket.emit("err", "חדר לא נמצא");
-    if (r.phase !== "lobby") return socket.emit("err", "המשחק כבר התחיל");
+    if (r.phase === "done" || r.phase === "abandoned") return socket.emit("err", "המשחק כבר נגמר");
     if (r.players.length >= r.maxPlayers) return socket.emit("err", "החדר מלא");
     r.players.push({ id:socket.id, name:data.name||"שחקן", color:COLORS[r.players.length%COLORS.length], score:0, userId:data.userId||null });
     io.to(r.id).emit("player_joined", { name: data.name||"שחקן" });
