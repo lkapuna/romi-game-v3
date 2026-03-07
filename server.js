@@ -60,7 +60,7 @@ app.post("/auth/register", async function(req, res) {
     var hashed = await bcrypt.hash(pin, 10);
     var answerHashed = await bcrypt.hash(answer, 10);
     var user = await User.create({ username: username, pin: hashed, phone: phone, securityQuestion: question, securityAnswer: answerHashed });
-    res.json({ ok: true, user: { id: user._id, username: user.username, wins: 0, gamesPlayed: 0 } });
+    res.json({ ok: true, user: { id: user._id, username: user.username, wins: 0, gamesPlayed: 0, coins: 0 } });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
   }
@@ -385,6 +385,21 @@ io.on("connection", function(socket) {
     broadcast(r);
     var allDone = r.players.every(function(p){ return r.drawings[p.id]; });
     if (allDone) { clearInterval(r.timer); r.timer = null; judge(r.id); }
+  });
+
+  socket.on('buy_time', function() {
+    var r = rooms[socket.data&&socket.data.roomId];
+    if (!r || r.phase !== 'drawing') return socket.emit('buy_time_result', { ok:false, reason:'אפשר לקנות זמן רק בזמן ציור' });
+    var player = r.players.find(function(p){ return p.id===socket.id; });
+    if (!player || !player.userId) return socket.emit('buy_time_result', { ok:false, reason:'צריך להתחבר כדי לקנות זמן' });
+    User.findById(player.userId, function(err, user) {
+      if (err || !user || (user.coins||0) < 5) return socket.emit('buy_time_result', { ok:false, reason:'אין מספיק מטבעות (צריך 5 🪙)' });
+      User.findByIdAndUpdate(player.userId, { $inc: { coins: -5 } }, function() {
+        r.timeLeft = (r.timeLeft||0) + 30;
+        io.to(r.id).emit('time_bonus', { name: player.name, timeLeft: r.timeLeft });
+        socket.emit('buy_time_result', { ok:true, coinsLeft: (user.coins||0) - 5 });
+      });
+    });
   });
 
   socket.on("leave_room", function() {
