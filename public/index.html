@@ -15,6 +15,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d0d1a;--card:#1a1a2e;--surf:#16213e;--brd:rgba(255,255,255,0.10);--r:#ff4757;--y:#ffd32a;--g:#2ed573;--bl:#1e90ff;--pu:#a855f7;--pk:#ff6b9d;--tx:#ffffff;--mu:#8892b0;--glow-y:rgba(255,211,42,0.15);--glow-b:rgba(30,144,255,0.15)}
+.dot-pulse{width:12px;height:12px;border-radius:50%;background:var(--y);animation:pulse 1s infinite ease-in-out}
+@keyframes pulse{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.2);opacity:1}}
+.emoji-float{position:absolute;font-size:2rem;animation:floatUp 2.5s ease-out forwards;pointer-events:none}
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-300px) scale(1.5);opacity:0}}
 body{font-family:'Heebo',sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 50%,rgba(168,85,247,0.08) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(30,144,255,0.08) 0%,transparent 50%),radial-gradient(circle at 60% 80%,rgba(255,75,87,0.06) 0%,transparent 50%);color:var(--tx);min-height:100vh;direction:rtl}
 input,button{font-family:inherit}
 .f{font-family:'Fredoka One',cursive!important}
@@ -40,7 +44,7 @@ input,button{font-family:inherit}
 .btn-blue{background:linear-gradient(135deg,#1e90ff,#a855f7);color:#fff;box-shadow:0 4px 15px rgba(30,144,255,0.3)}
 .btn-green{background:linear-gradient(135deg,#2ed573,#17c0eb);color:#111;box-shadow:0 4px 15px rgba(46,213,115,0.3)}
 .btn-yel{background:linear-gradient(135deg,#ffd32a,#ff6b35);color:#111;box-shadow:0 4px 15px rgba(255,211,42,0.3)}
-.mpgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.mpgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 .mpbtn{padding:9px;border-radius:9px;border:2px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;text-align:center;font-weight:700;font-size:.88rem;transition:all .2s}
 .mpbtn.on{border-color:#ffd32a;color:#ffd32a;background:rgba(255,211,42,.15);box-shadow:0 0 10px rgba(255,211,42,.2)}
 .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
@@ -265,6 +269,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
           <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa">🎨 יחיד</div>
           <div class="mpbtn on" id="mp2" onclick="setMax(2)">2 שחקנים</div>
           <div class="mpbtn" id="mp3" onclick="setMax(3)">3 שחקנים</div>
+          <div class="mpbtn" id="mp4" onclick="setMax(4)">4 שחקנים</div>
         </div>
         <button class="btn btn-blue" onclick="doCreate()">&#10024; פתח חדר</button>
       </div>
@@ -312,6 +317,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div style="display:flex;align-items:center;gap:8px">
         <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
         <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
       </div>
     </div>
     <div class="topic-box">
@@ -336,28 +342,31 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()">&#128465; נקה</button>
         <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()">&#9989; שלח ציור!</button>
       </div>
+
+      </div>
     </div>
     <div class="wlist" id="wlist"></div>
   </div>
 
   <!-- JUDGE -->
   <div id="sJudge" class="screen fu">
-    <div class="scores" id="scores2"></div>
     <div class="card">
-      <h2 class="f" style="text-align:center;font-size:1.6rem;margin-bottom:18px;background:linear-gradient(135deg,#ff6b6b,#ffd93d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">&#9878; השופט שופט...</h2>
-      <div class="dgrid" id="dgrid"></div>
-      <div id="judgeSpinner" style="text-align:center;padding:16px">
-        <div class="spinner" style="margin:0 auto 10px"></div>
-        <p style="color:var(--mu)">השופט AI בוחן...</p>
+      <div id="dgrid" style="display:grid;gap:10px;margin-bottom:12px"></div>
+      <div id="judgeSpinner" style="text-align:center;padding:16px;display:none">
+        <div style="font-size:2rem;margin-bottom:8px">🤔</div>
+        <div class="f" style="color:var(--y)">השופט בוחן...</div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:10px">
+          <div class="dot-pulse"></div><div class="dot-pulse" style="animation-delay:.2s"></div><div class="dot-pulse" style="animation-delay:.4s"></div>
+        </div>
       </div>
       <div id="verdictWrap" style="display:none">
         <div class="vbox" id="vbox"></div>
-        <button class="btn btn-yel" id="nextBtn" onclick="socket.emit('next')" style="display:none;margin-top:4px"></button>
+        <button class="btn btn-blue" id="nextBtn" style="display:none;width:100%;margin-top:8px" onclick="socket.emit('next')"></button>
       </div>
     </div>
   </div>
 
-  <!-- FINAL -->
+
   <div id="sFinal" class="screen fu" style="text-align:center">
     <div class="bo" style="font-size:3.8rem;margin-bottom:12px">&#127942;</div>
     <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">המשחק הסתיים!</h2>
@@ -530,8 +539,14 @@ function showUserBar() {
   var bar = document.getElementById("userBar");
   bar.style.display="flex";
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
-  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
+  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+(currentUser.coins||0);
   showMyBadges();
+}
+
+function buyTime() {
+  if (!currentUser) return toast("צריך להתחבר כדי לקנות זמן");
+  if ((currentUser.coins||0) < 5) return toast("אין מספיק מטבעות! צריך 5 🪙");
+  socket.emit("buy_time");
 }
 
 function inviteToRoom() {
@@ -896,10 +911,34 @@ socket.on("state",function(room){
   amHost=(myId===room.hostId);
   renderScores(room);
   if(room.phase==="lobby"){goSafe("sLobby");renderLobby(room);}
-  if(room.phase==="drawing"){goSafe("sDraw");renderDraw(room);}
+  if(room.phase==="drawing"){
+    goSafe("sDraw");renderDraw(room);
+    var btn=document.getElementById("buyTimeBtn");
+    if(btn) btn.style.display=currentUser?"block":"none";
+  }
   if(room.phase==="judging"){goSafe("sJudge");renderJudging(room);}
-  if(room.phase==="results"){goSafe("sJudge");renderResults(room);}
-  if(room.phase==="done"){go("sFinal");renderFinal(room);confetti();}
+  if(room.phase==="results"){
+    goSafe("sJudge");renderResults(room);
+    // Update coins display if current user won this round
+    if(currentUser && room.lastWinner && room.lastWinner.id===myId) {
+      currentUser.coins = (currentUser.coins||0) + 1;
+      localStorage.setItem("romi_user", JSON.stringify(currentUser));
+      document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+currentUser.coins;
+    }
+  }
+  if(room.phase==="done"){
+    go("sFinal");renderFinal(room);confetti();
+    // Top scorer gets 5 bonus coins
+    if(currentUser && room.players) {
+      var top = room.players.reduce(function(a,b){ return (a.score||0)>=(b.score||0)?a:b; });
+      if(top.id === myId) {
+        currentUser.coins = (currentUser.coins||0) + 5;
+        localStorage.setItem("romi_user", JSON.stringify(currentUser));
+        document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+currentUser.coins;
+        toast("🎉 +5 מטבעות על ניצחון במשחק!");
+      }
+    }
+  }
 });
 
 socket.on("tick",function(t){
@@ -911,10 +950,45 @@ socket.on("tick",function(t){
 
 socket.on("drawings",function(d){
   shownDrawings=d;
-  if(curRoom)renderDrawingsGrid(curRoom);
+  // Also update curRoom with drawings so they survive re-renders
+  if(curRoom){
+    curRoom.shownDrawings=d;
+    renderDrawingsGrid(curRoom);
+  }
 });
 
 socket.on("err",function(msg){toast(msg);});
+
+socket.on("buy_time_result", function(data) {
+  if (!data.ok) { toast(data.reason || "לא ניתן לקנות זמן"); return; }
+  if (currentUser) {
+    currentUser.coins = data.coinsLeft;
+    localStorage.setItem("romi_user", JSON.stringify(currentUser));
+    document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+data.coinsLeft;
+  }
+  toast("✅ קיבלת +30 שניות!");
+});
+
+socket.on("time_bonus", function(data) {
+  toast("⏱️ "+data.name+" קנה +30 שניות!");
+});
+
+socket.on("player_joined", function(data) {
+  toast("👋 " + data.name + " הצטרף למשחק!");
+});
+
+socket.on("player_left", function(data) {
+  // Show overlay with message and button to go home
+  var overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;";
+  overlay.innerHTML = '<div style="background:var(--surf);border:2px solid var(--brd);border-radius:18px;padding:30px;text-align:center;max-width:300px">'
+    + '<div style="font-size:2.5rem;margin-bottom:12px">😢</div>'
+    + '<div class="f" style="font-size:1.2rem;color:var(--y);margin-bottom:8px">' + data.name + ' עזב את המשחק</div>'
+    + '<div style="color:var(--mu);font-size:.9rem;margin-bottom:20px">המשחק הסתיים</div>'
+    + '<button onclick="location.reload()" style="background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:Fredoka One,cursive;font-size:1rem;cursor:pointer;width:100%">🏠 חזרה לתפריט</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+});
 
 function doCreate(){
   var name=(currentUser&&currentUser.username)||document.getElementById("cName").value.trim()||"מארח";
@@ -1014,13 +1088,20 @@ function renderRoomList(list){
     return;
   }
   el.innerHTML=list.map(function(r){
-    return '<div class="room-item'+(r.id===selRoomId?" sel":"")+'" data-id="'+r.id+'" onclick="selectRoom(this,\''+r.id+'\')">'
-      +'<span style="font-size:1.3rem">&#127918;</span>'
-      +'<div style="flex:1"><div style="font-weight:700">החדר של '+r.host+'</div>'
-      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים</div></div>'
-      +'<span style="color:var(--g);font-size:.8rem">פתוח ✅</span>'
+    var dot = r.canJoin
+      ? '<span style="width:10px;height:10px;border-radius:50%;background:#2ed573;display:inline-block;box-shadow:0 0 6px #2ed573;flex-shrink:0"></span>'
+      : '<span style="width:10px;height:10px;border-radius:50%;background:#ff4757;display:inline-block;box-shadow:0 0 6px #ff4757;flex-shrink:0"></span>';
+    var statusText = r.phase==="lobby" ? "ממתין" : r.phase==="results" ? "בין סיבובים" : "במשחק";
+    var clickable = r.canJoin ? ' onclick="selectRoom(this,\'' + r.id + '\')"' : '';
+    return '<div class="room-item'+(r.id===selRoomId?" sel":"")+'" data-id="'+r.id+'"'+clickable+' style="'+(r.canJoin?'cursor:pointer':'cursor:default;opacity:.7')+'">'
+      +dot
+      +'<div style="flex:1;margin:0 8px"><div style="font-weight:700">החדר של '+r.host+'</div>'
+      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים · '+statusText+'</div></div>'
+      +(r.canJoin?'<span style="color:var(--g);font-size:.78rem">הצטרף ✅</span>':'<span style="color:var(--r);font-size:.78rem">פעיל 🔴</span>')
       +'</div>';
   }).join("");
+  var jb=document.getElementById("joinBtn");
+  if(jb&&selRoomId){var sel=list.find(function(r){return r.id===selRoomId;});jb.disabled=!sel||!sel.canJoin;}
 }
 
 function selectRoom(el,id){
@@ -1051,19 +1132,41 @@ function renderLobby(room){
   }
   document.getElementById("slots").innerHTML=slots;
   var allReady=cur>=max;
+  var canEarlyStart=max>=3&&cur>=2&&!allReady;
   var btn=document.getElementById("startBtn");
   var msg=document.getElementById("lobbyMsg");
   if(amHost){
     btn.style.display="block";
-    btn.disabled=!allReady;
-    btn.textContent=allReady?"🎨 כולם מוכנים — התחל!":"🎨 התחל משחק!";
-    btn.style.background=allReady?"linear-gradient(135deg,#6bcb77,#2ea04b)":"";
-    msg.textContent=allReady?"":"ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+    if(allReady){
+      btn.disabled=false;
+      btn.textContent="🎨 כולם מוכנים — התחל!";
+      btn.style.background="linear-gradient(135deg,#6bcb77,#2ea04b)";
+      msg.textContent="";
+    } else if(canEarlyStart){
+      // Show early start button after 5 seconds
+      btn.disabled=true;
+      btn.textContent="🎨 התחל עם "+cur+" שחקנים (5שנ')";
+      btn.style.background="linear-gradient(135deg,#f7b731,#f0932b)";
+      msg.textContent="ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+      if(!window._earlyStartTimer){
+        window._earlyStartTimer=setTimeout(function(){
+          btn.disabled=false;
+          btn.textContent="🎨 התחל עם "+cur+" שחקנים";
+          window._earlyStartTimer=null;
+        },5000);
+      }
+    } else {
+      btn.disabled=true;
+      btn.textContent="🎨 התחל משחק!";
+      btn.style.background="";
+      msg.textContent="ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+    }
   }else{
     btn.style.display="none";
     msg.textContent=allReady?"ממתין שהמארח יתחיל...":"ממתין לעוד "+(max-cur)+" שחקנים...";
   }
 }
+
 
 function renderScores(room){
   var html=room.players.map(function(p){
@@ -1097,29 +1200,26 @@ function renderDrawingsGrid(room){
   var grid=document.getElementById("dgrid");
   if(!grid)return;
   grid.style.gridTemplateColumns="repeat("+cols+",1fr)";
+  var drawings = room.shownDrawings || shownDrawings;
   grid.innerHTML=room.players.map(function(p){
     var isWin=room.lastWinner&&room.lastWinner.id===p.id;
-    return'<div class="dcard'+(isWin?" win":"")+'">'
-      +(shownDrawings[p.id]?'<img src="'+shownDrawings[p.id]+'" alt="'+p.name+'"/>'
-        :'<div style="height:90px;display:flex;align-items:center;justify-content:center;color:var(--mu)">&#9203;</div>')
-      +'<div style="font-weight:700;font-size:.87rem;color:'+p.color+'">'+p.name+'</div>'
-      +(isWin?'<div style="font-size:1rem;margin-top:3px">&#127942;</div>':"")
-      +'</div>';
-  }).join("");
+    return'<div class="dcard'+(isWin?" win":"")+'">'      +(drawings[p.id]?'<img src="'+drawings[p.id]+'" alt="'+p.name+'"/>'        :'<div style="height:90px;display:flex;align-items:center;justify-content:center;color:var(--mu)">&#9203;</div>')      +'<div style="font-weight:700;font-size:.87rem;color:'+p.color+'">'+p.name+'</div>'      +(isWin?'<div style="font-size:1rem;margin-top:3px">&#127942;</div>':"")      +'</div>';  }).join("");
 }
 
 function renderResults(room){
   renderDrawingsGrid(room);
-  document.getElementById("judgeSpinner").style.display="none";
+  var sp=document.getElementById("judgeSpinner");
+  var vw=document.getElementById("verdictWrap");
+  var nb=document.getElementById("nextBtn");
+  if(sp) sp.style.display="none";
   var w=room.lastWinner;
   if(w){
     document.getElementById("vbox").innerHTML=
-      '<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">&#127942; '+w.name+' ניצח!</div>'
+      '<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">🏆 '+w.name+' ניצח!</div>'
       +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
-    document.getElementById("verdictWrap").style.display="block";
-    var nb=document.getElementById("nextBtn");
-    if(amHost){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
-    else{nb.style.display="none";}
+    if(vw) vw.style.display="block";
+    if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
+    else if(nb){nb.style.display="none";}
   }
 }
 
