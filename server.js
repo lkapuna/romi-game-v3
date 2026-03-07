@@ -208,8 +208,11 @@ const MAX_ROUNDS = 5;
 
 function getLobbyList() {
   return Object.values(rooms)
-    .filter(function(r) { return r.phase === "lobby"; })
-    .map(function(r) { return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers }; });
+    .filter(function(r) { return r.phase !== "done" && r.phase !== "abandoned"; })
+    .map(function(r) {
+      var canJoin = r.phase === "lobby" || (r.phase === "results" && r.players.length < r.maxPlayers && r.maxPlayers >= 3);
+      return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers, phase:r.phase, canJoin:canJoin };
+    });
 }
 
 function pushLobby() { io.emit("lobby_list", getLobbyList()); }
