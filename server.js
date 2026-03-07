@@ -32,7 +32,8 @@ const UserSchema = new mongoose.Schema({
   badges: { type: [String], default: [] },
   securityQuestion: { type: String, default: "" },
   securityAnswer: { type: String, default: "" },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  coins: { type: Number, default: 0 }
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -59,7 +60,7 @@ app.post("/auth/register", async function(req, res) {
     var hashed = await bcrypt.hash(pin, 10);
     var answerHashed = await bcrypt.hash(answer, 10);
     var user = await User.create({ username: username, pin: hashed, phone: phone, securityQuestion: question, securityAnswer: answerHashed });
-    res.json({ ok: true, user: { id: user._id, username: user.username, wins: 0, gamesPlayed: 0 } });
+    res.json({ ok: true, user: { id: user._id, username: user.username, wins: 0, gamesPlayed: 0, coins: 0 } });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
   }
@@ -73,7 +74,7 @@ app.post("/auth/login", async function(req, res) {
     if (!user) return res.json({ ok: false, error: "שם משתמש לא נמצא" });
     var match = await bcrypt.compare(pin, user.pin);
     if (!match) return res.json({ ok: false, error: "קוד שגוי" });
-    res.json({ ok: true, user: { id: user._id, username: user.username, wins: user.wins, gamesPlayed: user.gamesPlayed } });
+    res.json({ ok: true, user: { id: user._id, username: user.username, wins: user.wins, gamesPlayed: user.gamesPlayed, coins: user.coins||0 } });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
   }
@@ -201,14 +202,17 @@ app.post("/solo/judge", async function(req, res) {
 // ── Game State ────────────────────────────────────────────────────────
 const rooms = {};
 const COLORS = ["#ff6b6b","#4d96ff","#ffd93d","#6bcb77","#a78bfa","#ff6fc8"];
-const TOPICS = ["חתול","כלב","סוס","פיל","כריש","פינגווין","ארנב","פרה","אריה","צב","דג","ציפור","פרפר","תוכי","דב","נחש","תמנון","עוגה","פיצה","גלידה","המבורגר","תות","אבטיח","עוגיה","ענבים","תפוח","גזר","עץ","פרח","שמש","הר","קשת בענן","יער","ירח","כוכב","חורף","קיץ","מכונית","ספינה","מטוס","אופניים","צוללת","רכבת","מסוק","חללית","בית","בלון","גשר","רובוט","כיסא","מנורה","טלפון","מחשב","מטרייה","כובע","נעל","תיק","שעון","דינוזאור","פיראט","קוסם","נסיכה","דרדסים","דרקון","חייזר","כדורגל","כדורסל","גיטרה","שחמט","גלישה","מערה","זיקוקים","בלונים"];
+const TOPICS = ["חתול","כלב","סוס","פיל","תנין","כריש","פינגווין","ארנב","פרה","אריה","צב","דג","ציפור","פרפר","תוכי","קוף","זאב","דב","נחש","תמנון","ינשוף","עוגה","פיצה","גלידה","המבורגר","תות","אבטיח","עוגיה","ענבים","תפוח","גזר","עץ","פרח","שמש","ים","הר","ענן","קשת בענן","וולקן","יער","ירח","כוכב","חורף","קיץ","מכונית","רקטה","ספינה","מטוס","אופניים","צוללת","רכבת","מסוק","חללית","בית","בלון","גשר","רובוט","כיסא","מנורה","טלפון","מחשב","מטרייה","כובע","נעל","תיק","שעון","דינוזאור","פיראט","פיראטים","קוסם","נסיכה","דרדסים","דרקון","חייזר","כדורגל","כדורסל","גיטרה","תוף","שחמט","גלישה","מערה","זיקוקים","בלונים"];
 const DRAW_TIME = 60;
 const MAX_ROUNDS = 5;
 
 function getLobbyList() {
   return Object.values(rooms)
-    .filter(function(r) { return r.phase === "lobby"; })
-    .map(function(r) { return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers }; });
+    .filter(function(r) { return r.phase !== "done" && r.phase !== "abandoned"; })
+    .map(function(r) {
+      var canJoin = r.phase !== "done" && r.phase !== "abandoned" && r.players.length < r.maxPlayers;
+      return { id:r.id, host:r.players[0]&&r.players[0].name||"?", count:r.players.length, max:r.maxPlayers, phase:r.phase, canJoin:canJoin };
+    });
 }
 
 function pushLobby() { io.emit("lobby_list", getLobbyList()); }
@@ -250,8 +254,8 @@ async function judge(roomId) {
   if (!drawers.length) {
     r.phase = "results";
     r.lastWinner = { name:"אף אחד", color:"#aaa", reason:"אף אחד לא צייר!" };
-    broadcast(r);
     io.to(r.id).emit("drawings", r.drawings);
+    broadcast(r);
     return;
   }
 
@@ -294,7 +298,7 @@ async function judge(roomId) {
     if (winner.userId) {
       var updatedUser = await User.findByIdAndUpdate(
         winner.userId,
-        { $inc: { wins: 1, streak: 1 } },
+        { $inc: { wins: 1, streak: 1, coins: 1 } },
         { new: true }
       );
       if (updatedUser && updatedUser.streak > updatedUser.maxStreak) {
@@ -320,8 +324,8 @@ async function judge(roomId) {
   }
 
   r.phase = "results";
-  broadcast(r);
   io.to(r.id).emit("drawings", r.drawings);
+  broadcast(r);
 }
 
 // ── Sockets ───────────────────────────────────────────────────────────
@@ -342,6 +346,7 @@ io.on("connection", function(socket) {
     rooms[id] = {
       id:id, hostId:socket.id, maxPlayers:max,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
+      pendingPlayers:[],
       phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now()
     };
     socket.join(id);
@@ -354,9 +359,10 @@ io.on("connection", function(socket) {
   socket.on("join", function(data) {
     var r = rooms[data.roomId];
     if (!r) return socket.emit("err", "חדר לא נמצא");
-    if (r.phase !== "lobby") return socket.emit("err", "המשחק כבר התחיל");
+    if (r.phase === "done" || r.phase === "abandoned") return socket.emit("err", "המשחק כבר נגמר");
     if (r.players.length >= r.maxPlayers) return socket.emit("err", "החדר מלא");
     r.players.push({ id:socket.id, name:data.name||"שחקן", color:COLORS[r.players.length%COLORS.length], score:0, userId:data.userId||null });
+    io.to(r.id).emit("player_joined", { name: data.name||"שחקן" });
     socket.join(data.roomId);
     socket.data.roomId = data.roomId;
     socket.emit("joined", data.roomId);
@@ -386,6 +392,25 @@ io.on("connection", function(socket) {
     if (allDone) { clearInterval(r.timer); r.timer = null; judge(r.id); }
   });
 
+  socket.on('buy_time', function() {
+    var r = rooms[socket.data&&socket.data.roomId];
+    if (!r || r.phase !== 'drawing') return socket.emit('buy_time_result', { ok:false, reason:'אפשר לקנות זמן רק בזמן ציור' });
+    var player = r.players.find(function(p){ return p.id===socket.id; });
+    if (!player || !player.userId) return socket.emit('buy_time_result', { ok:false, reason:'צריך להתחבר כדי לקנות זמן' });
+    User.findById(player.userId).then(function(user) {
+      if (!user || (user.coins||0) < 5) return socket.emit('buy_time_result', { ok:false, reason:'אין מספיק מטבעות (צריך 5 🪙)' });
+      return User.findByIdAndUpdate(player.userId, { $inc: { coins: -5 } }).then(function() {
+        r.timeLeft = (r.timeLeft||0) + 30;
+        io.to(r.id).emit('tick', r.timeLeft);
+        io.to(r.id).emit('time_bonus', { name: player.name });
+        socket.emit('buy_time_result', { ok:true, coinsLeft: (user.coins||0) - 5 });
+      });
+    }).catch(function(err) {
+      console.error('buy_time error:', err.message);
+      socket.emit('buy_time_result', { ok:false, reason:'שגיאה בשרת' });
+    });
+  });
+
   socket.on("leave_room", function() {
     var r = rooms[socket.data.roomId];
     if (!r) return;
@@ -407,16 +432,44 @@ io.on("connection", function(socket) {
   socket.on("next", function() {
     var r = rooms[socket.data.roomId];
     if (!r || r.hostId !== socket.id) return;
-    if (r.round >= MAX_ROUNDS) { r.phase = "done"; broadcast(r); }
+    // Add any pending players
+    if (r.pendingPlayers && r.pendingPlayers.length > 0) {
+      r.pendingPlayers.forEach(function(p) { r.players.push(p); });
+      r.pendingPlayers = [];
+      broadcast(r);
+    }
+    if (r.round >= MAX_ROUNDS) {
+      r.phase = "done";
+      // Award 5 bonus coins to overall winner (most points)
+      var topPlayer = r.players.reduce(function(a,b){ return (a.score||0)>=(b.score||0)?a:b; });
+      if (topPlayer.userId) {
+        User.findByIdAndUpdate(topPlayer.userId, { $inc: { coins: 5 } }).catch(function(){});
+      }
+      broadcast(r);
+    }
     else startRound(r.id);
   });
 
   socket.on("disconnect", function() {
     var r = rooms[socket.data&&socket.data.roomId];
     if (!r) return;
+    var leftPlayer = r.players.find(function(p){ return p.id === socket.id; });
+    var leftName = leftPlayer ? leftPlayer.name : "שחקן";
     r.players = r.players.filter(function(p){ return p.id !== socket.id; });
-    if (r.players.length === 0) { clearInterval(r.timer); delete rooms[r.id]; }
-    else { if (r.hostId === socket.id) r.hostId = r.players[0].id; broadcast(r); }
+    if (r.players.length === 0) {
+      clearInterval(r.timer);
+      delete rooms[r.id];
+    } else {
+      if (r.hostId === socket.id) r.hostId = r.players[0].id;
+      // אם המשחק היה פעיל — עצור ושלח הודעה לשאר
+      if (r.phase === "drawing" || r.phase === "judging" || r.phase === "results") {
+        clearInterval(r.timer);
+        r.timer = null;
+        r.phase = "abandoned";
+      }
+      io.to(r.id).emit("player_left", { name: leftName });
+      broadcast(r);
+    }
     pushLobby();
   });
 });
