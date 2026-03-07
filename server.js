@@ -32,7 +32,8 @@ const UserSchema = new mongoose.Schema({
   badges: { type: [String], default: [] },
   securityQuestion: { type: String, default: "" },
   securityAnswer: { type: String, default: "" },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  coins: { type: Number, default: 0 }
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -73,7 +74,7 @@ app.post("/auth/login", async function(req, res) {
     if (!user) return res.json({ ok: false, error: "שם משתמש לא נמצא" });
     var match = await bcrypt.compare(pin, user.pin);
     if (!match) return res.json({ ok: false, error: "קוד שגוי" });
-    res.json({ ok: true, user: { id: user._id, username: user.username, wins: user.wins, gamesPlayed: user.gamesPlayed } });
+    res.json({ ok: true, user: { id: user._id, username: user.username, wins: user.wins, gamesPlayed: user.gamesPlayed, coins: user.coins||0 } });
   } catch(e) {
     res.json({ ok: false, error: "שגיאה, נסה שוב" });
   }
@@ -294,7 +295,7 @@ async function judge(roomId) {
     if (winner.userId) {
       var updatedUser = await User.findByIdAndUpdate(
         winner.userId,
-        { $inc: { wins: 1, streak: 1 } },
+        { $inc: { wins: 1, streak: 1, coins: 1 } },
         { new: true }
       );
       if (updatedUser && updatedUser.streak > updatedUser.maxStreak) {
@@ -407,7 +408,15 @@ io.on("connection", function(socket) {
   socket.on("next", function() {
     var r = rooms[socket.data.roomId];
     if (!r || r.hostId !== socket.id) return;
-    if (r.round >= MAX_ROUNDS) { r.phase = "done"; broadcast(r); }
+    if (r.round >= MAX_ROUNDS) {
+      r.phase = "done";
+      // Award 5 bonus coins to overall winner (most points)
+      var topPlayer = r.players.reduce(function(a,b){ return (a.score||0)>=(b.score||0)?a:b; });
+      if (topPlayer.userId) {
+        User.findByIdAndUpdate(topPlayer.userId, { $inc: { coins: 5 } }).catch(function(){});
+      }
+      broadcast(r);
+    }
     else startRound(r.id);
   });
 
