@@ -1083,13 +1083,20 @@ function renderRoomList(list){
     return;
   }
   el.innerHTML=list.map(function(r){
-    return '<div class="room-item'+(r.id===selRoomId?" sel":"")+'" data-id="'+r.id+'" onclick="selectRoom(this,\''+r.id+'\')">'
-      +'<span style="font-size:1.3rem">&#127918;</span>'
-      +'<div style="flex:1"><div style="font-weight:700">החדר של '+r.host+'</div>'
-      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים</div></div>'
-      +'<span style="color:var(--g);font-size:.8rem">פתוח ✅</span>'
+    var dot = r.canJoin
+      ? '<span style="width:10px;height:10px;border-radius:50%;background:#2ed573;display:inline-block;box-shadow:0 0 6px #2ed573;flex-shrink:0"></span>'
+      : '<span style="width:10px;height:10px;border-radius:50%;background:#ff4757;display:inline-block;box-shadow:0 0 6px #ff4757;flex-shrink:0"></span>';
+    var statusText = r.phase==="lobby" ? "ממתין" : r.phase==="results" ? "בין סיבובים" : "במשחק";
+    var clickable = r.canJoin ? ' onclick="selectRoom(this,\'' + r.id + '\')"' : '';
+    return '<div class="room-item'+(r.id===selRoomId?" sel":"")+'" data-id="'+r.id+'"'+clickable+' style="'+(r.canJoin?'cursor:pointer':'cursor:default;opacity:.7')+'">'
+      +dot
+      +'<div style="flex:1;margin:0 8px"><div style="font-weight:700">החדר של '+r.host+'</div>'
+      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים · '+statusText+'</div></div>'
+      +(r.canJoin?'<span style="color:var(--g);font-size:.78rem">הצטרף ✅</span>':'<span style="color:var(--r);font-size:.78rem">פעיל 🔴</span>')
       +'</div>';
   }).join("");
+  var jb=document.getElementById("joinBtn");
+  if(jb&&selRoomId){var sel=list.find(function(r){return r.id===selRoomId;});jb.disabled=!sel||!sel.canJoin;}
 }
 
 function selectRoom(el,id){
@@ -1120,19 +1127,41 @@ function renderLobby(room){
   }
   document.getElementById("slots").innerHTML=slots;
   var allReady=cur>=max;
+  var canEarlyStart=max>=3&&cur>=2&&!allReady;
   var btn=document.getElementById("startBtn");
   var msg=document.getElementById("lobbyMsg");
   if(amHost){
     btn.style.display="block";
-    btn.disabled=!allReady;
-    btn.textContent=allReady?"🎨 כולם מוכנים — התחל!":"🎨 התחל משחק!";
-    btn.style.background=allReady?"linear-gradient(135deg,#6bcb77,#2ea04b)":"";
-    msg.textContent=allReady?"":"ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+    if(allReady){
+      btn.disabled=false;
+      btn.textContent="🎨 כולם מוכנים — התחל!";
+      btn.style.background="linear-gradient(135deg,#6bcb77,#2ea04b)";
+      msg.textContent="";
+    } else if(canEarlyStart){
+      // Show early start button after 5 seconds
+      btn.disabled=true;
+      btn.textContent="🎨 התחל עם "+cur+" שחקנים (5שנ')";
+      btn.style.background="linear-gradient(135deg,#f7b731,#f0932b)";
+      msg.textContent="ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+      if(!window._earlyStartTimer){
+        window._earlyStartTimer=setTimeout(function(){
+          btn.disabled=false;
+          btn.textContent="🎨 התחל עם "+cur+" שחקנים";
+          window._earlyStartTimer=null;
+        },5000);
+      }
+    } else {
+      btn.disabled=true;
+      btn.textContent="🎨 התחל משחק!";
+      btn.style.background="";
+      msg.textContent="ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+    }
   }else{
     btn.style.display="none";
     msg.textContent=allReady?"ממתין שהמארח יתחיל...":"ממתין לעוד "+(max-cur)+" שחקנים...";
   }
 }
+
 
 function renderScores(room){
   var html=room.players.map(function(p){
