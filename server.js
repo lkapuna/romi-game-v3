@@ -396,7 +396,9 @@ io.on("connection", function(socket) {
       if (err || !user || (user.coins||0) < 5) return socket.emit('buy_time_result', { ok:false, reason:'אין מספיק מטבעות (צריך 5 🪙)' });
       User.findByIdAndUpdate(player.userId, { $inc: { coins: -5 } }, function() {
         r.timeLeft = (r.timeLeft||0) + 30;
-        io.to(r.id).emit('time_bonus', { name: player.name, timeLeft: r.timeLeft });
+        // Emit the new timeLeft to all players so their display updates
+        io.to(r.id).emit('tick', r.timeLeft);
+        io.to(r.id).emit('time_bonus', { name: player.name });
         socket.emit('buy_time_result', { ok:true, coinsLeft: (user.coins||0) - 5 });
       });
     });
