@@ -316,6 +316,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div style="display:flex;align-items:center;gap:8px">
         <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
         <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
       </div>
     </div>
     <div class="topic-box">
@@ -537,7 +538,7 @@ function showUserBar() {
   var bar = document.getElementById("userBar");
   bar.style.display="flex";
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
-  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0);
+  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+(currentUser.coins||0);
   showMyBadges();
 }
 
