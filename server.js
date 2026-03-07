@@ -342,7 +342,7 @@ io.on("connection", function(socket) {
     });
 
     var id = Math.random().toString(36).slice(2,8).toUpperCase();
-    var max = Math.min(Math.max(+(data.maxPlayers)||2, 2), 3);
+    var max = Math.min(Math.max(+(data.maxPlayers)||2, 2), 4);
     rooms[id] = {
       id:id, hostId:socket.id, maxPlayers:max,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
