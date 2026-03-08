@@ -91,7 +91,6 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 #conf{position:fixed;inset:0;pointer-events:none;z-index:998}
 .cp{position:absolute;width:9px;height:9px;border-radius:2px;animation:fall linear forwards}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div id="conf"></div>
@@ -373,7 +372,6 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">המשחק הסתיים!</h2>
     <p id="finalMsg" style="color:var(--mu);margin-bottom:22px"></p>
     <div class="card" style="text-align:right"><div id="finalList"></div></div>
-    <div id="roundGallery" style="margin-top:16px"></div>
     <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()">🏠 משחק חדש</button>
     <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()">📲 שתף תוצאות</button>
     <div id="newBadgesWrap" style="display:none;margin-top:14px">
@@ -549,18 +547,6 @@ function buyTime() {
   if (!currentUser) return toast("צריך להתחבר כדי לקנות זמן");
   if ((currentUser.coins||0) < 5) return toast("אין מספיק מטבעות! צריך 5 🪙");
   socket.emit("buy_time");
-}
-
-function downloadRound(round) {
-  var snap = roundSnapshots.find(function(s){ return s.round===round; });
-  if(!snap || !snap._el) return;
-  if(typeof html2canvas === "undefined") return toast("לא ניתן להוריד כרגע");
-  html2canvas(snap._el, {backgroundColor:"#1a1a2e", scale:2}).then(function(canvas){
-    var a = document.createElement("a");
-    a.href = canvas.toDataURL("image/jpeg", 0.9);
-    a.download = "סיבוב-"+round+"-"+snap.topic+".jpg";
-    a.click();
-  }).catch(function(){ toast("שגיאה בהורדה"); });
 }
 
 function inviteToRoom() {
@@ -901,7 +887,7 @@ function showSoloResults() {
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
 var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
-var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false,roundSnapshots=[];
+var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
 
 socket=io();
 socket.on("connect",function(){
@@ -1235,22 +1221,6 @@ function renderResults(room){
     if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
     else if(nb){nb.style.display="none";}
   }
-  // Save round data for gallery
-  if(room.lastWinner && room.phase==="results") {
-    var alreadySaved = roundSnapshots.some(function(s){ return s.round===room.round; });
-    if(!alreadySaved) {
-      var drawings = room.shownDrawings || shownDrawings;
-      if(drawings && Object.keys(drawings).length > 0) {
-        roundSnapshots.push({
-          round: room.round,
-          topic: room.topic,
-          winner: room.lastWinner,
-          drawings: Object.assign({}, drawings),
-          players: room.players.slice()
-        });
-      }
-    }
-  }
 }
 
 function renderFinal(room){
@@ -1271,46 +1241,7 @@ function renderFinal(room){
   }).join("");
 }
 
-  // Show round gallery
-  var gallery = document.getElementById("roundGallery");
-  if(gallery && roundSnapshots.length > 0){
-    gallery.innerHTML = '<div class="f" style="font-size:1.1rem;color:var(--y);margin:16px 0 10px">📸 ציורי המשחק</div>'
-      + roundSnapshots.map(function(snap){
-        var cols = Math.min(snap.players.length, 2);
-        var grid = snap.players.map(function(p){
-          var isWin = snap.winner && snap.winner.id === p.id;
-          var img = snap.drawings[p.id];
-          return '<div style="text-align:center;background:'+(isWin?"rgba(255,211,42,.1)":"var(--card)")+';border-radius:10px;padding:8px;border:2px solid '+(isWin?"var(--y)":"var(--brd)")+'">'
-            +(img ? '<img src="'+img+'" style="width:100%;border-radius:6px"/>' : '<div style="height:80px;background:var(--surf);border-radius:6px"></div>')
-            +'<div style="font-size:.8rem;font-weight:700;color:'+(isWin?"var(--y)":p.color)+';margin-top:4px">'+(isWin?"🏆 ":"")+p.name+'</div>'
-            +'</div>';
-        }).join("");
-        // Create downloadable image using canvas
-        var canvasId = "rc_"+snap.round;
-        return '<div style="margin-bottom:16px;background:var(--surf);border-radius:12px;padding:12px;border:1px solid var(--brd)">'
-          +'<div style="color:var(--mu);font-size:.82rem;margin-bottom:8px">סיבוב '+snap.round+' — נושא: <strong style="color:var(--tx)">'+snap.topic+'</strong></div>'
-          +'<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px;margin-bottom:10px" id="'+canvasId+'">'+grid+'</div>'
-          +'<button onclick="downloadRound('+snap.round+')" style="width:100%;background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:10px;padding:8px;font-family:Fredoka One,cursive;font-size:.95rem;cursor:pointer">💾 הורד תמונה</button>'
-          +'</div>';
-      }).join("");
-    // After rendering, enable downloads via html2canvas
-    roundSnapshots.forEach(function(snap){
-      var el = document.getElementById("rc_"+snap.round);
-      if(el) snap._el = el;
-    });
-  }
 
-function go(id){
-  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
-  document.getElementById(id).classList.add("active");
-
-  if(id==="sDraw"){
-    submitted=false;canvasInited=false;
-    document.getElementById("subOver").style.display="none";
-    document.getElementById("submitBtn").disabled=false;
-    initCanvas();
-  }
-}
 
 function goSafe(id){
   if(!document.getElementById(id).classList.contains("active"))go(id);
