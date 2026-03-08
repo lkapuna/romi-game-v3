@@ -95,6 +95,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 <body>
 <div id="conf"></div>
 <div class="wrap">
+  <div style="text-align:left;margin-bottom:6px">
+    <button id="langBtnTop" onclick="toggleLang()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 12px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:700">EN</button>
+  </div>
   <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><button id="langBtn" onclick="toggleLang()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:3px 9px;border-radius:8px;cursor:pointer;font-size:.8rem;font-family:Fredoka One,cursive;margin-left:6px">EN</button><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
       <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -131,39 +134,39 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div class="tab" id="ta2" onclick="authTab('register')" data-i18n="register">הרשמה</div>
       </div>
       <div id="pLogin">
-        <label class="lbl">שם משתמש</label>
+        <label class="lbl" data-i18n="username_lbl">שם משתמש</label>
         <input class="inp" id="lUser" placeholder="הכנס שם משתמש..."/>
-        <label class="lbl">קוד סודי (4 ספרות)</label>
+        <label class="lbl" data-i18n="pin_lbl">קוד סודי (4 ספרות)</label>
         <input class="inp" id="lPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
-        <button class="btn btn-blue" onclick="doLogin()">🔒 כנס למשחק</button>
+        <button class="btn btn-blue" onclick="doLogin()" data-i18n="enter_game">🔒 כנס למשחק</button>
         <div style="text-align:center;margin-top:10px">
-          <span onclick="authTab('reset')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline">שכחתי את הקוד</span>
+          <span onclick="authTab('reset')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline" data-i18n="forgot_pin">שכחתי את הקוד</span>
         </div>
         <div id="loginErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
       <div id="pRegister" style="display:none">
-        <label class="lbl">בחר שם משתמש</label>
+        <label class="lbl" data-i18n="choose_username">בחר שם משתמש</label>
         <input class="inp" id="rUser" placeholder="למשל: רומי123"/>
-        <label class="lbl">מספר טלפון</label>
+        <label class="lbl" data-i18n="phone_lbl">מספר טלפון</label>
         <input class="inp" id="rPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
-        <label class="lbl">קוד סודי (4 ספרות)</label>
+        <label class="lbl" data-i18n="pin_lbl">קוד סודי (4 ספרות)</label>
         <input class="inp" id="rPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
-        <label class="lbl">שאלת אבטחה</label>
+        <label class="lbl" data-i18n="security_q">שאלת אבטחה</label>
         <select class="inp" id="rQuestion" style="margin-bottom:8px">
-          <option value="">-- בחר שאלה --</option>
-          <option value="pet">מה שם החיה שלך?</option>
-          <option value="food">מה האוכל האהוב עליך?</option>
-          <option value="city">באיזה עיר נולדת?</option>
-          <option value="friend">מה שם החבר הכי טוב שלך?</option>
-          <option value="color">מה הצבע האהוב עליך?</option>
+          <option value="" data-i18n="choose_q">-- בחר שאלה --</option>
+          <option value="pet" data-i18n="q_pet">מה שם החיה שלך?</option>
+          <option value="food" data-i18n="q_food">מה האוכל האהוב עליך?</option>
+          <option value="city" data-i18n="q_city">באיזה עיר נולדת?</option>
+          <option value="friend" data-i18n="q_friend">מה שם החבר הכי טוב שלך?</option>
+          <option value="color" data-i18n="q_color">מה הצבע האהוב עליך?</option>
         </select>
         <input class="inp" id="rAnswer" placeholder="תשובה לשאלת האבטחה..."/>
-        <button class="btn btn-green" onclick="doRegister()">✨ צור חשבון</button>
+        <button class="btn btn-green" onclick="doRegister()" data-i18n="create_account">✨ צור חשבון</button>
         <div id="regErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
       <div id="pReset" style="display:none">
-        <h3 class="f" style="color:var(--y);margin-bottom:12px;font-size:1.05rem">🔑 איפוס קוד סודי</h3>
-        <label class="lbl">מספר טלפון שנרשמת איתו</label>
+        <h3 class="f" style="color:var(--y);margin-bottom:12px;font-size:1.05rem" data-i18n="reset_title">🔑 איפוס קוד סודי</h3>
+        <label class="lbl" data-i18n="phone_registered">מספר טלפון שנרשמת איתו</label>
         <input class="inp" id="resetPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
         <div id="resetStep2" style="display:none">
           <label class="lbl" id="resetQuestionLbl" style="color:var(--y);font-weight:700"></label>
@@ -176,7 +179,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn btn-yel" id="resetBtn" onclick="doReset()">🔍 מצא חשבון</button>
         <div id="resetErr" style="margin-top:8px;text-align:center;font-size:.88rem"></div>
         <div style="text-align:center;margin-top:10px">
-          <span onclick="authTab('login')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline">חזרה לכניסה</span>
+          <span onclick="authTab('login')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline" data-i18n="back_to_login">חזרה לכניסה</span>
         </div>
       </div>
     </div>
@@ -408,7 +411,26 @@ var TR = {
     playersJoined:"שחקנים שהצטרפו",exit:"🏠 יציאה",back:"→ חזרה",topic:"נושא:",
     soloTitle:"🎨 אימון יחיד",soloDesc:"צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!",
     startChallenge:"🚀 התחל אתגר!",leaderTitle:"🏆 טבלת מובילים",buyTime:"+30שנ' 🪙5",
-    gameOver:"המשחק הסתיים!",newGame:"🏠 משחק חדש",shareResults:"📲 שתף תוצאות"},
+    gameOver:"המשחק הסתיים!",newGame:"🏠 משחק חדש",shareResults:"📲 שתף תוצאות",
+    username_lbl:"שם משתמש",choose_username:"בחר שם משתמש",
+    pin_lbl:"קוד סודי (4 ספרות)",forgot_pin:"שכחתי את הקוד",
+    enter_game:"🔒 כנס למשחק",create_account:"✨ צור חשבון",
+    phone_lbl:"מספר טלפון",security_q:"שאלת אבטחה",security_a:"תשובה לשאלת האבטחה...",
+    choose_q:"-- בחר שאלה --",
+    q_pet:"מה שם החיה שלך?",q_food:"מה האוכל האהוב עליך?",
+    q_city:"באיזה עיר נולדת?",q_friend:"מה שם החבר הכי טוב שלך?",q_color:"מה הצבע האהוב עליך?",
+    reset_title:"🔑 איפוס קוד סודי",phone_registered:"מספר טלפון שנרשמת איתו",
+    your_answer:"התשובה שלך...",new_pin:"קוד סודי חדש (4 ספרות)",
+    find_account:"🔍 מצא חשבון",back_to_login:"חזרה לכניסה",
+    enter_username:"הכנס שם משתמש...",example_name:"למשל: רומי123",
+    enter_name:"הכנס שם...",
+    game_instructions:"הוראות משחק",
+    instr_solo:"🎨 אימון יחיד — צייר לבד וקבל ציון ומשוב מ-AI",
+    instr_create:"🚀 פתח חדר — פתחו משחק וחברים יצטרפו אליכם",
+    instr_join:"🪙 הצטרפו לחדר — הצטרפו למשחק פתוח של חבר",
+    instr_leaders:"🏆 מובילים — ראו את השחקנים הטובים ביותר",
+    instr_how:"כולם מציירים את אותו נושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות מנצח! 👑",
+    hello:"שלום"},
   en:{wins:"Wins",games:"Games",judging:"Judge is reviewing...",sent:"Drawing Sent!",waiting:"Waiting for others...",loading:"Loading...",
     winner:"🏆 {name} wins!",nextRound:"➡️ Next Round",finishGame:"🎊 Finish Game!",
     waitingFor:"Waiting for {n} more...",waitingHost:"Waiting for host to start...",waitingMore:"Waiting for {n} more...",
@@ -424,7 +446,26 @@ var TR = {
     playersJoined:"Players Joined",exit:"🏠 Exit",back:"→ Back",topic:"Topic:",
     soloTitle:"🎨 Solo Practice",soloDesc:"Draw the given topic — an AI judge will rate your drawing!",
     startChallenge:"🚀 Start Challenge!",leaderTitle:"🏆 Leaderboard",buyTime:"+30sec 🪙5",
-    gameOver:"Game Over!",newGame:"🏠 New Game",shareResults:"📲 Share Results"}
+    gameOver:"Game Over!",newGame:"🏠 New Game",shareResults:"📲 Share Results",
+    username_lbl:"Username",choose_username:"Choose username",
+    pin_lbl:"Secret Code (4 digits)",forgot_pin:"Forgot my code",
+    enter_game:"🔒 Enter Game",create_account:"✨ Create Account",
+    phone_lbl:"Phone Number",security_q:"Security Question",security_a:"Your answer...",
+    choose_q:"-- Choose a question --",
+    q_pet:"What is your pet's name?",q_food:"What is your favorite food?",
+    q_city:"What city were you born in?",q_friend:"What is your best friend's name?",q_color:"What is your favorite color?",
+    reset_title:"🔑 Reset Secret Code",phone_registered:"Phone number you registered with",
+    your_answer:"Your answer...",new_pin:"New secret code (4 digits)",
+    find_account:"🔍 Find Account",back_to_login:"Back to Login",
+    enter_username:"Enter username...",example_name:"e.g. Romi123",
+    enter_name:"Enter name...",
+    game_instructions:"How to Play",
+    instr_solo:"🎨 Solo — Draw alone and get AI feedback",
+    instr_create:"🚀 Open Room — Start a game and invite friends",
+    instr_join:"🪙 Join Room — Join a friend's open game",
+    instr_leaders:"🏆 Leaders — See the top players",
+    instr_how:"Everyone draws the same topic ← AI judge picks the best ← 5 rounds ← Most points wins! 👑",
+    hello:"Hello"}
 };
 
 function t(key,vars){
@@ -446,8 +487,25 @@ function toggleLang(){
 function applyTranslations(){
   document.querySelectorAll("[data-i18n]").forEach(function(el){
     var k=el.getAttribute("data-i18n");
-    if(TR[lang]&&TR[lang][k])el.textContent=TR[lang][k];
+    if(TR[lang]&&TR[lang][k]){
+      if(el.tagName==="INPUT"||el.tagName==="TEXTAREA") el.placeholder=TR[lang][k];
+      else el.textContent=TR[lang][k];
+    }
   });
+  // Update placeholders
+  var ph={lUser:"enter_username",rUser:"example_name",rAnswer:"security_a",resetAnswer:"your_answer"};
+  Object.keys(ph).forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&TR[lang]&&TR[lang][ph[id]])el.placeholder=TR[lang][ph[id]];
+  });
+  // Update langBtnTop
+  var btnTop=document.getElementById("langBtnTop");
+  if(btnTop)btnTop.textContent=lang==="he"?"EN":"עב";
+  var btnBar=document.getElementById("langBtn");
+  if(btnBar)btnBar.textContent=lang==="he"?"EN":"עב";
+  // Hello greeting
+  var nameEl=document.getElementById("userBarName");
+  if(nameEl&&currentUser)nameEl.textContent=t("hello")+", "+currentUser.username+"!";
   if(typeof curRoom!=="undefined"&&curRoom){
     if(curRoom.phase==="lobby")renderLobby(curRoom);
     if(curRoom.phase==="drawing")renderDraw(curRoom);
@@ -607,7 +665,7 @@ function doLogout() {
 function showUserBar() {
   var bar = document.getElementById("userBar");
   bar.style.display="flex";
-  document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
+  document.getElementById("userBarName").textContent=t("hello")+", "+currentUser.username+"!";
   updateStatsBar();
   showMyBadges();
 }
