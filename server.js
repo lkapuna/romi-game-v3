@@ -232,7 +232,10 @@ function startRound(roomId) {
   r.phase = "drawing";
   r.drawings = {};
   r.lastWinner = null;
-  r.topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+  var available = TOPICS.filter(function(t){ return !r.usedTopics.includes(t); });
+  if(available.length === 0) { r.usedTopics = []; available = TOPICS; }
+  r.topic = available[Math.floor(Math.random() * available.length)];
+  r.usedTopics.push(r.topic);
   r.timeLeft = DRAW_TIME;
   broadcast(r);
   pushLobby();
@@ -347,7 +350,7 @@ io.on("connection", function(socket) {
       id:id, hostId:socket.id, maxPlayers:max,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
       pendingPlayers:[],
-      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now()
+      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now(), usedTopics:[]
     };
     socket.join(id);
     socket.data.roomId = id;
