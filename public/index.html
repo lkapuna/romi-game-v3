@@ -1318,6 +1318,11 @@ function renderFinal(room){
 
 
 
+function go(id){
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
+  var el=document.getElementById(id);
+  if(el)el.classList.add("active");
+}
 function goSafe(id){
   if(!document.getElementById(id).classList.contains("active"))go(id);
 }
