@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const { TOPICS_EN } = require("./translations");
 const http = require("http");
 const { Server } = require("socket.io");
 const fetch = require("node-fetch");
@@ -218,7 +219,9 @@ function getLobbyList() {
 function pushLobby() { io.emit("lobby_list", getLobbyList()); }
 
 function broadcast(r) {
+  var topicEn = TOPICS_EN[r.topic] || r.topic;
   io.to(r.id).emit("state", {
+    topicEn: topicEn,
     id:r.id, hostId:r.hostId, maxPlayers:r.maxPlayers,
     players:r.players, phase:r.phase, round:r.round, topic:r.topic,
     submitted:Object.keys(r.drawings), lastWinner:r.lastWinner
@@ -280,7 +283,7 @@ async function judge(roomId) {
             role:"user",
             content:[
               ...imageMessages,
-              { type:"text", text:"שופט תחרות ציורים. נושא: \""+r.topic+"\".\n"+names+"\nבחר מנצח לפי קרבה לנושא ויצירתיות.\nענה JSON בלבד: {\"winner\":\"שם\",\"reason\":\"סיבה בעברית\"}" }
+              { type:"text", text:"You are a drawing competition judge. Topic: \""+((TOPICS_EN[r.topic])||r.topic)+"\".\n"+names+"\nPick a winner based on closeness to the topic and creativity.\nRespond JSON only: {\"winner\":\"name\",\"reason_he\":\"reason in Hebrew\",\"reason_en\":\"reason in English\"}" }
             ]
           }]
         })
@@ -295,7 +298,7 @@ async function judge(roomId) {
       || drawers.find(function(p){ return parsed.winner&&parsed.winner.includes(p.name); })
       || drawers[0];
     winner.score = (winner.score||0) + 1;
-    r.lastWinner = { id:winner.id, name:winner.name, color:winner.color, reason:parsed.reason };
+    r.lastWinner = { id:winner.id, name:winner.name, color:winner.color, reason:parsed.reason_he||parsed.reason||"", reason_en:parsed.reason_en||parsed.reason||"" };
 
     // Update stats + streak + badges
     if (winner.userId) {
