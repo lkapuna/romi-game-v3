@@ -95,7 +95,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 <body>
 <div id="conf"></div>
 <div class="wrap">
-  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
+  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><button id="langBtn" onclick="toggleLang()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:3px 9px;border-radius:8px;cursor:pointer;font-size:.8rem;font-family:Fredoka One,cursive;margin-left:6px">EN</button><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
       <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <!-- Fan of color swatches -->
@@ -127,8 +127,8 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div id="sAuth" class="screen active fu">
     <div class="card">
       <div class="tabs">
-        <div class="tab on" id="ta1" onclick="authTab('login')">כניסה</div>
-        <div class="tab" id="ta2" onclick="authTab('register')">הרשמה</div>
+        <div class="tab on" id="ta1" onclick="authTab('login')" data-i18n="login">כניסה</div>
+        <div class="tab" id="ta2" onclick="authTab('register')" data-i18n="register">הרשמה</div>
       </div>
       <div id="pLogin">
         <label class="lbl">שם משתמש</label>
@@ -186,10 +186,10 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div id="sLeader" class="screen fu">
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
-        <h2 class="f" style="color:var(--y);font-size:1.2rem">🏆 טבלת מובילים</h2>
+        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem" data-i18n="back">→ חזרה</button>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem" data-i18n="leaderTitle">🏆 טבלת מובילים</h2>
       </div>
-      <div id="leaderList"><div style="text-align:center;padding:20px;color:var(--mu)">טוען...</div></div>
+      <div id="leaderList"><div style="text-align:center;padding:20px;color:var(--mu)" id="loadingTxt">טוען...</div></div>
     </div>
   </div>
 
@@ -199,11 +199,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
-        <h2 class="f" style="color:#a78bfa;font-size:1.2rem">🎨 אימון יחיד</h2>
+        <h2 class="f" style="color:#a78bfa;font-size:1.2rem" data-i18n="soloTitle">🎨 אימון יחיד</h2>
       </div>
       <div id="soloStart">
-        <p style="color:var(--mu);margin-bottom:16px;line-height:1.6">צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!</p>
-        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()">🚀 התחל אתגר!</button>
+        <p style="color:var(--mu);margin-bottom:16px;line-height:1.6" data-i18n="soloDesc">צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!</p>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()" data-i18n="startChallenge">🚀 התחל אתגר!</button>
       </div>
       <div id="soloGame" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -252,23 +252,23 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div id="sHome" class="screen fu">
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-        <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px">🏆 מובילים</button>
-        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף משחק</button>
-        <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
+        <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px" data-i18n="leaderboard">🏆 מובילים</button>
+        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px" data-i18n="share">📲 שתף משחק</button>
+        <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px" data-i18n="install">📱 התקן</button>
       </div>
       <div id="myBadges" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
       <div class="tabs">
-        <div class="tab on" id="t1" onclick="switchTab('create')">פתח חדר חדש</div>
-        <div class="tab" id="t2" onclick="switchTab('join')">הצטרף לחדר</div>
+        <div class="tab on" id="t1" onclick="switchTab('create')" data-i18n="openRoom">פתח חדר חדש</div>
+        <div class="tab" id="t2" onclick="switchTab('join')" data-i18n="joinRoom">הצטרף לחדר</div>
       </div>
       <div id="pCreate">
-        <label class="lbl">השם שלך</label>
+        <label class="lbl" data-i18n="yourName">השם שלך</label>
         <input class="inp" id="cName" placeholder="הכנס שם..."/>
-        <label class="lbl">כמה שחקנים?</label>
+        <label class="lbl" data-i18n="howMany">כמה שחקנים?</label>
         <div class="mpgrid">
           <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa">🎨 יחיד</div>
-          <div class="mpbtn on" id="mp2" onclick="setMax(2)">2 שחקנים</div>
-          <div class="mpbtn" id="mp3" onclick="setMax(3)">3 שחקנים</div>
+          <div class="mpbtn on" id="mp2" onclick="setMax(2)" data-i18n="p2">2 שחקנים</div>
+          <div class="mpbtn" id="mp3" onclick="setMax(3)" data-i18n="p3">3 שחקנים</div>
           <div class="mpbtn" id="mp4" onclick="setMax(4)">4 שחקנים</div>
         </div>
         <button class="btn btn-blue" onclick="doCreate()">&#10024; פתח חדר</button>
@@ -295,11 +295,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
         <button onclick="leaveRoom()" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
-        <h2 class="f" style="color:var(--y);font-size:1.2rem">🎮 ממתינים לשחקנים...</h2>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem" data-i18n="waitingPlayers">🎮 ממתינים לשחקנים...</h2>
       </div>
-      <button onclick="inviteToRoom()" style="width:100%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;border:none;border-radius:12px;padding:10px;font-size:1rem;cursor:pointer;margin-bottom:12px">📲 הזמן חברים לחדר זה</button>
+      <button onclick="inviteToRoom()" style="width:100%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;border:none;border-radius:12px;padding:10px;font-size:1rem;cursor:pointer;margin-bottom:12px" data-i18n="inviteFriends">📲 הזמן חברים לחדר זה</button>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="color:var(--mu);font-size:.82rem">שחקנים שהצטרפו</span>
+        <span style="color:var(--mu);font-size:.82rem" data-i18n="playersJoined">שחקנים שהצטרפו</span>
         <span class="f" style="color:var(--y)" id="progTxt">0/0</span>
       </div>
       <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
@@ -315,27 +315,27 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="round-row">
       <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
       <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
+        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem" data-i18n="exit">🏠 יציאה</button>
         <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
-        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
+        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer" data-i18n="buyTime">+30שנ' 🪙5</button>
       </div>
     </div>
     <div class="topic-box">
-      <span style="color:var(--mu);font-size:.8rem">נושא:</span>
+      <span style="color:var(--mu);font-size:.8rem" id="topicLbl">נושא:</span>
       <strong id="topicEl" style="font-size:1.05rem"></strong>
     </div>
     <div class="card" style="padding:14px;position:relative">
       <div class="tools">
-        <button class="tbtn on" id="penBtn" onclick="setTool('pen')">&#9999; עט</button>
-        <button class="tbtn" id="erBtn" onclick="setTool('eraser')">&#129529; מחק</button>
+        <button class="tbtn on" id="penBtn" onclick="setTool('pen')" data-i18n="pen">✏️ עט</button>
+        <button class="tbtn" id="erBtn" onclick="setTool('eraser')" data-i18n="eraser">🧹 מחק</button>
         <input type="range" id="bSize" min="2" max="30" value="6" style="accent-color:var(--bl);width:72px"/>
         <div id="swatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       </div>
       <div style="position:relative">
         <canvas id="cv" width="1000" height="800"></canvas>
         <div class="sub-over" id="subOver">
-          <span>&#9989;</span><span>הציור נשלח!</span>
-          <span style="color:var(--mu);font-family:'Heebo',sans-serif;font-size:.85rem">ממתין לשאר...</span>
+          <span>&#9989;</span><span id="sentTxt">הציור נשלח!</span>
+          <span style="color:var(--mu);font-family:'Heebo',sans-serif;font-size:.85rem" id="waitingTxt">ממתין לשאר...</span>
         </div>
       </div>
       <div class="cact">
@@ -354,7 +354,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div id="dgrid" style="display:grid;gap:10px;margin-bottom:12px"></div>
       <div id="judgeSpinner" style="text-align:center;padding:16px;display:none">
         <div style="font-size:2rem;margin-bottom:8px">🤔</div>
-        <div class="f" style="color:var(--y)">השופט בוחן...</div>
+        <div class="f" style="color:var(--y)" id="judgingTxt">השופט בוחן...</div>
         <div style="display:flex;justify-content:center;gap:6px;margin-top:10px">
           <div class="dot-pulse"></div><div class="dot-pulse" style="animation-delay:.2s"></div><div class="dot-pulse" style="animation-delay:.4s"></div>
         </div>
@@ -369,11 +369,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
   <div id="sFinal" class="screen fu" style="text-align:center">
     <div class="bo" style="font-size:3.8rem;margin-bottom:12px">&#127942;</div>
-    <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">המשחק הסתיים!</h2>
+    <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" data-i18n="gameOver">המשחק הסתיים!</h2>
     <p id="finalMsg" style="color:var(--mu);margin-bottom:22px"></p>
     <div class="card" style="text-align:right"><div id="finalList"></div></div>
-    <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()">🏠 משחק חדש</button>
-    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()">📲 שתף תוצאות</button>
+    <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()" data-i18n="newGame">🏠 משחק חדש</button>
+    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()" data-i18n="shareResults">📲 שתף תוצאות</button>
     <div id="newBadgesWrap" style="display:none;margin-top:14px">
       <div class="f" style="color:var(--y);margin-bottom:8px">🎉 תג חדש!</div>
       <div id="newBadgesList" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
@@ -539,13 +539,13 @@ function showUserBar() {
   var bar = document.getElementById("userBar");
   bar.style.display="flex";
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
-  document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+(currentUser.coins||0);
+  document.getElementById("userBarStats").textContent=t("wins")+": "+(currentUser.wins||0)+" | "+t("games")+": "+(currentUser.gamesPlayed||0)+" | 🪙 "+(currentUser.coins||0);
   showMyBadges();
 }
 
 function buyTime() {
   if (!currentUser) return toast("צריך להתחבר כדי לקנות זמן");
-  if ((currentUser.coins||0) < 5) return toast("אין מספיק מטבעות! צריך 5 🪙");
+  if ((currentUser.coins||0) < 5) return toast(t("notEnoughCoins"));
   socket.emit("buy_time");
 }
 
@@ -966,15 +966,15 @@ socket.on("buy_time_result", function(data) {
     localStorage.setItem("romi_user", JSON.stringify(currentUser));
     document.getElementById("userBarStats").textContent="ניצחונות: "+(currentUser.wins||0)+" | משחקים: "+(currentUser.gamesPlayed||0)+" | 🪙 "+data.coinsLeft;
   }
-  toast("✅ קיבלת +30 שניות!");
+  toast(t("gotTime"));
 });
 
 socket.on("time_bonus", function(data) {
-  toast("⏱️ "+data.name+" קנה +30 שניות!");
+  toast(t("boughtTime",{name:data.name}));
 });
 
 socket.on("player_joined", function(data) {
-  toast("👋 " + data.name + " הצטרף למשחק!");
+  toast(t("playerJoined",{name:data.name}));
 });
 
 socket.on("player_left", function(data) {
@@ -1091,13 +1091,13 @@ function renderRoomList(list){
     var dot = r.canJoin
       ? '<span style="width:10px;height:10px;border-radius:50%;background:#2ed573;display:inline-block;box-shadow:0 0 6px #2ed573;flex-shrink:0"></span>'
       : '<span style="width:10px;height:10px;border-radius:50%;background:#ff4757;display:inline-block;box-shadow:0 0 6px #ff4757;flex-shrink:0"></span>';
-    var statusText = r.phase==="lobby" ? "ממתין" : r.phase==="results" ? "בין סיבובים" : "במשחק";
+    var statusText = r.phase==="lobby" ? t("waitingStatus") : r.phase==="results" ? t("betweenRounds") : t("activeGame");
     var clickable = r.canJoin ? ' onclick="selectRoom(this,\'' + r.id + '\')"' : '';
     return '<div class="room-item'+(r.id===selRoomId?" sel":"")+'" data-id="'+r.id+'"'+clickable+' style="'+(r.canJoin?'cursor:pointer':'cursor:default;opacity:.7')+'">'
       +dot
-      +'<div style="flex:1;margin:0 8px"><div style="font-weight:700">החדר של '+r.host+'</div>'
-      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' שחקנים · '+statusText+'</div></div>'
-      +(r.canJoin?'<span style="color:var(--g);font-size:.78rem">הצטרף ✅</span>':'<span style="color:var(--r);font-size:.78rem">פעיל 🔴</span>')
+      +'<div style="flex:1;margin:0 8px"><div style="font-weight:700">'+t('hostOf')+' '+r.host+'</div>'
+      +'<div style="color:var(--mu);font-size:.8rem">'+r.count+' / '+r.max+' '+t("players")+' · '+statusText+'</div></div>'
+      +(r.canJoin?'<span style="color:var(--g);font-size:.78rem">'+t('joinable')+'</span>':'<span style="color:var(--r);font-size:.78rem">'+t('full')+'</span>')
       +'</div>';
   }).join("");
   var jb=document.getElementById("joinBtn");
@@ -1139,31 +1139,31 @@ function renderLobby(room){
     btn.style.display="block";
     if(allReady){
       btn.disabled=false;
-      btn.textContent="🎨 כולם מוכנים — התחל!";
+      btn.textContent=t("allReady");
       btn.style.background="linear-gradient(135deg,#6bcb77,#2ea04b)";
       msg.textContent="";
     } else if(canEarlyStart){
       // Show early start button after 5 seconds
       btn.disabled=true;
-      btn.textContent="🎨 התחל עם "+cur+" שחקנים (5שנ')";
+      btn.textContent=t("earlyStart",{n:cur})+" (5"+t("sec")+")";
       btn.style.background="linear-gradient(135deg,#f7b731,#f0932b)";
-      msg.textContent="ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+      msg.textContent=t("waitingFor",{n:max-cur});
       if(!window._earlyStartTimer){
         window._earlyStartTimer=setTimeout(function(){
           btn.disabled=false;
-          btn.textContent="🎨 התחל עם "+cur+" שחקנים";
+          btn.textContent=t("earlyStart",{n:cur});
           window._earlyStartTimer=null;
         },5000);
       }
     } else {
       btn.disabled=true;
-      btn.textContent="🎨 התחל משחק!";
+      btn.textContent=t("startGame");
       btn.style.background="";
-      msg.textContent="ממתין ל-"+(max-cur)+" שחקנים נוספים...";
+      msg.textContent=t("waitingFor",{n:max-cur});
     }
   }else{
     btn.style.display="none";
-    msg.textContent=allReady?"ממתין שהמארח יתחיל...":"ממתין לעוד "+(max-cur)+" שחקנים...";
+    msg.textContent=allReady?t("waitingHost"):t("waitingMore",{n:max-cur});
   }
 }
 
@@ -1178,8 +1178,8 @@ function renderScores(room){
 }
 
 function renderDraw(room){
-  document.getElementById("topicEl").textContent=room.topic;
-  document.getElementById("roundLbl").textContent="סיבוב "+room.round+" מתוך 5";
+  document.getElementById("topicEl").textContent=lang==="en"?(room.topicEn||room.topic):room.topic;
+  document.getElementById("roundLbl").textContent=t("round")+" "+room.round+" מתוך 5";
   document.getElementById("wlist").innerHTML=room.players.map(function(p){
     var done=room.submitted.indexOf(p.id)>=0;
     return'<div class="witem"><div class="dot" style="background:'+p.color+'"></div>'
@@ -1215,10 +1215,10 @@ function renderResults(room){
   var w=room.lastWinner;
   if(w){
     document.getElementById("vbox").innerHTML=
-      '<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">🏆 '+w.name+' ניצח!</div>'
-      +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+w.reason+'</div>';
+      '<div class="f" style="font-size:1.35rem;color:'+w.color+';margin-bottom:6px">'+t('winner',{name:w.name})+'</div>'
+      +'<div style="color:var(--mu);line-height:1.55;font-size:.92rem">'+(lang==="en"?(w.reason_en||w.reason):w.reason)+'</div>';
     if(vw) vw.style.display="block";
-    if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
+    if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?t("finishGame"):t("nextRound");}
     else if(nb){nb.style.display="none";}
   }
 }
@@ -1228,7 +1228,7 @@ function renderFinal(room){
   var sorted=room.players.slice().sort(function(a,b){return(b.score||0)-(a.score||0);});
   var top=sorted[0];
   var tied=sorted.filter(function(p){return(p.score||0)===(top.score||0);});
-  document.getElementById("finalMsg").textContent=tied.length>1?"🤝 תיקו!":"מזל טוב "+top.name+"! 🎉";
+  document.getElementById("finalMsg").textContent=tied.length>1?t("tie"):t("congrats",{name:top.name});
   var medals=["🥇","🥈","🥉","4️⃣"];
   document.getElementById("finalList").innerHTML=sorted.map(function(p,i){
     return'<div class="frow">'
