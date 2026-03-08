@@ -389,6 +389,75 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
 <script>
 
+var lang = localStorage.getItem("romi_lang") || "he";
+document.documentElement.dir = lang==="he" ? "rtl" : "ltr";
+
+var TR = {
+  he:{wins:"ניצחונות",games:"משחקים",judging:"השופט בוחן...",sent:"הציור נשלח!",waiting:"ממתין לשאר...",loading:"טוען...",
+    winner:"🏆 {name} ניצח!",nextRound:"➡️ לסיבוב הבא",finishGame:"🎊 סיים משחק!",
+    waitingFor:"ממתין ל-{n} שחקנים נוספים...",waitingHost:"ממתין שהמארח יתחיל...",waitingMore:"ממתין לעוד {n} שחקנים...",
+    earlyStart:"🎨 התחל עם {n} שחקנים",allReady:"🎨 כולם מוכנים — התחל!",startGame:"🎨 התחל משחק!",
+    hostOf:"החדר של",players:"שחקנים",waitingStatus:"ממתין",betweenRounds:"בין סיבובים",activeGame:"במשחק",
+    joinable:"הצטרף ✅",full:"פעיל 🔴",playerJoined:"👋 {name} הצטרף למשחק!",
+    notEnoughCoins:"אין מספיק מטבעות (צריך 5 🪙)",gotTime:"✅ קיבלת +30 שניות!",boughtTime:"⏱️ {name} קנה +30 שניות!",
+    tie:"🤝 תיקו!",congrats:"מזל טוב {name}! 🎉",backHome:"🏠 חזרה לתפריט",
+    leaderboard:"🏆 מובילים",share:"📲 שתף משחק",install:"📱 התקן",
+    openRoom:"פתח חדר חדש",joinRoom:"הצטרף לחדר",yourName:"השם שלך",howMany:"כמה שחקנים?",
+    p2:"2 שחקנים",p3:"3 שחקנים",openRoomBtn:"✨ פתח חדר",joinBtn:"🚀 הצטרף",
+    waitingPlayers:"🎮 ממתינים לשחקנים...",inviteFriends:"📲 הזמן חברים לחדר זה",
+    playersJoined:"שחקנים שהצטרפו",exit:"🏠 יציאה",back:"→ חזרה",topic:"נושא:",
+    soloTitle:"🎨 אימון יחיד",soloDesc:"צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!",
+    startChallenge:"🚀 התחל אתגר!",leaderTitle:"🏆 טבלת מובילים",buyTime:"+30שנ' 🪙5",
+    gameOver:"המשחק הסתיים!",newGame:"🏠 משחק חדש",shareResults:"📲 שתף תוצאות"},
+  en:{wins:"Wins",games:"Games",judging:"Judge is reviewing...",sent:"Drawing Sent!",waiting:"Waiting for others...",loading:"Loading...",
+    winner:"🏆 {name} wins!",nextRound:"➡️ Next Round",finishGame:"🎊 Finish Game!",
+    waitingFor:"Waiting for {n} more...",waitingHost:"Waiting for host to start...",waitingMore:"Waiting for {n} more...",
+    earlyStart:"🎨 Start with {n} players",allReady:"🎨 Everyone ready — Start!",startGame:"🎨 Start Game!",
+    hostOf:"Room by",players:"players",waitingStatus:"Waiting",betweenRounds:"Between rounds",activeGame:"In game",
+    joinable:"Join ✅",full:"Active 🔴",playerJoined:"👋 {name} joined!",
+    notEnoughCoins:"Not enough coins (need 5 🪙)",gotTime:"✅ Got +30 seconds!",boughtTime:"⏱️ {name} bought +30 seconds!",
+    tie:"🤝 Tie!",congrats:"Congrats {name}! 🎉",backHome:"🏠 Back to Menu",
+    leaderboard:"🏆 Leaders",share:"📲 Share",install:"📱 Install",
+    openRoom:"Open New Room",joinRoom:"Join Room",yourName:"Your Name",howMany:"How many players?",
+    p2:"2 Players",p3:"3 Players",openRoomBtn:"✨ Open Room",joinBtn:"🚀 Join",
+    waitingPlayers:"🎮 Waiting for players...",inviteFriends:"📲 Invite friends",
+    playersJoined:"Players Joined",exit:"🏠 Exit",back:"→ Back",topic:"Topic:",
+    soloTitle:"🎨 Solo Practice",soloDesc:"Draw the given topic — an AI judge will rate your drawing!",
+    startChallenge:"🚀 Start Challenge!",leaderTitle:"🏆 Leaderboard",buyTime:"+30sec 🪙5",
+    gameOver:"Game Over!",newGame:"🏠 New Game",shareResults:"📲 Share Results"}
+};
+
+function t(key,vars){
+  var s=(TR[lang]&&TR[lang][key])||(TR.he[key])||key;
+  if(vars)Object.keys(vars).forEach(function(k){s=s.replace("{"+k+"}",vars[k]);});
+  return s;
+}
+
+function toggleLang(){
+  lang=lang==="he"?"en":"he";
+  localStorage.setItem("romi_lang",lang);
+  document.documentElement.dir=lang==="he"?"rtl":"ltr";
+  var btn=document.getElementById("langBtn");
+  if(btn)btn.textContent=lang==="he"?"EN":"עב";
+  applyTranslations();
+  updateStatsBar();
+}
+
+function applyTranslations(){
+  document.querySelectorAll("[data-i18n]").forEach(function(el){
+    var k=el.getAttribute("data-i18n");
+    if(TR[lang]&&TR[lang][k])el.textContent=TR[lang][k];
+  });
+  if(typeof curRoom!=="undefined"&&curRoom){
+    if(curRoom.phase==="lobby")renderLobby(curRoom);
+    if(curRoom.phase==="drawing")renderDraw(curRoom);
+    if(curRoom.phase==="results"||curRoom.phase==="judging")renderResults(curRoom);
+    if(curRoom.phase==="done")renderFinal(curRoom);
+  }
+}
+
+
+
 
 
 // ════════════════════════════════════════════════
@@ -539,8 +608,14 @@ function showUserBar() {
   var bar = document.getElementById("userBar");
   bar.style.display="flex";
   document.getElementById("userBarName").textContent="שלום, "+currentUser.username+"!";
-  document.getElementById("userBarStats").textContent=t("wins")+": "+(currentUser.wins||0)+" | "+t("games")+": "+(currentUser.gamesPlayed||0)+" | 🪙 "+(currentUser.coins||0);
+  updateStatsBar();
   showMyBadges();
+}
+function updateStatsBar() {
+  if(!currentUser) return;
+  var wl=(typeof lang!=="undefined"&&lang==="en")?"Wins":"ניצחונות";
+  var gl=(typeof lang!=="undefined"&&lang==="en")?"Games":"משחקים";
+  document.getElementById("userBarStats").textContent=wl+": "+(currentUser.wins||0)+" | "+gl+": "+(currentUser.gamesPlayed||0)+" | 🪙 "+(currentUser.coins||0);
 }
 
 function buyTime() {
