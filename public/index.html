@@ -91,6 +91,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 #conf{position:fixed;inset:0;pointer-events:none;z-index:998}
 .cp{position:absolute;width:9px;height:9px;border-radius:2px;animation:fall linear forwards}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div id="conf"></div>
@@ -372,6 +373,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">המשחק הסתיים!</h2>
     <p id="finalMsg" style="color:var(--mu);margin-bottom:22px"></p>
     <div class="card" style="text-align:right"><div id="finalList"></div></div>
+    <div id="roundGallery" style="margin-top:16px"></div>
     <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()">🏠 משחק חדש</button>
     <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()">📲 שתף תוצאות</button>
     <div id="newBadgesWrap" style="display:none;margin-top:14px">
@@ -887,7 +889,7 @@ function showSoloResults() {
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
 var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
-var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
+var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false,roundSnapshots=[];
 
 socket=io();
 socket.on("connect",function(){
@@ -1221,6 +1223,15 @@ function renderResults(room){
     if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
     else if(nb){nb.style.display="none";}
   }
+  // Capture round screenshot
+  setTimeout(function(){
+    var el = document.getElementById("sJudge");
+    if(el && typeof html2canvas !== "undefined"){
+      html2canvas(el, {backgroundColor:"#0d0d1a", scale:1.5}).then(function(canvas){
+        roundSnapshots.push({ round: room.round, topic: room.topic, dataUrl: canvas.toDataURL("image/jpeg", 0.85) });
+      }).catch(function(){});
+    }
+  }, 500);
 }
 
 function renderFinal(room){
@@ -1240,6 +1251,19 @@ function renderFinal(room){
       +'</div>';
   }).join("");
 }
+
+  // Show round gallery
+  var gallery = document.getElementById("roundGallery");
+  if(gallery && roundSnapshots.length > 0){
+    gallery.innerHTML = '<div class="f" style="font-size:1.1rem;color:var(--y);margin-bottom:12px">📸 תמונות מהמשחק</div>'
+      + roundSnapshots.map(function(s){
+        return '<div style="margin-bottom:14px;background:var(--surf);border-radius:12px;padding:10px;border:1px solid var(--brd)">'
+          +'<div style="color:var(--mu);font-size:.82rem;margin-bottom:6px">סיבוב '+s.round+' — '+s.topic+'</div>'
+          +'<img src="'+s.dataUrl+'" style="width:100%;border-radius:8px"/>'
+          +'<a href="'+s.dataUrl+'" download="סיבוב-'+s.round+'-'+s.topic+'.jpg" style="display:block;margin-top:8px;background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;text-align:center;padding:8px;border-radius:10px;font-family:Fredoka One,cursive;text-decoration:none;font-size:.95rem">💾 הורד תמונה</a>'
+          +'</div>';
+      }).join("");
+  }
 
 function go(id){
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
@@ -1266,7 +1290,7 @@ function switchTab(t){
 
 function setMax(n){
   maxPl=n;
-  [2,3,4].forEach(function(i){document.getElementById("mp"+i).classList.toggle("on",i===n);});
+  [2,3,4].forEach(function(i){document.getElementById("mp"+i)&&document.getElementById("mp"+i).classList.toggle("on",i===n);});
 }
 
 function toast(msg){
