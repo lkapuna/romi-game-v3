@@ -1236,14 +1236,20 @@ function renderResults(room){
     else if(nb){nb.style.display="none";}
   }
   // Save round data for gallery
-  if(room.lastWinner && shownDrawings) {
-    roundSnapshots.push({
-      round: room.round,
-      topic: room.topic,
-      winner: room.lastWinner,
-      drawings: Object.assign({}, shownDrawings),
-      players: room.players.slice()
-    });
+  if(room.lastWinner && room.phase==="results") {
+    var alreadySaved = roundSnapshots.some(function(s){ return s.round===room.round; });
+    if(!alreadySaved) {
+      var drawings = room.shownDrawings || shownDrawings;
+      if(drawings && Object.keys(drawings).length > 0) {
+        roundSnapshots.push({
+          round: room.round,
+          topic: room.topic,
+          winner: room.lastWinner,
+          drawings: Object.assign({}, drawings),
+          players: room.players.slice()
+        });
+      }
+    }
   }
 }
 
