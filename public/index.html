@@ -551,6 +551,18 @@ function buyTime() {
   socket.emit("buy_time");
 }
 
+function downloadRound(round) {
+  var snap = roundSnapshots.find(function(s){ return s.round===round; });
+  if(!snap || !snap._el) return;
+  if(typeof html2canvas === "undefined") return toast("לא ניתן להוריד כרגע");
+  html2canvas(snap._el, {backgroundColor:"#1a1a2e", scale:2}).then(function(canvas){
+    var a = document.createElement("a");
+    a.href = canvas.toDataURL("image/jpeg", 0.9);
+    a.download = "סיבוב-"+round+"-"+snap.topic+".jpg";
+    a.click();
+  }).catch(function(){ toast("שגיאה בהורדה"); });
+}
+
 function inviteToRoom() {
   var url = location.origin + "?room=" + myRoomId;
   var text = "🎨 בוא לשחק מציירים ביחד!\nנכנס לחדר שלי ישירות: " + url;
@@ -1223,15 +1235,16 @@ function renderResults(room){
     if(amHost && nb){nb.style.display="block";nb.textContent=room.round>=5?"🎊 סיים משחק!":"➡️ לסיבוב הבא";}
     else if(nb){nb.style.display="none";}
   }
-  // Capture round screenshot
-  setTimeout(function(){
-    var el = document.getElementById("sJudge");
-    if(el && typeof html2canvas !== "undefined"){
-      html2canvas(el, {backgroundColor:"#0d0d1a", scale:1.5}).then(function(canvas){
-        roundSnapshots.push({ round: room.round, topic: room.topic, dataUrl: canvas.toDataURL("image/jpeg", 0.85) });
-      }).catch(function(){});
-    }
-  }, 500);
+  // Save round data for gallery
+  if(room.lastWinner && shownDrawings) {
+    roundSnapshots.push({
+      round: room.round,
+      topic: room.topic,
+      winner: room.lastWinner,
+      drawings: Object.assign({}, shownDrawings),
+      players: room.players.slice()
+    });
+  }
 }
 
 function renderFinal(room){
@@ -1255,14 +1268,30 @@ function renderFinal(room){
   // Show round gallery
   var gallery = document.getElementById("roundGallery");
   if(gallery && roundSnapshots.length > 0){
-    gallery.innerHTML = '<div class="f" style="font-size:1.1rem;color:var(--y);margin-bottom:12px">📸 תמונות מהמשחק</div>'
-      + roundSnapshots.map(function(s){
-        return '<div style="margin-bottom:14px;background:var(--surf);border-radius:12px;padding:10px;border:1px solid var(--brd)">'
-          +'<div style="color:var(--mu);font-size:.82rem;margin-bottom:6px">סיבוב '+s.round+' — '+s.topic+'</div>'
-          +'<img src="'+s.dataUrl+'" style="width:100%;border-radius:8px"/>'
-          +'<a href="'+s.dataUrl+'" download="סיבוב-'+s.round+'-'+s.topic+'.jpg" style="display:block;margin-top:8px;background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;text-align:center;padding:8px;border-radius:10px;font-family:Fredoka One,cursive;text-decoration:none;font-size:.95rem">💾 הורד תמונה</a>'
+    gallery.innerHTML = '<div class="f" style="font-size:1.1rem;color:var(--y);margin:16px 0 10px">📸 ציורי המשחק</div>'
+      + roundSnapshots.map(function(snap){
+        var cols = Math.min(snap.players.length, 2);
+        var grid = snap.players.map(function(p){
+          var isWin = snap.winner && snap.winner.id === p.id;
+          var img = snap.drawings[p.id];
+          return '<div style="text-align:center;background:'+(isWin?"rgba(255,211,42,.1)":"var(--card)")+';border-radius:10px;padding:8px;border:2px solid '+(isWin?"var(--y)":"var(--brd)")+'">'
+            +(img ? '<img src="'+img+'" style="width:100%;border-radius:6px"/>' : '<div style="height:80px;background:var(--surf);border-radius:6px"></div>')
+            +'<div style="font-size:.8rem;font-weight:700;color:'+(isWin?"var(--y)":p.color)+';margin-top:4px">'+(isWin?"🏆 ":"")+p.name+'</div>'
+            +'</div>';
+        }).join("");
+        // Create downloadable image using canvas
+        var canvasId = "rc_"+snap.round;
+        return '<div style="margin-bottom:16px;background:var(--surf);border-radius:12px;padding:12px;border:1px solid var(--brd)">'
+          +'<div style="color:var(--mu);font-size:.82rem;margin-bottom:8px">סיבוב '+snap.round+' — נושא: <strong style="color:var(--tx)">'+snap.topic+'</strong></div>'
+          +'<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px;margin-bottom:10px" id="'+canvasId+'">'+grid+'</div>'
+          +'<button onclick="downloadRound('+snap.round+')" style="width:100%;background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:10px;padding:8px;font-family:Fredoka One,cursive;font-size:.95rem;cursor:pointer">💾 הורד תמונה</button>'
           +'</div>';
       }).join("");
+    // After rendering, enable downloads via html2canvas
+    roundSnapshots.forEach(function(snap){
+      var el = document.getElementById("rc_"+snap.round);
+      if(el) snap._el = el;
+    });
   }
 
 function go(id){
