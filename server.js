@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const { TOPICS_EN } = require("./translations");
 const http = require("http");
 const { Server } = require("socket.io");
 const fetch = require("node-fetch");
@@ -219,9 +218,7 @@ function getLobbyList() {
 function pushLobby() { io.emit("lobby_list", getLobbyList()); }
 
 function broadcast(r) {
-  var topicEn = TOPICS_EN[r.topic] || r.topic;
   io.to(r.id).emit("state", {
-    topicEn: topicEn,
     id:r.id, hostId:r.hostId, maxPlayers:r.maxPlayers,
     players:r.players, phase:r.phase, round:r.round, topic:r.topic,
     submitted:Object.keys(r.drawings), lastWinner:r.lastWinner
