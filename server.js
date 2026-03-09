@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const { TOPICS_EN } = require("./translations");
 const http = require("http");
 const { Server } = require("socket.io");
 const fetch = require("node-fetch");
@@ -218,7 +219,9 @@ function getLobbyList() {
 function pushLobby() { io.emit("lobby_list", getLobbyList()); }
 
 function broadcast(r) {
+  var topicEn = TOPICS_EN[r.topic] || r.topic;
   io.to(r.id).emit("state", {
+    topicEn: topicEn,
     id:r.id, hostId:r.hostId, maxPlayers:r.maxPlayers,
     players:r.players, phase:r.phase, round:r.round, topic:r.topic,
     submitted:Object.keys(r.drawings), lastWinner:r.lastWinner
@@ -232,7 +235,10 @@ function startRound(roomId) {
   r.phase = "drawing";
   r.drawings = {};
   r.lastWinner = null;
-  r.topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+  var available = TOPICS.filter(function(t){ return !r.usedTopics.includes(t); });
+  if(available.length === 0) { r.usedTopics = []; available = TOPICS; }
+  r.topic = available[Math.floor(Math.random() * available.length)];
+  r.usedTopics.push(r.topic);
   r.timeLeft = DRAW_TIME;
   broadcast(r);
   pushLobby();
@@ -277,7 +283,7 @@ async function judge(roomId) {
             role:"user",
             content:[
               ...imageMessages,
-              { type:"text", text:"שופט תחרות ציורים. נושא: \""+r.topic+"\".\n"+names+"\nבחר מנצח לפי קרבה לנושא ויצירתיות.\nענה JSON בלבד: {\"winner\":\"שם\",\"reason\":\"סיבה בעברית\"}" }
+              { type:"text", text:"You are a drawing competition judge. Topic: \""+((TOPICS_EN[r.topic])||r.topic)+"\".\n"+names+"\nPick a winner based on closeness to the topic and creativity.\nRespond JSON only: {\"winner\":\"name\",\"reason_he\":\"reason in Hebrew\",\"reason_en\":\"reason in English\"}" }
             ]
           }]
         })
@@ -292,7 +298,7 @@ async function judge(roomId) {
       || drawers.find(function(p){ return parsed.winner&&parsed.winner.includes(p.name); })
       || drawers[0];
     winner.score = (winner.score||0) + 1;
-    r.lastWinner = { id:winner.id, name:winner.name, color:winner.color, reason:parsed.reason };
+    r.lastWinner = { id:winner.id, name:winner.name, color:winner.color, reason:parsed.reason_he||parsed.reason||"", reason_en:parsed.reason_en||parsed.reason||"" };
 
     // Update stats + streak + badges
     if (winner.userId) {
@@ -347,7 +353,7 @@ io.on("connection", function(socket) {
       id:id, hostId:socket.id, maxPlayers:max,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
       pendingPlayers:[],
-      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now()
+      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now(), usedTopics:[], usedTopics:[]
     };
     socket.join(id);
     socket.data.roomId = id;
@@ -414,15 +420,29 @@ io.on("connection", function(socket) {
   socket.on("leave_room", function() {
     var r = rooms[socket.data.roomId];
     if (!r) return;
-    // if host leaves lobby, delete the room
+    var leftPlayer = r.players.find(function(p){ return p.id === socket.id; });
+    var leftName = leftPlayer ? leftPlayer.name : "שחקן";
     if (r.hostId === socket.id && r.phase === "lobby") {
+      // Host leaves lobby - notify and delete room
+      io.to(r.id).emit("player_left", { name: leftName });
       clearInterval(r.timer);
       delete rooms[r.id];
       pushLobby();
     } else {
       r.players = r.players.filter(function(p){ return p.id !== socket.id; });
-      if (r.players.length === 0) { clearInterval(r.timer); delete rooms[r.id]; }
-      else broadcast(r);
+      if (r.players.length === 0) {
+        clearInterval(r.timer);
+        delete rooms[r.id];
+      } else {
+        if (r.hostId === socket.id) r.hostId = r.players[0].id;
+        if (r.phase === "drawing" || r.phase === "judging" || r.phase === "results") {
+          clearInterval(r.timer);
+          r.timer = null;
+          r.phase = "abandoned";
+        }
+        io.to(r.id).emit("player_left", { name: leftName });
+        broadcast(r);
+      }
       pushLobby();
     }
     socket.leave(socket.data.roomId);
