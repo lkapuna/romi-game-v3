@@ -353,7 +353,7 @@ io.on("connection", function(socket) {
       id:id, hostId:socket.id, maxPlayers:max,
       players:[{ id:socket.id, name:data.name||"מארח", color:COLORS[0], score:0, userId:data.userId||null }],
       pendingPlayers:[],
-      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now(), usedTopics:[]
+      phase:"lobby", round:0, topic:"", drawings:{}, timer:null, timeLeft:0, lastWinner:null, createdAt:Date.now(), usedTopics:[], usedTopics:[]
     };
     socket.join(id);
     socket.data.roomId = id;
