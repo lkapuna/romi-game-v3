@@ -134,52 +134,52 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div class="tab" id="ta2" onclick="authTab('register')" data-i18n="register">הרשמה</div>
       </div>
       <div id="pLogin">
-        <label class="lbl" data-i18n="username_lbl">שם משתמש</label>
+        <label class="lbl" data-i18n="username_lbl" data-i18n="username_lbl" data-i18n="username_lbl">שם משתמש</label>
         <input class="inp" id="lUser" placeholder="הכנס שם משתמש..."/>
-        <label class="lbl" data-i18n="pin_lbl">קוד סודי (4 ספרות)</label>
+        <label class="lbl" data-i18n="pin_lbl" data-i18n="pin_lbl" data-i18n="pin_lbl">קוד סודי (4 ספרות)</label>
         <input class="inp" id="lPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
-        <button class="btn btn-blue" onclick="doLogin()" data-i18n="enter_game">🔒 כנס למשחק</button>
+        <button class="btn btn-blue" onclick="doLogin()" data-i18n="enter_game" data-i18n="enter_game" data-i18n="enter_game">🔒 כנס למשחק</button>
         <div style="text-align:center;margin-top:10px">
-          <span onclick="authTab('reset')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline" data-i18n="forgot_pin">שכחתי את הקוד</span>
+          <span onclick="authTab('reset')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline" data-i18n="forgot_pin" data-i18n="forgot_pin" data-i18n="forgot_pin">שכחתי את הקוד</span>
         </div>
         <div id="loginErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
       <div id="pRegister" style="display:none">
-        <label class="lbl" data-i18n="choose_username">בחר שם משתמש</label>
+        <label class="lbl" data-i18n="choose_username" data-i18n="choose_username" data-i18n="choose_username">בחר שם משתמש</label>
         <input class="inp" id="rUser" placeholder="למשל: רומי123"/>
-        <label class="lbl" data-i18n="phone_lbl">מספר טלפון</label>
+        <label class="lbl" data-i18n="phone_lbl" data-i18n="phone_lbl" data-i18n="phone_lbl">מספר טלפון</label>
         <input class="inp" id="rPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
         <label class="lbl" data-i18n="pin_lbl">קוד סודי (4 ספרות)</label>
         <input class="inp" id="rPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
-        <label class="lbl" data-i18n="security_q">שאלת אבטחה</label>
+        <label class="lbl" data-i18n="security_q" data-i18n="security_q" data-i18n="security_q">שאלת אבטחה</label>
         <select class="inp" id="rQuestion" style="margin-bottom:8px">
-          <option value="" data-i18n="choose_q">-- בחר שאלה --</option>
-          <option value="pet" data-i18n="q_pet">מה שם החיה שלך?</option>
-          <option value="food" data-i18n="q_food">מה האוכל האהוב עליך?</option>
-          <option value="city" data-i18n="q_city">באיזה עיר נולדת?</option>
-          <option value="friend" data-i18n="q_friend">מה שם החבר הכי טוב שלך?</option>
-          <option value="color" data-i18n="q_color">מה הצבע האהוב עליך?</option>
+          <option value="" data-i18n="choose_q" data-i18n="choose_q" data-i18n="choose_q">-- בחר שאלה --</option>
+          <option value="pet" data-i18n="q_pet" data-i18n="q_pet" data-i18n="q_pet">מה שם החיה שלך?</option>
+          <option value="food" data-i18n="q_food" data-i18n="q_food" data-i18n="q_food">מה האוכל האהוב עליך?</option>
+          <option value="city" data-i18n="q_city" data-i18n="q_city" data-i18n="q_city">באיזה עיר נולדת?</option>
+          <option value="friend" data-i18n="q_friend" data-i18n="q_friend" data-i18n="q_friend">מה שם החבר הכי טוב שלך?</option>
+          <option value="color" data-i18n="q_color" data-i18n="q_color" data-i18n="q_color">מה הצבע האהוב עליך?</option>
         </select>
         <input class="inp" id="rAnswer" placeholder="תשובה לשאלת האבטחה..."/>
-        <button class="btn btn-green" onclick="doRegister()" data-i18n="create_account">✨ צור חשבון</button>
+        <button class="btn btn-green" onclick="doRegister()" data-i18n="create_account" data-i18n="create_account" data-i18n="create_account">✨ צור חשבון</button>
         <div id="regErr" style="color:var(--r);text-align:center;margin-top:8px;font-size:.88rem"></div>
       </div>
       <div id="pReset" style="display:none">
-        <h3 class="f" style="color:var(--y);margin-bottom:12px;font-size:1.05rem" data-i18n="reset_title">🔑 איפוס קוד סודי</h3>
-        <label class="lbl" data-i18n="phone_registered">מספר טלפון שנרשמת איתו</label>
+        <h3 class="f" style="color:var(--y);margin-bottom:12px;font-size:1.05rem" data-i18n="reset_title" data-i18n="reset_title" data-i18n="reset_title">🔑 איפוס קוד סודי</h3>
+        <label class="lbl" data-i18n="phone_registered" data-i18n="phone_registered" data-i18n="phone_registered">מספר טלפון שנרשמת איתו</label>
         <input class="inp" id="resetPhone" type="tel" inputmode="numeric" placeholder="05X-XXXXXXX"/>
         <div id="resetStep2" style="display:none">
           <label class="lbl" id="resetQuestionLbl" style="color:var(--y);font-weight:700"></label>
           <input class="inp" id="resetAnswer" placeholder="התשובה שלך..."/>
           <div id="resetStep3" style="display:none">
-            <label class="lbl">קוד סודי חדש (4 ספרות)</label>
+            <label class="lbl" data-i18n="new_pin_lbl" data-i18n="new_pin_lbl" data-i18n="new_pin_lbl">קוד סודי חדש (4 ספרות)</label>
             <input class="inp" id="resetPin" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="font-size:1.4rem;letter-spacing:6px;text-align:center"/>
           </div>
         </div>
-        <button class="btn btn-yel" id="resetBtn" onclick="doReset()">🔍 מצא חשבון</button>
+        <button class="btn btn-yel" id="resetBtn" onclick="doReset()" data-i18n="find_account" data-i18n="find_account">🔍 מצא חשבון</button>
         <div id="resetErr" style="margin-top:8px;text-align:center;font-size:.88rem"></div>
         <div style="text-align:center;margin-top:10px">
-          <span onclick="authTab('login')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline" data-i18n="back_to_login">חזרה לכניסה</span>
+          <span onclick="authTab('login')" style="color:var(--mu);font-size:.82rem;cursor:pointer;text-decoration:underline" data-i18n="back_to_login" data-i18n="back_to_login" data-i18n="back_to_login">חזרה לכניסה</span>
         </div>
       </div>
     </div>
@@ -189,10 +189,10 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div id="sLeader" class="screen fu">
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem" data-i18n="back">→ חזרה</button>
-        <h2 class="f" style="color:var(--y);font-size:1.2rem" data-i18n="leaderTitle">🏆 טבלת מובילים</h2>
+        <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem" data-i18n="back" data-i18n="back">→ חזרה</button>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem" data-i18n="leaderTitle" data-i18n="leaderTitle" data-i18n="leaderTitle">🏆 טבלת מובילים</h2>
       </div>
-      <div id="leaderList"><div style="text-align:center;padding:20px;color:var(--mu)" id="loadingTxt">טוען...</div></div>
+      <div id="leaderList"><div style="text-align:center;padding:20px;color:var(--mu)" id="loadingTxt" data-i18n="loading" data-i18n="loading">טוען...</div></div>
     </div>
   </div>
 
@@ -202,16 +202,16 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <button onclick="go('sHome')" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
-        <h2 class="f" style="color:#a78bfa;font-size:1.2rem" data-i18n="soloTitle">🎨 אימון יחיד</h2>
+        <h2 class="f" style="color:#a78bfa;font-size:1.2rem" data-i18n="soloTitle" data-i18n="soloTitle" data-i18n="soloTitle">🎨 אימון יחיד</h2>
       </div>
       <div id="soloStart">
-        <p style="color:var(--mu);margin-bottom:16px;line-height:1.6" data-i18n="soloDesc">צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!</p>
-        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()" data-i18n="startChallenge">🚀 התחל אתגר!</button>
+        <p style="color:var(--mu);margin-bottom:16px;line-height:1.6" data-i18n="soloDesc" data-i18n="soloDesc">צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!</p>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()" data-i18n="startChallenge" data-i18n="startChallenge" data-i18n="startChallenge">🚀 התחל אתגר!</button>
       </div>
       <div id="soloGame" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <span class="f" style="color:#a78bfa" id="soloRoundLbl"></span>
-          <div><span class="tnum f" id="soloTimer" style="font-size:2rem">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+          <div><span class="tnum f" id="soloTimer" style="font-size:2rem">60</span><span style="color:var(--mu);font-size:.8rem" data-i18n="sec_short"> שנ'</span></div>
         </div>
         <div class="topic-box">
           <span style="color:var(--mu);font-size:.8rem">צייר:</span>
@@ -226,8 +226,8 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
           </div>
           <canvas id="soloCv" width="1000" height="800"></canvas>
           <div class="cact" style="margin-top:10px">
-            <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
-            <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
+            <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()" data-i18n="clear" data-i18n="clear">🗑️ נקה</button>
+            <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()" data-i18n="submit_judge" data-i18n="submit_solo">✅ שלח לשיפוט!</button>
           </div>
         </div>
       </div>
@@ -236,17 +236,17 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div id="soloFeedbackBox" class="vbox" style="margin-bottom:14px"></div>
         <div id="soloDrawingBox" style="margin-bottom:14px"></div>
         <div style="display:flex;gap:8px">
-          <button class="btn" style="flex:1;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="go('sHome')">🏠 בית</button>
-          <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloNextBtn" onclick="nextSolo()">➡️ נושא הבא</button>
+          <button class="btn" style="flex:1;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="go('sHome')" data-i18n="home" data-i18n="home">🏠 בית</button>
+          <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloNextBtn" onclick="nextSolo()" data-i18n="next_topic" data-i18n="next_topic">➡️ נושא הבא</button>
         </div>
       </div>
       <div id="soloResults" style="display:none;text-align:center">
         <div class="bo" style="font-size:3rem;margin-bottom:10px">🎨</div>
-        <h2 class="f" style="font-size:1.8rem;margin-bottom:6px;color:#a78bfa">סיימת!</h2>
+        <h2 class="f" style="font-size:1.8rem;margin-bottom:6px;color:#a78bfa" data-i18n="finished" data-i18n="finished">סיימת!</h2>
         <div id="soloFinalScore" style="font-size:1.1rem;color:var(--mu);margin-bottom:20px"></div>
         <div id="soloFinalList" class="card" style="text-align:right;margin-bottom:14px"></div>
-        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;max-width:240px" onclick="startSolo()">🔄 שחק שוב</button>
-        <button class="btn btn-blue" style="margin-top:8px;max-width:240px" onclick="go('sHome')">🏠 חזור לבית</button>
+        <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;max-width:240px" onclick="startSolo()" data-i18n="play_again" data-i18n="play_again">🔄 שחק שוב</button>
+        <button class="btn btn-blue" style="margin-top:8px;max-width:240px" onclick="go('sHome')" data-i18n="back_home2" data-i18n="back_home2">🏠 חזור לבית</button>
       </div>
     </div>
   </div>
@@ -255,35 +255,35 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <div id="sHome" class="screen fu">
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-        <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px" data-i18n="leaderboard">🏆 מובילים</button>
-        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px" data-i18n="share">📲 שתף משחק</button>
-        <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px" data-i18n="install">📱 התקן</button>
+        <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px" data-i18n="leaderboard" data-i18n="leaderboard">🏆 מובילים</button>
+        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px" data-i18n="share" data-i18n="share">📲 שתף משחק</button>
+        <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px" data-i18n="install" data-i18n="install">📱 התקן</button>
       </div>
       <div id="myBadges" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
       <div class="tabs">
-        <div class="tab on" id="t1" onclick="switchTab('create')" data-i18n="openRoom">פתח חדר חדש</div>
-        <div class="tab" id="t2" onclick="switchTab('join')" data-i18n="joinRoom">הצטרף לחדר</div>
+        <div class="tab on" id="t1" onclick="switchTab('create')" data-i18n="openRoom" data-i18n="openRoom" data-i18n="openRoom">פתח חדר חדש</div>
+        <div class="tab" id="t2" onclick="switchTab('join')" data-i18n="joinRoom" data-i18n="joinRoom" data-i18n="joinRoom">הצטרף לחדר</div>
       </div>
       <div id="pCreate">
-        <label class="lbl" data-i18n="howMany">כמה שחקנים?</label>
+        <label class="lbl" data-i18n="howMany" data-i18n="howMany" data-i18n="howMany">כמה שחקנים?</label>
         <div class="mpgrid">
-          <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa">🎨 יחיד</div>
-          <div class="mpbtn on" id="mp2" onclick="setMax(2)" data-i18n="p2">2 שחקנים</div>
-          <div class="mpbtn" id="mp3" onclick="setMax(3)" data-i18n="p3">3 שחקנים</div>
+          <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa" data-i18n="solo">🎨 יחיד</div>
+          <div class="mpbtn on" id="mp2" onclick="setMax(2)" data-i18n="p2" data-i18n="p2" data-i18n="p2">2 שחקנים</div>
+          <div class="mpbtn" id="mp3" onclick="setMax(3)" data-i18n="p3" data-i18n="p3" data-i18n="p3">3 שחקנים</div>
           <div class="mpbtn" id="mp4" onclick="setMax(4)">4 שחקנים</div>
         </div>
-        <button class="btn btn-blue" onclick="doCreate()">&#10024; פתח חדר</button>
+        <button class="btn btn-blue" onclick="doCreate()" data-i18n="openRoomBtn">&#10024; פתח חדר</button>
       </div>
       <div id="pJoin" style="display:none">
-        <label class="lbl" style="margin-bottom:8px">בחר חדר לפי שם המארח:</label>
+        <label class="lbl" style="margin-bottom:8px" data-i18n="choose_room" data-i18n="choose_room" data-i18n="choose_room">בחר חדר לפי שם המארח:</label>
         <div class="room-list" id="roomList"><div class="no-rooms">אין חדרים פתוחים כרגע...</div></div>
-        <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled>&#128682; הצטרף</button>
+        <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled data-i18n="joinBtn">&#128682; הצטרף</button>
       </div>
       <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(30,144,255,0.1));border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1px solid rgba(168,85,247,0.25);font-size:.82rem;line-height:1.9">
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7">אימון יחיד</strong> <span style="color:var(--mu)">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff">פתחו חדר</strong> <span style="color:var(--mu)">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573">הצטרפו לחדר</strong> <span style="color:var(--mu)">— הצטרפו למשחק פתוח של חבר</span></span></div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a">מובילים</strong> <span style="color:var(--mu)">— ראו את השחקנים הטובים ביותר</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🎨</span><span><strong style="color:#a855f7" data-i18n="solo_short" data-i18n="solo_short">אימון יחיד</strong> <span style="color:var(--mu)" data-i18n="solo_desc_short" data-i18n="solo_ai">— צייר לבד וקבל ציון ומשוב מ-AI</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚀</span><span><strong style="color:#1e90ff" data-i18n="open_room_short" data-i18n="create_short">פתחו חדר</strong> <span style="color:var(--mu)" data-i18n="open_room_desc" data-i18n="create_desc">— פתחו משחק וחברים יצטרפו אליכם</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🚪</span><span><strong style="color:#2ed573" data-i18n="join_room_short" data-i18n="join_short">הצטרפו לחדר</strong> <span style="color:var(--mu)" data-i18n="join_room_desc" data-i18n="join_desc">— הצטרפו למשחק פתוח של חבר</span></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span>🏆</span><span><strong style="color:#ffd32a" data-i18n="leaders_short" data-i18n="leaders_short">מובילים</strong> <span style="color:var(--mu)" data-i18n="leaders_desc" data-i18n="leaders_desc">— ראו את השחקנים הטובים ביותר</span></span></div>
     <div style="border-top:1px solid var(--brd);margin-top:8px;padding-top:8px;color:var(--mu);text-align:center;font-size:.8rem">כולם מציירים את אותו הנושא ← שופט AI בוחר את הציור הטוב ביותר ← 5 סיבובים ← הכי הרבה נקודות <strong style="color:var(--y)">מנצח! 👑</strong></div>
   </div>
     </div>
@@ -294,16 +294,16 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
         <button onclick="leaveRoom()" style="background:var(--surf);border:1px solid var(--brd);color:var(--mu);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">→ חזרה</button>
-        <h2 class="f" style="color:var(--y);font-size:1.2rem" data-i18n="waitingPlayers">🎮 ממתינים לשחקנים...</h2>
+        <h2 class="f" style="color:var(--y);font-size:1.2rem" data-i18n="waitingPlayers" data-i18n="waitingPlayers" data-i18n="waitingPlayers">🎮 ממתינים לשחקנים...</h2>
       </div>
-      <button onclick="inviteToRoom()" style="width:100%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;border:none;border-radius:12px;padding:10px;font-size:1rem;cursor:pointer;margin-bottom:12px" data-i18n="inviteFriends">📲 הזמן חברים לחדר זה</button>
+      <button onclick="inviteToRoom()" style="width:100%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;border:none;border-radius:12px;padding:10px;font-size:1rem;cursor:pointer;margin-bottom:12px" data-i18n="inviteFriends" data-i18n="inviteFriends" data-i18n="inviteFriends">📲 הזמן חברים לחדר זה</button>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="color:var(--mu);font-size:.82rem" data-i18n="playersJoined">שחקנים שהצטרפו</span>
+        <span style="color:var(--mu);font-size:.82rem" data-i18n="playersJoined" data-i18n="playersJoined" data-i18n="playersJoined">שחקנים שהצטרפו</span>
         <span class="f" style="color:var(--y)" id="progTxt">0/0</span>
       </div>
       <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
       <div class="pslots" id="slots"></div>
-      <button class="btn btn-blue" id="startBtn" onclick="socket.emit('start')" disabled>&#127912; התחל משחק!</button>
+      <button class="btn btn-blue" id="startBtn" onclick="socket.emit('start')" disabled data-i18n="startGame">&#127912; התחל משחק!</button>
       <div id="lobbyMsg" style="text-align:center;color:var(--mu);margin-top:8px;font-size:.87rem"></div>
     </div>
   </div>
@@ -314,13 +314,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="round-row">
       <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
       <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem" data-i18n="exit">🏠 יציאה</button>
+        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem" data-i18n="exit" data-i18n="exit">🏠 יציאה</button>
         <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
         <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer" data-i18n="buyTime">+30שנ' 🪙5</button>
       </div>
     </div>
     <div class="topic-box">
-      <span style="color:var(--mu);font-size:.8rem" id="topicLbl">נושא:</span>
+      <span style="color:var(--mu);font-size:.8rem" id="topicLbl" data-i18n="topic">נושא:</span>
       <strong id="topicEl" style="font-size:1.05rem"></strong>
     </div>
     <div class="card" style="padding:14px;position:relative">
@@ -333,13 +333,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div style="position:relative">
         <canvas id="cv" width="1000" height="800"></canvas>
         <div class="sub-over" id="subOver">
-          <span>&#9989;</span><span id="sentTxt">הציור נשלח!</span>
-          <span style="color:var(--mu);font-family:'Heebo',sans-serif;font-size:.85rem" id="waitingTxt">ממתין לשאר...</span>
+          <span>&#9989;</span><span id="sentTxt" data-i18n="sent" data-i18n="drawing_sent">הציור נשלח!</span>
+          <span style="color:var(--mu);font-family:'Heebo',sans-serif;font-size:.85rem" id="waitingTxt" data-i18n="waiting" data-i18n="waiting_others">ממתין לשאר...</span>
         </div>
       </div>
       <div class="cact">
-        <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()">&#128465; נקה</button>
-        <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()">&#9989; שלח ציור!</button>
+        <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearCv()" data-i18n="clear">&#128465; נקה</button>
+        <button class="btn btn-green" style="flex:2;font-size:1rem" id="submitBtn" onclick="submitDraw()" data-i18n="submit_judge">&#9989; שלח ציור!</button>
       </div>
 
       </div>
@@ -353,7 +353,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
       <div id="dgrid" style="display:grid;gap:10px;margin-bottom:12px"></div>
       <div id="judgeSpinner" style="text-align:center;padding:16px;display:none">
         <div style="font-size:2rem;margin-bottom:8px">🤔</div>
-        <div class="f" style="color:var(--y)" id="judgingTxt">השופט בוחן...</div>
+        <div class="f" style="color:var(--y)" id="judgingTxt" data-i18n="judging" data-i18n="judge_checking">השופט בוחן...</div>
         <div style="display:flex;justify-content:center;gap:6px;margin-top:10px">
           <div class="dot-pulse"></div><div class="dot-pulse" style="animation-delay:.2s"></div><div class="dot-pulse" style="animation-delay:.4s"></div>
         </div>
@@ -368,13 +368,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
   <div id="sFinal" class="screen fu" style="text-align:center">
     <div class="bo" style="font-size:3.8rem;margin-bottom:12px">&#127942;</div>
-    <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" data-i18n="gameOver">המשחק הסתיים!</h2>
+    <h2 class="f" style="font-size:1.9rem;margin-bottom:6px;background:linear-gradient(135deg,var(--y),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" data-i18n="gameOver" data-i18n="gameOver" data-i18n="gameOver" data-i18n="gameOver">המשחק הסתיים!</h2>
     <p id="finalMsg" style="color:var(--mu);margin-bottom:22px"></p>
     <div class="card" style="text-align:right"><div id="finalList"></div></div>
-    <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()" data-i18n="newGame">🏠 משחק חדש</button>
-    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()" data-i18n="shareResults">📲 שתף תוצאות</button>
+    <button class="btn btn-blue" style="margin-top:14px;max-width:240px" onclick="location.reload()" data-i18n="newGame" data-i18n="newGame" data-i18n="newGame" data-i18n="newGame">🏠 משחק חדש</button>
+    <button class="btn" style="margin-top:10px;max-width:240px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive" onclick="shareResult()" data-i18n="shareResults" data-i18n="shareResults" data-i18n="shareResults" data-i18n="shareResults">📲 שתף תוצאות</button>
     <div id="newBadgesWrap" style="display:none;margin-top:14px">
-      <div class="f" style="color:var(--y);margin-bottom:8px">🎉 תג חדש!</div>
+      <div class="f" style="color:var(--y);margin-bottom:8px" data-i18n="newBadge" data-i18n="new_badge">🎉 תג חדש!</div>
       <div id="newBadgesList" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
     </div>
   </div>
@@ -408,6 +408,28 @@ var TR = {
     soloTitle:"🎨 אימון יחיד",soloDesc:"צייר את הנושא שיינתן לך — שופט AI יבחן את הציור ויתן לך ציון ומשוב!",
     startChallenge:"🚀 התחל אתגר!",leaderTitle:"🏆 טבלת מובילים",buyTime:"+30שנ' 🪙5",
     gameOver:"המשחק הסתיים!",newGame:"🏠 משחק חדש",shareResults:"📲 שתף תוצאות",
+    tagline:"מתחרות הציורים של רומי",
+    solo_short:"אימון יחיד",solo_ai:"— צייר לבד וקבל ציון ומשוב מ-AI",
+    create_short:"פתחו חדר",create_desc:"— פתחו משחק וחברים יצטרפו אליכם",
+    join_short:"הצטרפו לחדר",join_desc:"— הצטרפו למשחק פתוח של חבר",
+    leaders_short:"מובילים",leaders_desc:"— ראו את השחקנים הטובים ביותר",
+    choose_room:"בחר חדר לפי שם המארח:",
+    clear:"🗑️ נקה",submit_solo:"✅ שלח לשיפוט!",
+    home:"🏠 בית",next_topic:"➡️ נושא הבא",finished:"סיימת!",
+    play_again:"🔄 שחק שוב",back_home2:"🏠 חזור לבית",
+    new_pin_lbl:"קוד סודי חדש (4 ספרות)",
+    drawing_sent:"הציור נשלח!",waiting_others:"ממתין לשאר...",
+    judge_checking:"השופט בוחן...",new_badge:"🎉 תג חדש!",
+    drawing_together:"מציירים ביחד",
+    choose_room:"בחר חדר לפי שם המארח:",
+    solo_short:"אימון יחיד",solo_desc_short:"— צייר לבד וקבל ציון ומשוב מ-AI",
+    open_room_short:"פתחו חדר",open_room_desc:"— פתחו משחק וחברים יצטרפו אליכם",
+    join_room_short:"הצטרפו לחדר",join_room_desc:"— הצטרפו למשחק פתוח של חבר",
+    leaders_short:"מובילים",leaders_desc:"— ראו את השחקנים הטובים ביותר",
+    clear:"🗑️ נקה",submit_judge:"✅ שלח לשיפוט!",
+    home:"🏠 בית",next_topic:"➡️ נושא הבא",finished:"סיימת!",
+    play_again:"🔄 שחק שוב",back_home2:"🏠 חזור לבית",
+    new_pin_lbl:"קוד סודי חדש (4 ספרות)",sec_short:"שנ'",
     username_lbl:"שם משתמש",choose_username:"בחר שם משתמש",
     pin_lbl:"קוד סודי (4 ספרות)",forgot_pin:"שכחתי את הקוד",
     enter_game:"🔒 כנס למשחק",create_account:"✨ צור חשבון",
@@ -443,6 +465,28 @@ var TR = {
     soloTitle:"🎨 Solo Practice",soloDesc:"Draw the given topic — an AI judge will rate your drawing!",
     startChallenge:"🚀 Start Challenge!",leaderTitle:"🏆 Leaderboard",buyTime:"+30sec 🪙5",
     gameOver:"Game Over!",newGame:"🏠 New Game",shareResults:"📲 Share Results",
+    tagline:"Romi's Drawing Contest",
+    solo_short:"Solo Practice",solo_ai:"— Draw alone and get AI feedback",
+    create_short:"Open Room",create_desc:"— Start a game and invite friends",
+    join_short:"Join Room",join_desc:"— Join a friend's open game",
+    leaders_short:"Leaders",leaders_desc:"— See the top players",
+    choose_room:"Choose a room by host name:",
+    clear:"🗑️ Clear",submit_solo:"✅ Submit for Judging!",
+    home:"🏠 Home",next_topic:"➡️ Next Topic",finished:"Done!",
+    play_again:"🔄 Play Again",back_home2:"🏠 Back to Home",
+    new_pin_lbl:"New secret code (4 digits)",
+    drawing_sent:"Drawing Sent!",waiting_others:"Waiting for others...",
+    judge_checking:"Judge is reviewing...",new_badge:"🎉 New Badge!",
+    drawing_together:"Drawing Together",
+    choose_room:"Choose room by host name:",
+    solo_short:"Solo Practice",solo_desc_short:"— Draw alone and get AI feedback",
+    open_room_short:"Open Room",open_room_desc:"— Start a game and friends join",
+    join_room_short:"Join Room",join_room_desc:"— Join a friend's open game",
+    leaders_short:"Leaders",leaders_desc:"— See the top players",
+    clear:"🗑️ Clear",submit_judge:"✅ Submit for judging!",
+    home:"🏠 Home",next_topic:"➡️ Next Topic",finished:"Done!",
+    play_again:"🔄 Play Again",back_home2:"🏠 Back Home",
+    new_pin_lbl:"New secret code (4 digits)",sec_short:"sec",
     username_lbl:"Username",choose_username:"Choose username",
     pin_lbl:"Secret Code (4 digits)",forgot_pin:"Forgot my code",
     enter_game:"🔒 Enter Game",create_account:"✨ Create Account",
@@ -728,7 +772,7 @@ window.addEventListener("appinstalled", function() {
 });
 
 function shareGame() {
-  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  var text = "🎨 בואו לשחק בתחרות הציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
   if (navigator.share) {
     navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
   } else {
@@ -1037,7 +1081,9 @@ socket.on("state",function(room){
   renderScores(room);
   if(room.phase==="lobby"){goSafe("sLobby");renderLobby(room);}
   if(room.phase==="drawing"){
-    goSafe("sDraw");renderDraw(room);
+    goSafe("sDraw");
+    if(!canvasInited) initCanvas();
+    renderDraw(room);
     var btn=document.getElementById("buyTimeBtn");
     if(btn) btn.style.display=currentUser?"block":"none";
   }
