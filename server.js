@@ -420,15 +420,29 @@ io.on("connection", function(socket) {
   socket.on("leave_room", function() {
     var r = rooms[socket.data.roomId];
     if (!r) return;
-    // if host leaves lobby, delete the room
+    var leftPlayer = r.players.find(function(p){ return p.id === socket.id; });
+    var leftName = leftPlayer ? leftPlayer.name : "שחקן";
     if (r.hostId === socket.id && r.phase === "lobby") {
+      // Host leaves lobby - notify and delete room
+      io.to(r.id).emit("player_left", { name: leftName });
       clearInterval(r.timer);
       delete rooms[r.id];
       pushLobby();
     } else {
       r.players = r.players.filter(function(p){ return p.id !== socket.id; });
-      if (r.players.length === 0) { clearInterval(r.timer); delete rooms[r.id]; }
-      else broadcast(r);
+      if (r.players.length === 0) {
+        clearInterval(r.timer);
+        delete rooms[r.id];
+      } else {
+        if (r.hostId === socket.id) r.hostId = r.players[0].id;
+        if (r.phase === "drawing" || r.phase === "judging" || r.phase === "results") {
+          clearInterval(r.timer);
+          r.timer = null;
+          r.phase = "abandoned";
+        }
+        io.to(r.id).emit("player_left", { name: leftName });
+        broadcast(r);
+      }
       pushLobby();
     }
     socket.leave(socket.data.roomId);
