@@ -262,8 +262,6 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <div class="tab" id="t2" onclick="switchTab('join')">הצטרף לחדר</div>
       </div>
       <div id="pCreate">
-        <label class="lbl">השם שלך</label>
-        <input class="inp" id="cName" placeholder="הכנס שם..."/>
         <label class="lbl">כמה שחקנים?</label>
         <div class="mpgrid">
           <div class="mpbtn" id="mp1" onclick="go('sSolo')" style="border-color:#a78bfa;color:#a78bfa">🎨 יחיד</div>
@@ -274,8 +272,6 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn btn-blue" onclick="doCreate()">&#10024; פתח חדר</button>
       </div>
       <div id="pJoin" style="display:none">
-        <label class="lbl">השם שלך</label>
-        <input class="inp" id="jName" placeholder="הכנס שם..."/>
         <label class="lbl" style="margin-bottom:8px">בחר חדר לפי שם המארח:</label>
         <div class="room-list" id="roomList"><div class="no-rooms">אין חדרים פתוחים כרגע...</div></div>
         <button class="btn btn-blue" id="joinBtn" onclick="doJoin()" disabled>&#128682; הצטרף</button>
@@ -350,6 +346,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 
   <!-- JUDGE -->
   <div id="sJudge" class="screen fu">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
+    </div>
     <div class="card">
       <div id="dgrid" style="display:grid;gap:10px;margin-bottom:12px"></div>
       <div id="judgeSpinner" style="text-align:center;padding:16px;display:none">
@@ -578,11 +577,7 @@ function leaveRoom() {
   go("sHome");
 }
 
-function prefillNames() {
-  if (!currentUser) return;
-  var cn=document.getElementById("cName"); if(cn&&!cn.value) cn.value=currentUser.username;
-  var jn=document.getElementById("jName"); if(jn&&!jn.value) jn.value=currentUser.username;
-}
+function prefillNames() {}
 
 // ════════════════════════════════════════════════
 // SHARE & INSTALL
@@ -603,7 +598,7 @@ window.addEventListener("appinstalled", function() {
 });
 
 function shareGame() {
-  var text = "🎨 בוא לשחק תחרות ציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  var text = "🎨 בואו לשחק בתחוות הציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
   if (navigator.share) {
     navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
   } else {
@@ -991,13 +986,15 @@ socket.on("player_left", function(data) {
 });
 
 function doCreate(){
-  var name=(currentUser&&currentUser.username)||document.getElementById("cName").value.trim()||"מארח";
+  if(!currentUser)return toast("צריך להתחבר כדי לפתוח חדר");
+  var name=currentUser.username;
   socket.emit("create",{name:name,maxPlayers:maxPl,userId:currentUser&&currentUser.id});
 }
 
 function doJoin(){
   if(!selRoomId)return toast("בחר חדר מהרשימה");
-  var name=(currentUser&&currentUser.username)||document.getElementById("jName").value.trim()||"שחקן";
+  if(!currentUser)return toast("צריך להתחבר כדי להצטרף");
+  var name=currentUser.username;
   socket.emit("join",{roomId:selRoomId,name:name,userId:currentUser&&currentUser.id});
 }
 
