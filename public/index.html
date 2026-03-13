@@ -30,7 +30,7 @@ input,button{font-family:inherit}
 .fu{animation:fadeUp .3s ease both}
 .spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--y);border-radius:50%;animation:spin .8s linear infinite}
 .bo{animation:bounce 1s ease infinite}
-.wrap{max-width:800px;margin:0 auto;padding:20px 14px}
+.wrap{max-width:800px;margin:0 auto;padding:20px 14px}.draw-mode .wrap{padding:6px 6px}
 .screen{display:none}.screen.active{display:block}
 .card{background:var(--card);border-radius:18px;padding:22px;border:1px solid var(--brd);margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
 .title{font-size:clamp(1.6rem,5vw,2.5rem);text-align:center;margin-bottom:4px;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#4d96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -76,6 +76,8 @@ input,button{font-family:inherit}
 .sw{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s;flex-shrink:0}
 .sw.on{border-color:#fff;transform:scale(1.25)}
 canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius:10px;border:2px solid var(--brd);background:#fff}
+#sDraw.active ~ * #siteHeader, #sSolo.active ~ * #siteHeader{display:none}
+.screen.active#sDraw ~ #siteHeader,.screen.active#sSolo ~ #siteHeader{display:none}
 .cact{display:flex;gap:8px;margin-top:10px}
 .sub-over{display:none;position:absolute;inset:0;background:rgba(10,9,24,.82);border-radius:10px;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:'Fredoka One',cursive;font-size:1.3rem}
 .wlist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
@@ -94,9 +96,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 </head>
 <body>
 <div id="conf"></div>
-<div class="wrap">
+<div class="wrap" id="mainWrap">
   <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><a href="https://docs.google.com/forms/d/e/1FAIpQLSffMtpw1AMIwIFU7oHFeAft-v-wb7eTqRM8LahQwXpVCYByKg/viewform?usp=preview" target="_blank" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem;text-decoration:none">💬</a><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
+    <div id="siteHeader" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
       <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <!-- Fan of color swatches -->
         <g transform="translate(24,36)">
@@ -206,13 +208,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()">🚀 התחל אתגר!</button>
       </div>
       <div id="soloGame" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span class="f" style="color:#a78bfa" id="soloRoundLbl"></span>
-          <div><span class="tnum f" id="soloTimer" style="font-size:2rem">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding:0 2px">
+          <span class="f" style="color:#a78bfa;font-size:.82rem" id="soloRoundLbl"></span>
+          <div><span class="tnum f" id="soloTimer" style="font-size:1.4rem">60</span><span style="color:var(--mu);font-size:.72rem"> שנ'</span></div>
         </div>
-        <div class="topic-box">
-          <span style="color:var(--mu);font-size:.8rem">צייר:</span>
-          <strong id="soloTopic" style="font-size:1.1rem"></strong>
+        <div class="topic-box" style="padding:6px 12px;margin-bottom:6px">
+          <span style="color:var(--mu);font-size:.75rem">צייר: </span>
+          <strong id="soloTopic" style="font-size:1rem"></strong>
         </div>
         <div class="card" style="padding:14px;position:relative">
           <div class="tools">
@@ -309,17 +311,17 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- DRAW -->
   <div id="sDraw" class="screen fu">
     <div class="scores" id="scores1"></div>
-    <div class="round-row">
-      <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
-        <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
-        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;margin-bottom:4px">
+      <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:3px 8px;border-radius:8px;cursor:pointer;font-size:.75rem">🏠</button>
+      <span class="f" style="color:var(--y);font-size:.82rem" id="roundLbl"></span>
+      <div style="display:flex;align-items:center;gap:5px">
+        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:3px 7px;font-size:.72rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
+        <span class="tnum f" id="timerEl" style="font-size:1.4rem">60</span><span style="color:var(--mu);font-size:.72rem">שנ'</span>
       </div>
     </div>
-    <div class="topic-box">
-      <span style="color:var(--mu);font-size:.8rem">נושא:</span>
-      <strong id="topicEl" style="font-size:1.05rem"></strong>
+    <div class="topic-box" style="padding:6px 12px;margin-bottom:6px">
+      <span style="color:var(--mu);font-size:.75rem">נושא: </span>
+      <strong id="topicEl" style="font-size:1rem"></strong>
     </div>
     <div class="card" style="padding:14px;position:relative">
       <div class="tools">
