@@ -30,7 +30,12 @@ input,button{font-family:inherit}
 .fu{animation:fadeUp .3s ease both}
 .spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--y);border-radius:50%;animation:spin .8s linear infinite}
 .bo{animation:bounce 1s ease infinite}
-.wrap{max-width:800px;margin:0 auto;padding:20px 14px}.draw-mode .wrap{padding:6px 6px}
+.wrap{max-width:800px;margin:0 auto;padding:20px 14px}.draw-mode .wrap{padding:4px 4px}
+.draw-mode #sDraw .card{padding:8px;margin-bottom:4px}
+.draw-mode .topic-box{padding:5px 10px;margin-bottom:4px}
+.draw-mode .scores{margin-bottom:3px}
+.draw-mode .tools{margin-bottom:6px;gap:5px}
+.draw-mode .wlist{margin-top:4px}
 .screen{display:none}.screen.active{display:block}
 .card{background:var(--card);border-radius:18px;padding:22px;border:1px solid var(--brd);margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
 .title{font-size:clamp(1.6rem,5vw,2.5rem);text-align:center;margin-bottom:4px;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#4d96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -1277,7 +1282,12 @@ function renderFinal(room){
 function go(id){
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
   document.getElementById(id).classList.add("active");
-
+  var drawMode=(id==="sDraw"||id==="sSolo");
+  document.body.classList.toggle("draw-mode",drawMode);
+  var h=document.getElementById("siteHeader");
+  var ub=document.getElementById("userBar");
+  if(h)h.style.display=drawMode?"none":"";
+  if(ub)ub.style.display=drawMode?"none":"flex";
   if(id==="sDraw"){
     submitted=false;canvasInited=false;
     document.getElementById("subOver").style.display="none";
