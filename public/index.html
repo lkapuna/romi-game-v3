@@ -30,7 +30,12 @@ input,button{font-family:inherit}
 .fu{animation:fadeUp .3s ease both}
 .spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--y);border-radius:50%;animation:spin .8s linear infinite}
 .bo{animation:bounce 1s ease infinite}
-.wrap{max-width:800px;margin:0 auto;padding:20px 14px}
+.wrap{max-width:800px;margin:0 auto;padding:20px 14px}.draw-mode .wrap{padding:4px 4px}
+.draw-mode #sDraw .card{padding:8px;margin-bottom:4px}
+.draw-mode .topic-box{padding:5px 10px;margin-bottom:4px}
+.draw-mode .scores{margin-bottom:3px}
+.draw-mode .tools{margin-bottom:6px;gap:5px}
+.draw-mode .wlist{margin-top:4px}
 .screen{display:none}.screen.active{display:block}
 .card{background:var(--card);border-radius:18px;padding:22px;border:1px solid var(--brd);margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
 .title{font-size:clamp(1.6rem,5vw,2.5rem);text-align:center;margin-bottom:4px;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#4d96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -76,6 +81,8 @@ input,button{font-family:inherit}
 .sw{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s;flex-shrink:0}
 .sw.on{border-color:#fff;transform:scale(1.25)}
 canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius:10px;border:2px solid var(--brd);background:#fff}
+#sDraw.active ~ * #siteHeader, #sSolo.active ~ * #siteHeader{display:none}
+.screen.active#sDraw ~ #siteHeader,.screen.active#sSolo ~ #siteHeader{display:none}
 .cact{display:flex;gap:8px;margin-top:10px}
 .sub-over{display:none;position:absolute;inset:0;background:rgba(10,9,24,.82);border-radius:10px;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:'Fredoka One',cursive;font-size:1.3rem}
 .wlist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
@@ -94,9 +101,9 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
 </head>
 <body>
 <div id="conf"></div>
-<div class="wrap">
-  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
+<div class="wrap" id="mainWrap">
+  <div id="userBar" style="display:none;background:var(--card);border-radius:12px;padding:9px 14px;margin-bottom:12px;align-items:center;gap:10px;border:1px solid var(--brd)"><span>👤</span><span id="userBarName" style="font-weight:700;flex:1"></span><span id="userBarStats" style="color:var(--mu);font-size:.82rem"></span><a href="https://docs.google.com/forms/d/e/1FAIpQLSffMtpw1AMIwIFU7oHFeAft-v-wb7eTqRM8LahQwXpVCYByKg/viewform?usp=preview" target="_blank" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem;text-decoration:none">💬</a><button onclick="doLogout()" style="background:none;border:1px solid var(--brd);color:var(--mu);cursor:pointer;font-size:.82rem;padding:3px 8px;border-radius:6px">יציאה</button></div><div style="text-align:center;margin-bottom:16px">
+    <div id="siteHeader" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
       <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <!-- Fan of color swatches -->
         <g transform="translate(24,36)">
@@ -206,13 +213,13 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" onclick="startSolo()">🚀 התחל אתגר!</button>
       </div>
       <div id="soloGame" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span class="f" style="color:#a78bfa" id="soloRoundLbl"></span>
-          <div><span class="tnum f" id="soloTimer" style="font-size:2rem">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding:0 2px">
+          <span class="f" style="color:#a78bfa;font-size:.82rem" id="soloRoundLbl"></span>
+          <div><span class="tnum f" id="soloTimer" style="font-size:1.4rem">60</span><span style="color:var(--mu);font-size:.72rem"> שנ'</span></div>
         </div>
-        <div class="topic-box">
-          <span style="color:var(--mu);font-size:.8rem">צייר:</span>
-          <strong id="soloTopic" style="font-size:1.1rem"></strong>
+        <div class="topic-box" style="padding:6px 12px;margin-bottom:6px">
+          <span style="color:var(--mu);font-size:.75rem">צייר: </span>
+          <strong id="soloTopic" style="font-size:1rem"></strong>
         </div>
         <div class="card" style="padding:14px;position:relative">
           <div class="tools">
@@ -221,7 +228,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
             <input type="range" id="soloBSize" min="2" max="30" value="6" style="accent-color:#a78bfa;width:72px"/>
             <div id="soloSwatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
           </div>
-          <canvas id="soloCv" width="1000" height="800"></canvas>
+          <canvas id="soloCv" width="1000" height="1000"></canvas>
           <div class="cact" style="margin-top:10px">
             <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
             <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
@@ -253,8 +260,8 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
         <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px">🏆 מובילים</button>
-        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף משחק</button>
-        <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
+        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף</button>
+        <button class="btn" id="installBtn" onclick="showInstallGuide()" style="background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
       </div>
       <div id="myBadges" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
       <div class="tabs">
@@ -308,23 +315,28 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
   <!-- DRAW -->
   <div id="sDraw" class="screen fu">
     <div class="scores" id="scores1"></div>
-    <div class="round-row">
-      <span class="f" style="color:var(--y);font-size:.93rem" id="roundLbl"></span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.8rem">🏠 יציאה</button>
-        <div><span class="tnum f" id="timerEl">60</span><span style="color:var(--mu);font-size:.8rem"> שנ'</span></div>
-        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:4px 9px;font-size:.78rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;margin-bottom:4px">
+      <button onclick="confirmLeave()" style="background:none;border:1px solid var(--brd);color:var(--mu);padding:3px 8px;border-radius:8px;cursor:pointer;font-size:.75rem">🏠</button>
+      <span class="f" style="color:var(--y);font-size:.82rem" id="roundLbl"></span>
+      <div style="display:flex;align-items:center;gap:5px">
+        <button id="buyTimeBtn" onclick="buyTime()" style="display:none;background:linear-gradient(135deg,#f7b731,#f0932b);color:#111;border:none;border-radius:8px;padding:3px 7px;font-size:.72rem;font-family:Fredoka One,cursive;cursor:pointer">+30שנ' 🪙5</button>
+        <span class="tnum f" id="timerEl" style="font-size:1.4rem">60</span><span style="color:var(--mu);font-size:.72rem">שנ'</span>
       </div>
     </div>
-    <div class="topic-box">
-      <span style="color:var(--mu);font-size:.8rem">נושא:</span>
-      <strong id="topicEl" style="font-size:1.05rem"></strong>
+    <div class="topic-box" style="padding:6px 12px;margin-bottom:6px">
+      <span style="color:var(--mu);font-size:.75rem">נושא: </span>
+      <strong id="topicEl" style="font-size:1rem"></strong>
     </div>
     <div class="card" style="padding:14px;position:relative">
       <div class="tools">
         <button class="tbtn on" id="penBtn" onclick="setTool('pen')">&#9999; עט</button>
         <button class="tbtn" id="erBtn" onclick="setTool('eraser')">&#129529; מחק</button>
         <input type="range" id="bSize" min="2" max="30" value="6" style="accent-color:var(--bl);width:72px"/>
+        <div style="display:flex;gap:3px;margin-right:4px">
+          <button class="tbtn on" id="br_round" onclick="setBrush('round')" title="עיגול" style="font-size:.9rem;padding:4px 7px">⬤</button>
+          <button class="tbtn" id="br_square" onclick="setBrush('square')" title="ריבוע" style="font-size:.9rem;padding:4px 7px">■</button>
+          <button class="tbtn" id="br_spray" onclick="setBrush('spray')" title="ספריי" style="font-size:.9rem;padding:4px 7px">💨</button>
+        </div>
         <div id="swatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       </div>
       <div style="position:relative">
@@ -448,6 +460,7 @@ async function doLogin() {
     showUserBar();
     go("sHome");
     prefillNames();
+    checkIosInstall();
   } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
 }
 
@@ -474,6 +487,7 @@ async function doRegister() {
     showUserBar();
     go("sHome");
     prefillNames();
+    checkIosInstall();
   } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
 }
 
@@ -598,12 +612,36 @@ window.addEventListener("appinstalled", function() {
 });
 
 function shareGame() {
-  var text = "🎨 בואו לשחק בתחרות הציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
+  var text = "🎨 בואו לשחק בתחוות הציורים של רומי!\nמשחק ציורים מולטיפלייר עם שופט AI\n👉 " + location.origin;
   if (navigator.share) {
     navigator.share({ title:"תחרות הציורים של רומי", text:text, url:location.origin });
   } else {
     navigator.clipboard.writeText(location.origin).then(function(){ toast("הקישור הועתק! 📋"); });
   }
+}
+
+function closeInstallOverlay(){var o=document.getElementById("installOverlay");if(o)o.remove();}
+function showInstallGuide(){
+  var ua=navigator.userAgent.toLowerCase();
+  var isIos=(/iphone|ipad|ipod/.test(ua))||((/macintosh/.test(ua))&&navigator.maxTouchPoints>1);
+  var iosInstr="1. לחץ על כפתור השיתוף <strong style='color:#fff'>⬆️</strong> בתחתית Safari<br>2. גלול למטה ובחר <strong style='color:#fff'>הוסף למסך הבית</strong><br>3. לחץ <strong style='color:#fff'>הוסף</strong> ✅";
+  var andInstr="1. לחץ על תפריט שלוש הנקודות <strong style='color:#fff'>⋮</strong> בכרום<br>2. בחר <strong style='color:#fff'>הוסף למסך הבית</strong><br>3. לחץ <strong style='color:#fff'>הוסף</strong> ✅";
+  var overlay=document.createElement("div");
+  overlay.id="installOverlay";
+  overlay.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center;";
+  var box=document.createElement("div");
+  box.style.cssText="background:var(--surf);border:2px solid var(--brd);border-radius:18px 18px 0 0;padding:28px 24px 36px;text-align:center;width:100%;max-width:480px";
+  box.innerHTML="<div style='font-size:2rem;margin-bottom:10px'>📱</div>"
+    +"<div class='f' style='font-size:1.15rem;color:var(--y);margin-bottom:14px'>הוסף למסך הבית</div>"
+    +"<div style='color:var(--mu);font-size:.95rem;line-height:1.9;margin-bottom:20px'>"+(isIos?iosInstr:andInstr)+"</div>";
+  var btn=document.createElement("button");
+  btn.textContent="הבנתי!";
+  btn.style.cssText="background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 32px;font-family:Fredoka One,cursive;font-size:1rem;cursor:pointer";
+  btn.onclick=closeInstallOverlay;
+  box.appendChild(btn);
+  overlay.appendChild(box);
+  overlay.onclick=function(e){if(e.target===overlay)closeInstallOverlay();};
+  document.body.appendChild(overlay);
 }
 
 function installApp() {
@@ -762,7 +800,7 @@ function initSoloCanvas() {
   cv.onmousedown = function(e){ if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
   cv.onmousemove = function(e){ if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
   cv.onmouseup = cv.onmouseleave = function(){ soloDrawing=false; };
-  cv.ontouchstart = function(e){ e.preventDefault(); if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
+  cv.ontouchstart = function(e){ e.preventDefault(); if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; soloCtx.beginPath();soloCtx.arc(p.x,p.y,soloBsz/2,0,Math.PI*2);soloCtx.fillStyle=soloTool==="eraser"?"#fff":soloCol;soloCtx.fill(); };
   cv.ontouchmove = function(e){ e.preventDefault(); if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
   cv.ontouchend = function(){ soloDrawing=false; };
 }
@@ -881,7 +919,7 @@ function showSoloResults() {
 
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
-var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
+var tool="pen",col="#000",bsz=6,brushType="round",isDrawing=false,lx=0,ly=0,submitted=false;
 var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
 
 socket=io();
@@ -1037,19 +1075,45 @@ function initCanvas(){
   cv.onmousemove=function(e){if(!isDrawing||submitted)return;paint(ctx,pos(e));};
   cv.onmouseup=function(){isDrawing=false;};
   cv.onmouseleave=function(){isDrawing=false;};
-  cv.ontouchstart=function(e){e.preventDefault();if(submitted)return;isDrawing=true;var p=pos(e);lx=p.x;ly=p.y;};
+  cv.ontouchstart=function(e){e.preventDefault();if(submitted)return;isDrawing=true;var p=pos(e);lx=p.x;ly=p.y;if(brushType==="spray"&&tool!=="eraser"){for(var i=0;i<18;i++){var a=Math.random()*Math.PI*2,r=Math.random()*bsz*1.5;ctx.beginPath();ctx.arc(p.x+Math.cos(a)*r,p.y+Math.sin(a)*r,Math.random()*1.2+0.4,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();}}else{ctx.beginPath();ctx.arc(p.x,p.y,bsz/2,0,Math.PI*2);ctx.fillStyle=tool==="eraser"?"#fff":col;ctx.fill();}};
   cv.ontouchmove=function(e){e.preventDefault();if(!isDrawing||submitted)return;paint(ctx,pos(e));};
   cv.ontouchend=function(){isDrawing=false;};
 }
 
 function paint(ctx,p){
-  ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);
-  ctx.strokeStyle=tool==="eraser"?"#fff":col;
-  ctx.lineWidth=tool==="eraser"?bsz*3:bsz;
-  ctx.lineCap="round";ctx.lineJoin="round";ctx.stroke();
+  var c=tool==="eraser"?"#fff":col;
+  var sz=tool==="eraser"?bsz*3:bsz;
+  if(brushType==="spray"&&tool!=="eraser"){
+    for(var i=0;i<18;i++){
+      var angle=Math.random()*Math.PI*2;
+      var r=Math.random()*sz*1.5;
+      ctx.beginPath();
+      ctx.arc(p.x+Math.cos(angle)*r,p.y+Math.sin(angle)*r,Math.random()*1.2+0.4,0,Math.PI*2);
+      ctx.fillStyle=col;ctx.fill();
+    }
+  } else if(brushType==="square"&&tool!=="eraser"){
+    var dx=p.x-lx,dy=p.y-ly,dist=Math.sqrt(dx*dx+dy*dy)||1;
+    var steps=Math.ceil(dist/2);
+    for(var s=0;s<=steps;s++){
+      var tx=lx+dx*(s/steps),ty=ly+dy*(s/steps);
+      ctx.fillStyle=c;
+      ctx.fillRect(tx-sz/2,ty-sz/2,sz,sz);
+    }
+  } else {
+    ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle=c;ctx.lineWidth=sz;
+    ctx.lineCap="round";ctx.lineJoin="round";ctx.stroke();
+  }
   lx=p.x;ly=p.y;
 }
 
+function setBrush(b){
+  brushType=b;
+  ["round","square","spray"].forEach(function(x){
+    var el=document.getElementById("br_"+x);
+    if(el)el.classList.toggle("on",x===b);
+  });
+}
 function setTool(t){
   tool=t;
   document.getElementById("penBtn").classList.toggle("on",t==="pen");
@@ -1241,7 +1305,12 @@ function renderFinal(room){
 function go(id){
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
   document.getElementById(id).classList.add("active");
-
+  var drawMode=(id==="sDraw"||id==="sSolo");
+  document.body.classList.toggle("draw-mode",drawMode);
+  var h=document.getElementById("siteHeader");
+  var ub=document.getElementById("userBar");
+  if(h)h.style.display=drawMode?"none":"";
+  if(ub)ub.style.display=drawMode?"none":"flex";
   if(id==="sDraw"){
     submitted=false;canvasInited=false;
     document.getElementById("subOver").style.display="none";
