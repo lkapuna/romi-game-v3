@@ -255,6 +255,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px">🏆 מובילים</button>
         <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף משחק</button>
         <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
+        <button class="btn" id="iosInstallBtn" onclick="showIosInstall()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
       </div>
       <div id="myBadges" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
       <div class="tabs">
@@ -325,6 +326,11 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
         <button class="tbtn on" id="penBtn" onclick="setTool('pen')">&#9999; עט</button>
         <button class="tbtn" id="erBtn" onclick="setTool('eraser')">&#129529; מחק</button>
         <input type="range" id="bSize" min="2" max="30" value="6" style="accent-color:var(--bl);width:72px"/>
+        <div style="display:flex;gap:3px;margin-right:4px">
+          <button class="tbtn on" id="br_round" onclick="setBrush('round')" title="עיגול" style="font-size:.9rem;padding:4px 7px">⬤</button>
+          <button class="tbtn" id="br_square" onclick="setBrush('square')" title="ריבוע" style="font-size:.9rem;padding:4px 7px">■</button>
+          <button class="tbtn" id="br_spray" onclick="setBrush('spray')" title="ספריי" style="font-size:.9rem;padding:4px 7px">💨</button>
+        </div>
         <div id="swatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       </div>
       <div style="position:relative">
@@ -762,7 +768,7 @@ function initSoloCanvas() {
   cv.onmousedown = function(e){ if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
   cv.onmousemove = function(e){ if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
   cv.onmouseup = cv.onmouseleave = function(){ soloDrawing=false; };
-  cv.ontouchstart = function(e){ e.preventDefault(); if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; };
+  cv.ontouchstart = function(e){ e.preventDefault(); if(soloSubmitted)return; soloDrawing=true; var p=pos(e); soloLx=p.x; soloLy=p.y; soloCtx.beginPath();soloCtx.arc(p.x,p.y,soloBsz/2,0,Math.PI*2);soloCtx.fillStyle=soloTool==="eraser"?"#fff":soloCol;soloCtx.fill(); };
   cv.ontouchmove = function(e){ e.preventDefault(); if(!soloDrawing||soloSubmitted)return; paintSolo(ctx,pos(e)); };
   cv.ontouchend = function(){ soloDrawing=false; };
 }
@@ -881,7 +887,7 @@ function showSoloResults() {
 
 var COLS=["#000","#fff","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#8b5cf6","#ec4899","#92400e","#6b7280","#06b6d4"];
 var socket,myId,myRoomId,amHost=false;
-var tool="pen",col="#000",bsz=6,isDrawing=false,lx=0,ly=0,submitted=false;
+var tool="pen",col="#000",bsz=6,brushType="round",isDrawing=false,lx=0,ly=0,submitted=false;
 var shownDrawings={},curRoom=null,maxPl=2,selRoomId=null,canvasInited=false;
 
 socket=io();
@@ -1037,19 +1043,45 @@ function initCanvas(){
   cv.onmousemove=function(e){if(!isDrawing||submitted)return;paint(ctx,pos(e));};
   cv.onmouseup=function(){isDrawing=false;};
   cv.onmouseleave=function(){isDrawing=false;};
-  cv.ontouchstart=function(e){e.preventDefault();if(submitted)return;isDrawing=true;var p=pos(e);lx=p.x;ly=p.y;};
+  cv.ontouchstart=function(e){e.preventDefault();if(submitted)return;isDrawing=true;var p=pos(e);lx=p.x;ly=p.y;if(brushType==="square"&&tool!=="eraser"){ctx.fillStyle=col;ctx.fillRect(p.x-bsz/2,p.y-bsz/2,bsz,bsz);}else{ctx.beginPath();ctx.arc(p.x,p.y,bsz/2,0,Math.PI*2);ctx.fillStyle=tool==="eraser"?"#fff":col;ctx.fill();}};
   cv.ontouchmove=function(e){e.preventDefault();if(!isDrawing||submitted)return;paint(ctx,pos(e));};
   cv.ontouchend=function(){isDrawing=false;};
 }
 
 function paint(ctx,p){
-  ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);
-  ctx.strokeStyle=tool==="eraser"?"#fff":col;
-  ctx.lineWidth=tool==="eraser"?bsz*3:bsz;
-  ctx.lineCap="round";ctx.lineJoin="round";ctx.stroke();
+  var c=tool==="eraser"?"#fff":col;
+  var sz=tool==="eraser"?bsz*3:bsz;
+  if(brushType==="spray"&&tool!=="eraser"){
+    for(var i=0;i<18;i++){
+      var angle=Math.random()*Math.PI*2;
+      var r=Math.random()*sz*1.5;
+      ctx.beginPath();
+      ctx.arc(p.x+Math.cos(angle)*r,p.y+Math.sin(angle)*r,Math.random()*1.2+0.4,0,Math.PI*2);
+      ctx.fillStyle=col;ctx.fill();
+    }
+  } else if(brushType==="square"&&tool!=="eraser"){
+    var dx=p.x-lx,dy=p.y-ly,dist=Math.sqrt(dx*dx+dy*dy)||1;
+    var steps=Math.ceil(dist/2);
+    for(var s=0;s<=steps;s++){
+      var tx=lx+dx*(s/steps),ty=ly+dy*(s/steps);
+      ctx.fillStyle=c;
+      ctx.fillRect(tx-sz/2,ty-sz/2,sz,sz);
+    }
+  } else {
+    ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle=c;ctx.lineWidth=sz;
+    ctx.lineCap="round";ctx.lineJoin="round";ctx.stroke();
+  }
   lx=p.x;ly=p.y;
 }
 
+function setBrush(b){
+  brushType=b;
+  ["round","square","spray"].forEach(function(x){
+    var el=document.getElementById("br_"+x);
+    if(el)el.classList.toggle("on",x===b);
+  });
+}
 function setTool(t){
   tool=t;
   document.getElementById("penBtn").classList.toggle("on",t==="pen");
