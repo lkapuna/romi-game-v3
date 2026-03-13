@@ -255,7 +255,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
         <button class="btn btn-yel" onclick="openLeaderboard()" style="font-size:.85rem;padding:10px">🏆 מובילים</button>
-        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף משחק</button>
+        <button class="btn" onclick="shareGame()" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📲 שתף</button>
         <button class="btn" id="installBtn" onclick="installApp()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
         <button class="btn" id="iosInstallBtn" onclick="showIosInstall()" style="display:none;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px">📱 התקן</button>
       </div>
@@ -456,6 +456,7 @@ async function doLogin() {
     showUserBar();
     go("sHome");
     prefillNames();
+    checkIosInstall();
   } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
 }
 
@@ -482,6 +483,7 @@ async function doRegister() {
     showUserBar();
     go("sHome");
     prefillNames();
+    checkIosInstall();
   } catch(e) { errEl.textContent = "שגיאה, נסה שוב"; }
 }
 
