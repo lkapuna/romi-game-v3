@@ -228,7 +228,7 @@ canvas{display:block;width:100%;cursor:crosshair;touch-action:none;border-radius
             <input type="range" id="soloBSize" min="2" max="30" value="6" style="accent-color:#a78bfa;width:72px"/>
             <div id="soloSwatches" style="display:flex;gap:4px;flex-wrap:wrap"></div>
           </div>
-          <canvas id="soloCv" width="1000" height="1000"></canvas>
+          <canvas id="soloCv" width="1000" height="800"></canvas>
           <div class="cact" style="margin-top:10px">
             <button class="btn" style="flex:1;font-size:.92rem;background:var(--surf);color:var(--mu);border:1px solid var(--brd);font-family:'Heebo',sans-serif" onclick="clearSoloCv()">🗑️ נקה</button>
             <button class="btn" style="flex:2;background:linear-gradient(135deg,#a78bfa,#7b2fff);color:#fff;font-family:'Fredoka One',cursive" id="soloSubmitBtn" onclick="submitSolo()">✅ שלח לשיפוט!</button>
@@ -1011,15 +1011,31 @@ socket.on("player_joined", function(data) {
 });
 
 socket.on("player_left", function(data) {
-  // Show overlay with message and button to go home
+  // Only show game-over overlay if host left (wasHost) or game was abandoned
+  if(!data.wasHost) {
+    toast("😢 " + data.name + " עזב את המשחק");
+    return;
+  }
   var overlay = document.createElement("div");
+  overlay.id = "playerLeftOverlay";
   overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;";
-  overlay.innerHTML = '<div style="background:var(--surf);border:2px solid var(--brd);border-radius:18px;padding:30px;text-align:center;max-width:300px">'
-    + '<div style="font-size:2.5rem;margin-bottom:12px">😢</div>'
+  var box = document.createElement("div");
+  box.style.cssText = "background:var(--surf);border:2px solid var(--brd);border-radius:18px;padding:30px;text-align:center;max-width:300px";
+  box.innerHTML = '<div style="font-size:2.5rem;margin-bottom:12px">😢</div>'
     + '<div class="f" style="font-size:1.2rem;color:var(--y);margin-bottom:8px">' + data.name + ' עזב את המשחק</div>'
-    + '<div style="color:var(--mu);font-size:.9rem;margin-bottom:20px">המשחק הסתיים</div>'
-    + '<button onclick="location.reload()" style="background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:Fredoka One,cursive;font-size:1rem;cursor:pointer;width:100%">🏠 חזרה לתפריט</button>'
-    + '</div>';
+    + '<div style="color:var(--mu);font-size:.9rem;margin-bottom:20px">המשחק הסתיים</div>';
+  var btn = document.createElement("button");
+  btn.textContent = "🏠 חזרה לתפריט";
+  btn.style.cssText = "background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:Fredoka One,cursive;font-size:1rem;cursor:pointer;width:100%";
+  btn.onclick = function(){
+    if(socket && myRoomId) socket.emit("leave_room");
+    myRoomId = null; curRoom = null;
+    var o = document.getElementById("playerLeftOverlay");
+    if(o) o.remove();
+    go("sHome");
+  };
+  box.appendChild(btn);
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
 });
 
