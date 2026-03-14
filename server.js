@@ -426,18 +426,20 @@ io.on("connection", function(socket) {
       delete rooms[r.id];
       pushLobby();
     } else {
+      var wasHost = (r.hostId === socket.id);
       r.players = r.players.filter(function(p){ return p.id !== socket.id; });
       if (r.players.length === 0) {
         clearInterval(r.timer);
         delete rooms[r.id];
       } else {
-        if (r.hostId === socket.id) r.hostId = r.players[0].id;
-        if (r.phase === "drawing" || r.phase === "judging" || r.phase === "results") {
+        if (wasHost) r.hostId = r.players[0].id;
+        // Only stop game if HOST leaves during active game
+        if (wasHost && (r.phase === "drawing" || r.phase === "judging" || r.phase === "results")) {
           clearInterval(r.timer);
           r.timer = null;
           r.phase = "abandoned";
         }
-        io.to(r.id).emit("player_left", { name: leftName });
+        io.to(r.id).emit("player_left", { name: leftName, wasHost: wasHost });
         broadcast(r);
       }
       pushLobby();
@@ -477,14 +479,15 @@ io.on("connection", function(socket) {
       clearInterval(r.timer);
       delete rooms[r.id];
     } else {
-      if (r.hostId === socket.id) r.hostId = r.players[0].id;
-      // אם המשחק היה פעיל — עצור ושלח הודעה לשאר
-      if (r.phase === "drawing" || r.phase === "judging" || r.phase === "results") {
+      var wasHost = (r.hostId === socket.id);
+      if (wasHost) r.hostId = r.players[0].id;
+      // Only stop game if HOST disconnects during active game
+      if (wasHost && (r.phase === "drawing" || r.phase === "judging" || r.phase === "results")) {
         clearInterval(r.timer);
         r.timer = null;
         r.phase = "abandoned";
       }
-      io.to(r.id).emit("player_left", { name: leftName });
+      io.to(r.id).emit("player_left", { name: leftName, wasHost: wasHost });
       broadcast(r);
     }
     pushLobby();
