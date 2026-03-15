@@ -332,6 +332,14 @@ async function judge(roomId) {
 }
 
 // ── Sockets ───────────────────────────────────────────────────────────
+// Online users tracking
+var onlineUsers = {};
+
+function pushOnline() {
+  var list = Object.values(onlineUsers);
+  io.emit("online_users", { count: list.length, users: list });
+}
+
 io.on("connection", function(socket) {
   socket.emit("lobby_list", getLobbyList());
 
@@ -356,6 +364,8 @@ io.on("connection", function(socket) {
     socket.data.roomId = id;
     socket.emit("joined", id);
     broadcast(rooms[id]);
+    delete onlineUsers[socket.id];
+    pushOnline();
     pushLobby();
   });
 
@@ -467,6 +477,14 @@ io.on("connection", function(socket) {
       broadcast(r);
     }
     else startRound(r.id);
+  });
+
+  socket.on("set_online", function(data) {
+    if(data && data.username) {
+      onlineUsers[socket.id] = { username: data.username, id: socket.id };
+      socket.data.username = data.username;
+      pushOnline();
+    }
   });
 
   socket.on("disconnect", function() {
