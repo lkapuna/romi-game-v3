@@ -364,8 +364,6 @@ io.on("connection", function(socket) {
     socket.data.roomId = id;
     socket.emit("joined", id);
     broadcast(rooms[id]);
-    delete onlineUsers[socket.id];
-    pushOnline();
     pushLobby();
   });
 
@@ -488,6 +486,9 @@ io.on("connection", function(socket) {
   });
 
   socket.on("disconnect", function() {
+    // Always clean up online users
+    delete onlineUsers[socket.id];
+    pushOnline();
     var r = rooms[socket.data&&socket.data.roomId];
     if (!r) return;
     var leftPlayer = r.players.find(function(p){ return p.id === socket.id; });
